@@ -1,14 +1,29 @@
 = HHSL
 Vincent Devillers <https://github.com/treydone[@treydone]>;
 // settings:
-:uri-changelog: {uri-rel-file-base}CHANGELOG.adoc
-:uri-contribute: {uri-rel-file-base}CONTRIBUTING.adoc
-:uri-license: {uri-rel-file-base}LICENSE
+:idprefix:
+:idseparator: -
+ifndef::env-github[:icons: font]
+ifdef::env-github[]
+:status:
+:outfilesuffix: .adoc
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
 // URIs:
 :uri-org: https://github.com/treydone
 :uri-repo: {uri-org}/hhsl
 :uri-issues: {uri-repo}/issues
 :uri-contributors: {uri-repo}/graphs/contributors
+:uri-rel-file-base: link:
+:uri-rel-tree-base: link:
+ifdef::env-site[]
+:uri-rel-file-base: {uri-repo}/blob/master/
+:uri-rel-tree-base: {uri-repo}/tree/master/
+endif::[]
 :uri-changelog: {uri-rel-file-base}CHANGELOG.adoc
 :uri-contribute: {uri-rel-file-base}CONTRIBUTING.adoc
 :uri-license: {uri-rel-file-base}LICENSE
