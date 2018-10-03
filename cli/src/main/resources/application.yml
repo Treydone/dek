@@ -1,0 +1,6 @@
+banner:
+  location: classpath:banner.txt
+logging:
+  level:
+    root: ERROR
+    fr.layer4.hhsl: DEBUG

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>fr.layer4</groupId>
+        <artifactId>hhsl</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>cli</artifactId>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>fr.layer4</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.shell</groupId>
+            <artifactId>spring-shell-starter</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>binaries</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                        <configuration>
+                            <repositoryLayout>flat</repositoryLayout>
+                            <repositoryName>lib</repositoryName>
+                            <configurationSourceDirectory>src/main/resources</configurationSourceDirectory>
+                            <copyConfigurationDirectory>true</copyConfigurationDirectory>
+                            <configurationDirectory>conf</configurationDirectory>
+                            <logsDirectory>logs</logsDirectory>
+                            <licenseHeaderFile>${basedir}/license-header.txt</licenseHeaderFile>
+                            <programs>
+                                <program>
+                                    <id>hhsl</id>
+                                    <mainClass>fr.layer4.hhsl.Main</mainClass>
+                                    <jvmSettings>
+                                        <initialMemorySize>1024m</initialMemorySize>
+                                        <maxMemorySize>1024m</maxMemorySize>
+                                        <maxStackSize>128m</maxStackSize>
+                                        <extraArguments>
+                                            <!--<extraArgument>-Dlogging.file=%APP_BASE%/logs/hhsl.log</extraArgument>-->
+                                            <!--<extraArgument>-Dlogging.mode=file</extraArgument>-->
+                                            <extraArgument>-server</extraArgument>
+                                            <extraArgument>-XX:+UseConcMarkSweepGC</extraArgument>
+                                            <extraArgument>-XX:+CMSParallelRemarkEnabled</extraArgument>
+                                            <extraArgument>-XX:+UseCMSInitiatingOccupancyOnly</extraArgument>
+                                            <extraArgument>-XX:+ScavengeBeforeFullGC</extraArgument>
+                                            <extraArgument>-XX:+CMSScavengeBeforeRemark</extraArgument>
+                                            <!--<extraArgument>-XX:+PrintGCDateStamps</extraArgument>-->
+                                            <!--<extraArgument>-verbose:gc</extraArgument>-->
+                                            <!--<extraArgument>-XX:+PrintGCDetails</extraArgument>-->
+                                            <!--<extraArgument>-Xloggc:%APP_BASE%/logs/hhsl.gc.%p.log</extraArgument>-->
+                                            <!--<extraArgument>-XX:+UseGCLogFileRotation</extraArgument>-->
+                                            <!--<extraArgument>-XX:NumberOfGCLogFiles=10</extraArgument>-->
+                                            <!--<extraArgument>-XX:GCLogFileSize=100M</extraArgument>-->
+                                            <!--<extraArgument>-XX:+HeapDumpOnOutOfMemoryError</extraArgument>-->
+                                            <!--<extraArgument>-XX:HeapDumpPath=%APP_BASE%/logs/hhsl-heapdump`date`.hprof</extraArgument>-->
+                                            <extraArgument>-Djava.net.preferIPv4Stack=true</extraArgument>
+                                        </extraArguments>
+                                    </jvmSettings>
+                                </program>
+                            </programs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>make-final</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/zip.xml</descriptor>
+                            </descriptors>
+                            <attach>false</attach>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,49 @@
+= HHSL
+
+== Requirements
+
+Asciidoctor works on Linux, macOS and Windows and requires one of the following implementations of {uri-ruby}[Ruby]:
+
+* Ruby (MRI/CRuby 1.8.7 - 2.5)
+* JRuby (1.7 in Ruby 1.8 and 1.9 modes, 9000)
+* Rubinius 2.2.x
+* Opal (JavaScript)
+
+== Installation
+
+
+== Getting Help
+
+Asciidoctor is developed to help you easily write and publish your content.
+But we can't do it without your feedback!
+We encourage you to ask questions and discuss any aspects of the project on the discussion list, on Twitter or in the chat room.
+
+Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
+Discussion list (Nabble):: {uri-discuss}
+Twitter:: https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag or https://twitter.com/asciidoctor[@asciidoctor] mention
+
+ifdef::env-github[]
+Further information and documentation about Asciidoctor can be found on the project's website.
+
+{uri-project}[Home] | {uri-news}[News] | {uri-docs}[Docs]
+endif::[]
+
+The Asciidoctor organization on GitHub hosts the project's source code, issue tracker, and sub-projects.
+
+Source repository (git):: {uri-repo}
+Issue tracker:: {uri-issues}
+Asciidoctor organization on GitHub:: {uri-org}
+
+== License
+
+Copyright (C) 2012-2018 Dan Allen, Sarah White and the individual contributors to Asciidoctor.
+Use of this software is granted under the terms of the MIT License.
+
+See the {uri-license}[LICENSE] for the full license text.
+
+== Authors
+
+*Asciidoctor* is led by https://github.com/mojavelinux[Dan Allen] and https://github.com/graphitefriction[Sarah White] and has received contributions from {uri-contributors}[many individuals] in Asciidoctor's awesome community.
+The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and based on {uri-prototype}[a prototype] written by https://github.com/nickh[Nick Hengeveld].
+
+*AsciiDoc* was started by Stuart Rackham and has received contributions from many individuals in the AsciiDoc community.
