@@ -1,19 +1,17 @@
-package fr.layer4.hhsl;
+package fr.layer4.hhsl.registry;
 
 import lombok.Data;
 
 import java.net.URI;
 import java.util.Map;
 
+/**
+ * Represents a connection to registry. Connection are managed by the RegistryConnectionManager.
+ */
 @Data
-public class Cluster {
+public class RegistryConnection {
     private Long id;
-    private String registry;
     private String name;
-    private String type;
-    private String user;
-    private String password;
-    private byte[] banner;
     private URI uri;
     private Map<String, String> metadata;
 }

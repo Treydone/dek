@@ -6,28 +6,18 @@
 
     <parent>
         <groupId>fr.layer4.hhsl</groupId>
-        <artifactId>hhsl</artifactId>
+        <artifactId>plugins</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>core</artifactId>
+    <artifactId>local-registry</artifactId>
 
     <dependencies>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jline</groupId>
-            <artifactId>jline</artifactId>
-        </dependency>
-
-        <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
+            <groupId>fr.layer4.hhsl</groupId>
+            <artifactId>local-store</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>

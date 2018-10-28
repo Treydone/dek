@@ -1,6 +1,7 @@
 package fr.layer4.hhsl.commands;
 
-import fr.layer4.hhsl.local.LocalStore;
+import fr.layer4.hhsl.store.LockableStore;
+import fr.layer4.hhsl.store.Store;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
@@ -11,18 +12,24 @@ import org.springframework.shell.standard.ShellMethodAvailability;
 public class UnlockCommands {
 
     @Autowired
-    private LocalStore localStore;
+    private Store store;
 
     @ShellMethodAvailability(value = "*")
-    public Availability availabilityAfterUnlock() {
-        return localStore.isReady() && !localStore.isUnlocked()
-                ? Availability.available()
-                : Availability.unavailable("Secret store is not unlock");
+    public Availability availability() {
+        if (store instanceof LockableStore) {
+            LockableStore lockableStore = (LockableStore) store;
+            if (!lockableStore.isUnlocked()) {
+                return Availability.available();
+            }
+        }
+        return Availability.unavailable("Store is not lock");
     }
 
     @ShellMethod(value = "Unlock", group = "Main")
-    public String unlock() {
-        localStore.unlock();
-        return "OK";
+    public void unlock() {
+        if (store instanceof LockableStore) {
+            LockableStore lockableStore = (LockableStore) store;
+            lockableStore.unlock();
+        }
     }
 }

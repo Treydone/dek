@@ -28,6 +28,14 @@ endif::[]
 :uri-contribute: {uri-rel-file-base}CONTRIBUTING.adoc
 :uri-license: {uri-rel-file-base}LICENSE
 
+HHSL allows you to easily connect to multiple Hadoop clusters by downloading the rights clients,
+settings all the environment variables and preparing the *-defaults.xml/*-site.xml files.
+
+HHSL has been developed by Hadoop sysadmin and developers, dealing with multiple, or even one, clusters,
+who don't want to do the boring stuff of configuring all the clients like HDFS, HBase and others on every clusters.
+This tool aims to easily switch from one cluster to an other, and is a defacto adapted tool for team managing multiple clusters.
+
+
 == Requirements
 
 HHSL works on Linux, macOS and Windows and requires:
@@ -36,8 +44,84 @@ HHSL works on Linux, macOS and Windows and requires:
 
 == Installation
 
+Download the tarball, and just unzip it.
 
 == Getting Help
+
+// TODO:
+
+== How to
+
+On a fresh install, you first need to init the local database holding all the configuration:
+
+```
+hhsl
+hhsl:> init
+```
+
+or directly from the command line:
+
+```
+hhsl init
+```
+
+By initiating the database, a local registry is defined. You can then add a cluster.
+For instance, we add a cluster managed by Ambari, available at http://ambari:8080 and named PROD-HDP3.0:
+
+```
+hhsl add cluster ambari PROD-HDP3.0 http://ambari:8080
+> user:
+> password:
+```
+
+Verify that the cluster has been added:
+
+```
+hhsl list cluster
+```
+
+Now use it:
+
+```
+hhsl use PROD-HDP3.0
+```
+
+The command 'use' download the missing clients, prepare the environment variables and
+render the configuration files.
+
+Check environment variables:
+```
+env
+....
+HADOOP_HOME=/xxxxx
+SPARK_HOME=/xxxx
+HBASE_HOME=/xxxxx
+```
+
+Also have a look on configuration files:
+```
+
+```
+
+== Man
+
+**env**
+
+**set env**
+
+**get env**
+
+== FAQ
+
+=== How is security managed?
+
+Kerberos authentication is not yet managed by HHSL. This feature will be added soon.
+
+== Roadmap
+
+* Add security (Kerberos) switch
+* Manage other clients (Cassandra, MongoDB...)
+* Add MapR
 
 
 == License
@@ -48,3 +132,5 @@ Use of this software is granted under the terms of the MIT License.
 See the {uri-license}[LICENSE] for the full license text.
 
 == Authors
+
+* Vincent Devillers

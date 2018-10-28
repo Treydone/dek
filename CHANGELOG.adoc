@@ -1,4 +1,4 @@
-= Asciidoctor Changelog
+= Changelog
 :uri-repo: https://github.com/treydone/hhsl
 :icons: font
 :star: icon:star[role=red]
@@ -20,4 +20,5 @@ Build / Infrastructure::
 
 
 // tag::compact[]
+
 == 1.0.0 (2018-XX-XX) - @treydone

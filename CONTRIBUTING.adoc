@@ -19,7 +19,7 @@ You also assert that you are the original author of the work that you are contri
 
 We use the {uri-issues}[issue tracker on GitHub] associated with this project to track bugs and features.
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted.
-When submitting a bug report, please include a {uri-gist}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
+When submitting a bug report, please include a {uri-gist}[Gist] that includes any details that may help reproduce the bug, including your Java version and operating system.
 
 == Submitting a Pull Request
 
