@@ -23,12 +23,25 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl.config;
 
-import org.springframework.context.ApplicationEvent;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
+@Configuration
+public class HttpClientConfiguration {
+
+    @Bean
+    public CloseableHttpClient httpClient() {
+        return HttpClientBuilder.create().build();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate(new HttpComponentsClientHttpRequestFactory(httpClient()));
     }
 }

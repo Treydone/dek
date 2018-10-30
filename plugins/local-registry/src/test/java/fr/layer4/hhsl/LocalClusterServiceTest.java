@@ -1,3 +1,5 @@
+package fr.layer4.hhsl;
+
 /*-
  * #%L
  * HHSL
@@ -23,12 +25,73 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
 
-import org.springframework.context.ApplicationEvent;
+import org.junit.Test;
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
+public class LocalClusterServiceTest {
+
+    private LocalClusterService localClusterService;
+
+    @Test
+    public void getCluster_ok() {
+
+        // Given
+
+        // When
+        Cluster cluster = localClusterService.getCluster("test");
+
+        // Then
+        cluster.getId();
+
+    }
+
+    @Test
+    public void getCluster_unknown() {
+
+        // Given
+
+        // When
+        Cluster cluster = localClusterService.getCluster("test");
+
+        // Then
+        cluster.getId();
+
+    }
+
+    @Test
+    public void addCluster_ok() {
+
+        // Given
+
+        // When
+        Cluster cluster = localClusterService.addCluster("type", "name", "uri", "banner");
+
+        // Then
+        cluster.getId();
+
+    }
+
+    @Test
+    public void deleteCluster_ok() {
+
+        // Given
+
+        // When
+        localClusterService.deleteCluster("name");
+
+        // Then
+
+    }
+
+    @Test
+    public void deleteCluster_unknown() {
+
+        // Given
+
+        // When
+        localClusterService.deleteCluster("name");
+
+        // Then
+
     }
 }

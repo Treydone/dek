@@ -23,12 +23,16 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl.binaries;
 
-import org.springframework.context.ApplicationEvent;
+public interface BinariesStore {
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
-    }
+    /**
+     * Download and unpack the binaries for a client.
+     *
+     * @param basePath
+     * @param client
+     * @param version
+     */
+    void prepare(String basePath, String client, String version);
 }

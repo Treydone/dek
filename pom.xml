@@ -9,6 +9,39 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:Treydone/hhsl.git</connection>
+        <developerConnection>scm:git:git@github.com:Treydone/hhsl.git</developerConnection>
+        <url>http://github.com/Treydone/hhsl</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>github</system>
+        <url>http://github.com/Treydone/hhsl/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <id>treydone</id>
+            <name>Vincent Devillers</name>
+            <url>https://layer4.fr/</url>
+            <organization>Layer4</organization>
+            <organizationUrl>https://layer4.fr</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
     <modules>
         <module>core</module>
         <module>plugins</module>
@@ -16,8 +49,30 @@
     </modules>
 
     <properties>
+
+        <!-- General Properties -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <apache-commons-compress.version>1.9</apache-commons-compress.version>
+        <apache-commons-lang3.version>3.1</apache-commons-lang3.version>
+        <assertj.version>3.11.1</assertj.version>
+        <hoverfly.version>0.8.1</hoverfly.version>
+        <httpcomponents.version>4.5.3</httpcomponents.version>
+        <java.version>1.8</java.version>
+        <jackson.version>2.9.0</jackson.version>
         <jline.version>3.8.2</jline.version>
+        <junit.version>4.11</junit.version>
+        <logback.version>1.2.3</logback.version>
+        <lombok.version>1.18.2</lombok.version>
+        <mockito.version>2.9.0</mockito.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <spring-boot.version>1.5.8.RELEASE</spring-boot.version>
+        <spring-shell.version>2.0.1.RELEASE</spring-shell.version>
+
+        <spring.version>4.3.12.RELEASE</spring.version>
     </properties>
+
     <dependencyManagement>
         <dependencies>
 
@@ -31,21 +86,32 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>1.5.8.RELEASE</version>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>org.springframework.shell</groupId>
                 <artifactId>spring-shell-starter</artifactId>
-                <version>2.0.1.RELEASE</version>
+                <version>${spring-shell.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.9.0</version>
+                <version>${jackson.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -53,13 +119,76 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.2</version>
+                <version>${lombok.version}</version>
             </dependency>
 
+            <!-- Apache Commons -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.1</version>
+                <version>${apache-commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${apache-commons-compress.version}</version>
+            </dependency>
+
+            <!-- Slf4J -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <!-- Logback -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-access</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <!-- HttpComponents -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpcomponents.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- JLine -->
@@ -98,19 +227,25 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.11</version>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>2.9.0</version>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.11.1</version>
+                <version>${assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.specto</groupId>
+                <artifactId>hoverfly-java</artifactId>
+                <version>${hoverfly.version}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -118,14 +253,146 @@
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.1.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.${apache-commons-lang3.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>1.16</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <searchTransitive>true</searchTransitive>
+                                    <excludes>
+                                        <exclude>javax.servlet:servlet-api</exclude>
+                                        <exclude>javassist:javassist</exclude>
+                                        <exclude>commons-logging</exclude>
+                                        <exclude>aspectj:aspectj*</exclude>
+                                        <exclude>log4j:log4j</exclude>
+                                        <exclude>org.slf4j:1.5*</exclude>
+                                        <exclude>org.springframework:2.*</exclude>
+                                        <exclude>org.springframework:3.0.*</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>1.16</version>
+                <executions>
+                    <execution>
+                        <id>add-third-party</id>
+                        <goals>
+                            <goal>add-third-party</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <generateBundle>false</generateBundle>
+                            <includeTransitiveDependencies>false</includeTransitiveDependencies>
+                            <licenseMerges>
+                                <licenseMerge>
+                                    <![CDATA[GNU Affero General Public License (AGPL), Version 3.0|AGPL 3.0 license|The GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0]]></licenseMerge>
+                                <licenseMerge>
+                                    <![CDATA[Apache Software License, Version 2.0|Apache License, Version 2.0|Apache License version 2.0|The Apache Software License, Version 2.0]]></licenseMerge>
+                                <licenseMerge><![CDATA[BSD-Style License|BSD License]]></licenseMerge>
+                                <licenseMerge>
+                                    <![CDATA[Common Public License, Version 1.0|Common Public License Version 1.0]]></licenseMerge>
+                                <licenseMerge>
+                                    <![CDATA[Common Development And Distribution License (CDDL), Version 1.0|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0|CDDL license|CDDL 1.0 license]]></licenseMerge>
+                                <licenseMerge>
+                                    <![CDATA[Eclipse Public License, Version 1.0|EPL 1.0 license]]></licenseMerge>
+                                <licenseMerge>
+                                    <![CDATA[GNU General Lesser Public License (LGPL), Version 2.1|GNU General Lesser Public License (LGPL) version 2.1|LGPL 2.1|LGPL license|LGPL 2.1 license]]></licenseMerge>
+                                <licenseMerge>
+                                    <![CDATA[GNU General Lesser Public License (LGPL), Version 3.0|LGPL 3.0 license|The GNU Lesser General Public License, Version 3.0]]></licenseMerge>
+                            </licenseMerges>
+                            <useMissingFile>true</useMissingFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>update-file-header</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <licenseName>mit</licenseName>
+                            <organizationName>Layer4</organizationName>
+                            <inceptionYear>2018</inceptionYear>
+                            <projectName>HHSL</projectName>
+                            <addJavaLicenseAfterPackage>true</addJavaLicenseAfterPackage>
+                            <canUpdateCopyright>true</canUpdateCopyright>
+                            <canUpdateDescription>true</canUpdateDescription>
+                            <canUpdateLicense>true</canUpdateLicense>
+                            <roots>
+                                <root>src/main</root>
+                                <root>src/test</root>
+                            </roots>
+                            <excludes>
+                                <exclude>**/*.json</exclude>
+                                <exclude>**/*.adoc</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

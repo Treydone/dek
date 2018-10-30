@@ -23,12 +23,22 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl.binaries;
 
-import org.springframework.context.ApplicationEvent;
+import fr.layer4.hhsl.DefaultServices;
+import org.springframework.stereotype.Component;
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
+@Component
+public class HbaseClientPreparer extends AbstractClientPreparer {
+
+    @Override
+    public boolean isCompatible(String service, String version) {
+        return DefaultServices.HBASE.equalsIgnoreCase(service); // Don't care about the versions
+    }
+
+    @Override
+    public void prepare(String basePath, String service, String version) {
+
+        //TODO
     }
 }

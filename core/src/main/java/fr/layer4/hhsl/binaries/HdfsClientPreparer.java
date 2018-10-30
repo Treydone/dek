@@ -23,12 +23,37 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl.binaries;
 
-import org.springframework.context.ApplicationEvent;
+import fr.layer4.hhsl.DefaultServices;
+import org.springframework.stereotype.Component;
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
+import java.io.IOException;
+
+@Component
+public class HdfsClientPreparer extends AbstractClientPreparer {
+
+    @Override
+    public boolean isCompatible(String service, String version) {
+        return DefaultServices.HDFS.equalsIgnoreCase(service); // Don't care about the versions
+    }
+
+    @Override
+    public void prepare(String basePath, String service, String version) {
+
+        String url = "http://mirrors.ircam.fr/pub/apache/hadoop/common/hadoop-2.8.5/hadoop-2.8.5.tar.gz"; // TODO Take one the mirrors available
+
+        // Check if archive if already present
+        // TODO
+
+        // Download
+        try {
+            download(basePath, url);
+        } catch (IOException e) {
+            throw new RuntimeException("Can not download the client");
+        }
+
+        // Unpack
+        // TODO
     }
 }

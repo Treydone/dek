@@ -88,6 +88,16 @@
       "description": "Endpoint for view specific operations"
     }
   ],
+  "securityDefinitions": {
+    "basicAuth": {
+      "type": "basic"
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
   "paths": {
     "/actions": {
       "get": {
@@ -98,6 +108,7 @@
         "description": "",
         "operationId": "ActionService#getActionDefinitions",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -169,6 +180,7 @@
         "description": "",
         "operationId": "ActionService#getActionDefinition",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -213,6 +225,7 @@
         "description": "",
         "operationId": "ActionService#createActionDefinition",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -254,6 +267,7 @@
         "description": "",
         "operationId": "ActionService#updateActionDefinition",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -295,6 +309,7 @@
         "description": "",
         "operationId": "ActionService#deleteActionDefinition",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -330,6 +345,7 @@
         "description": "",
         "operationId": "getTargets",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -409,6 +425,7 @@
         "description": "",
         "operationId": "createTarget",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -458,6 +475,7 @@
         "description": "",
         "operationId": "getTarget",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -542,6 +560,7 @@
         "description": "",
         "operationId": "updateTarget",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -590,6 +609,7 @@
         "description": "",
         "operationId": "deleteTarget",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -626,6 +646,7 @@
         "description": "",
         "operationId": "BlueprintService#getBlueprints",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -695,6 +716,7 @@
         "description": "",
         "operationId": "BlueprintService#deleteBlueprints",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "responses": {
@@ -725,6 +747,7 @@
         "description": "",
         "operationId": "BlueprintService#getBlueprint",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -772,6 +795,7 @@
         "description": "",
         "operationId": "BlueprintService#createBlueprint",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -825,6 +849,7 @@
         "description": "",
         "operationId": "BlueprintService#deleteBlueprint",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -863,6 +888,7 @@
         "description": "",
         "operationId": "getClusters",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -910,10 +936,7 @@
           "200": {
             "description": "Successful operation",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ClusterResponseWrapper"
-              }
+              "$ref": "#/definitions/ClusterResponseWrapperContext"
             }
           },
           "401": {
@@ -940,6 +963,7 @@
         "description": "",
         "operationId": "getCluster",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -987,6 +1011,7 @@
         "description": "",
         "operationId": "createCluster",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1037,6 +1062,7 @@
         "description": "",
         "operationId": "updateCluster",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1087,6 +1113,7 @@
         "description": "",
         "operationId": "deleteCluster",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1125,6 +1152,7 @@
         "description": "",
         "operationId": "getClusterArtifacts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1206,6 +1234,7 @@
         "description": "",
         "operationId": "updateClusterArtifacts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1256,6 +1285,7 @@
         "description": "",
         "operationId": "deleteClusterArtifacts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1294,6 +1324,7 @@
         "description": "",
         "operationId": "getClusterArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1370,6 +1401,7 @@
         "description": "",
         "operationId": "createClusterArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1429,6 +1461,7 @@
         "description": "",
         "operationId": "updateClusterArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1485,6 +1518,7 @@
         "description": "",
         "operationId": "deleteClusterArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1529,6 +1563,7 @@
         "description": "",
         "operationId": "getConfigGroups",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1614,6 +1649,7 @@
         "description": "",
         "operationId": "createConfigGroup",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1657,6 +1693,7 @@
         "description": "",
         "operationId": "getConfigGroup",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1713,6 +1750,7 @@
         "description": "",
         "operationId": "updateConfigGroup",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1766,6 +1804,7 @@
         "description": "",
         "operationId": "deleteConfigGroup",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1807,6 +1846,7 @@
         "description": "",
         "operationId": "getConfigurations",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1891,6 +1931,7 @@
         "description": "",
         "operationId": "createConfigurations",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -1943,6 +1984,7 @@
         "description": "",
         "operationId": "getServiceConfigVersions",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2029,6 +2071,7 @@
         "description": "",
         "operationId": "getHostComponents",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2087,6 +2130,7 @@
         "description": "",
         "operationId": "deleteHostComponents",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2125,6 +2169,7 @@
         "description": "",
         "operationId": "getHostComponent",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2186,6 +2231,7 @@
         "description": "",
         "operationId": "createHostComponent",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2242,6 +2288,7 @@
         "description": "",
         "operationId": "updateHostComponent",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2298,6 +2345,7 @@
         "description": "",
         "operationId": "deleteHostComponent",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2342,6 +2390,7 @@
         "description": "",
         "operationId": "getProcesses",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2399,6 +2448,7 @@
         "description": "",
         "operationId": "getRequestSchedules",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2452,6 +2502,7 @@
         "description": "",
         "operationId": "createRequestSchedule",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2504,6 +2555,7 @@
         "description": "",
         "operationId": "getRequestSchedule",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2560,6 +2612,7 @@
         "description": "Changes status from COMPLETED to DISABLED",
         "operationId": "deleteRequestSchedule",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2604,6 +2657,7 @@
         "description": "Returns all services.",
         "operationId": "ServiceService#getServices",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2657,10 +2711,7 @@
           "200": {
             "description": "Successful operation",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ServiceResponseSwagger"
-              }
+              "$ref": "#/definitions/ServiceResponseWrapperContext"
             }
           },
           "500": {
@@ -2678,6 +2729,7 @@
         "description": "Returns the details of a service.",
         "operationId": "ServiceService#getService",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2708,7 +2760,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/ServiceResponseSwagger"
+                "$ref": "#/definitions/ServiceResponseWrapper"
               }
             }
           },
@@ -2728,6 +2780,7 @@
         "description": "",
         "operationId": "ServiceService#createServices",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2787,6 +2840,7 @@
         "description": "",
         "operationId": "ServiceService#updateService",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2843,6 +2897,7 @@
         "description": "",
         "operationId": "ServiceService#deleteService",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2887,6 +2942,7 @@
         "description": "",
         "operationId": "ServiceService#getArtifacts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -2968,6 +3024,7 @@
         "description": "",
         "operationId": "ServiceService#updateArtifacts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3024,6 +3081,7 @@
         "description": "",
         "operationId": "ServiceService#deleteArtifacts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3068,6 +3126,7 @@
         "description": "",
         "operationId": "ServiceService#getArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3155,6 +3214,7 @@
         "description": "",
         "operationId": "ServiceService#createArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3220,6 +3280,7 @@
         "description": "",
         "operationId": "ServiceService#updateArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3282,6 +3343,7 @@
         "description": "",
         "operationId": "ServiceService#deleteArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3332,6 +3394,7 @@
         "description": "Returns details of all groups.",
         "operationId": "GroupService#getGroups",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3395,6 +3458,7 @@
         "description": "Creates group resource.",
         "operationId": "GroupService#createGroup",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3427,6 +3491,7 @@
         "description": "Returns group details.",
         "operationId": "GroupService#getGroup",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3463,6 +3528,7 @@
         "description": "Delete group resource.",
         "operationId": "GroupService#deleteGroup",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3493,6 +3559,7 @@
         "description": "Returns details of all members.",
         "operationId": "MemberService#getMembers",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3563,6 +3630,7 @@
         "description": "Updates group member resources.",
         "operationId": "MemberService#updateMembers",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3602,6 +3670,7 @@
         "description": "Returns member details.",
         "operationId": "MemberService#getMember",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3645,6 +3714,7 @@
         "description": "Delete member resource.",
         "operationId": "MemberService#deleteMember",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3682,6 +3752,7 @@
         "description": "Returns all privileges for group.",
         "operationId": "GroupPrivilegeService#getPrivileges",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3754,6 +3825,7 @@
         "description": "Returns group privilege details.",
         "operationId": "GroupPrivilegeService#getPrivilege",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3799,6 +3871,7 @@
         "description": "",
         "operationId": "getHosts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3876,6 +3949,7 @@
         "description": "",
         "operationId": "createHosts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3923,6 +3997,7 @@
         "description": "",
         "operationId": "updateHosts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -3967,6 +4042,7 @@
         "description": "",
         "operationId": "deleteHosts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4007,6 +4083,7 @@
         "description": "",
         "operationId": "getHost",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4054,6 +4131,7 @@
         "description": "",
         "operationId": "createHost",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4108,6 +4186,7 @@
         "description": "",
         "operationId": "updateHost",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4159,6 +4238,7 @@
         "description": "",
         "operationId": "deleteHost",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4198,6 +4278,7 @@
         "description": "",
         "operationId": "RequestService#getRequests",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4267,6 +4348,7 @@
         "description": "",
         "operationId": "RequestService#createRequests",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4319,6 +4401,7 @@
         "description": "",
         "operationId": "RequestService#getRequest",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4363,6 +4446,7 @@
         "description": "Changes the state of an existing request. Usually used to cancel running requests.",
         "operationId": "RequestService#updateRequests",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4415,6 +4499,7 @@
         "description": "",
         "operationId": "getRootServices",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4458,6 +4543,7 @@
         "description": "",
         "operationId": "getRootService",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4508,6 +4594,7 @@
         "description": "",
         "operationId": "getRootServiceComponents",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4567,6 +4654,7 @@
         "description": "",
         "operationId": "getRootServiceComponent",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4624,6 +4712,7 @@
         "description": "",
         "operationId": "RootServiceComponentConfigurationService#getConfiguration",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4677,6 +4766,7 @@
         "description": "",
         "operationId": "RootServiceComponentConfigurationService#updateConfiguration",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4747,6 +4837,7 @@
         "description": "",
         "operationId": "RootServiceComponentConfigurationService#deleteConfiguration",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4797,6 +4888,7 @@
         "description": "",
         "operationId": "getRootServiceComponentHosts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4857,6 +4949,7 @@
         "description": "",
         "operationId": "getRootHosts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4903,6 +4996,7 @@
         "description": "",
         "operationId": "getRootHost",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -4953,6 +5047,7 @@
         "description": "",
         "operationId": "getRootServiceHostComponents",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5013,6 +5108,7 @@
         "description": "",
         "operationId": "getRootServiceHostComponent",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5077,6 +5173,7 @@
         "description": "",
         "operationId": "getSettings",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5150,6 +5247,7 @@
         "description": "",
         "operationId": "createSetting",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5199,6 +5297,7 @@
         "description": "",
         "operationId": "getSetting",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5279,6 +5378,7 @@
         "description": "",
         "operationId": "updateSetting",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5324,6 +5424,7 @@
         "description": "",
         "operationId": "deleteSetting",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5363,6 +5464,7 @@
         "description": "Returns all stacks.",
         "operationId": "StacksService#getStacks",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5431,6 +5533,7 @@
         "description": "Returns stack details.",
         "operationId": "StacksService#getStack",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5477,6 +5580,7 @@
         "description": "Returns all versions for a stack.",
         "operationId": "StacksService#getStackVersions",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5554,6 +5658,7 @@
         "description": "Returns the details for a stack version.",
         "operationId": "StacksService#getStackVersion",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5603,6 +5708,7 @@
         "description": "Returns all stack artifacts (e.g: kerberos descriptor, metrics descriptor)",
         "operationId": "StacksService#getStackArtifacts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5655,6 +5761,7 @@
         "description": "Returns the details of a stack artifact",
         "operationId": "StacksService#getStackArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5710,6 +5817,7 @@
         "description": "Returns all configurations for a stack version.",
         "operationId": "StacksService#getStackLevelConfigurations",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5793,6 +5901,7 @@
         "description": "Returns the configuration details for a given property.",
         "operationId": "StacksService#getStackLevelConfiguration",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5854,6 +5963,7 @@
         "description": "Returns the extension links for a stack version.",
         "operationId": "StacksService#getStackVersionLinks",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -5937,6 +6047,7 @@
         "description": "Returns all services for a stack version.",
         "operationId": "StacksService#getStackServices",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6020,6 +6131,7 @@
         "description": "Returns the details of a stack service.",
         "operationId": "StacksService#getStackService",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6075,6 +6187,7 @@
         "description": "Returns all stack service artifacts",
         "operationId": "StacksService#getStackServiceArtifacts",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6164,6 +6277,7 @@
         "description": "Returns the details of a stack service artifact.",
         "operationId": "StacksService#getStackServiceArtifact",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6225,6 +6339,7 @@
         "description": "Returns all components for a stack service.",
         "operationId": "StacksService#getServiceComponents",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6314,6 +6429,7 @@
         "description": "Returns details for a stack service component.",
         "operationId": "StacksService#getServiceComponent",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6375,6 +6491,7 @@
         "description": "Returns all dependencies for a stack service component.",
         "operationId": "StacksService#getServiceComponentDependencies",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6470,6 +6587,7 @@
         "description": "Returns a stack service component dependency.",
         "operationId": "StacksService#getServiceComponentDependency",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6537,6 +6655,7 @@
         "description": "Returns all configurations for a stack service.",
         "operationId": "StacksService#getStackConfigurations",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6626,6 +6745,7 @@
         "description": "Returns the details of a stack service configuration.",
         "operationId": "StacksService#getStackConfiguration",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6687,6 +6807,7 @@
         "description": "Returns all dependencies for a stack service configuration.",
         "operationId": "StacksService#getStackConfigurationDependencies",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6782,6 +6903,7 @@
         "description": "Returns all quicklinks configurations for a stack service.",
         "operationId": "StacksService#getStackServiceQuickLinksConfigurations",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6871,6 +6993,7 @@
         "description": "Returns the details of a quicklinks configuration.",
         "operationId": "StacksService#getStackServiceQuickLinksConfiguration",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -6935,6 +7058,7 @@
         "description": "Returns all stack themes",
         "operationId": "StacksService#getStackServiceThemes",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7024,6 +7148,7 @@
         "description": "Returns stack service theme details.",
         "operationId": "StacksService#getStackServiceTheme",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7085,6 +7210,7 @@
         "description": "",
         "operationId": "getUsers",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7162,6 +7288,7 @@
         "description": "",
         "operationId": "createUsers",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7211,6 +7338,7 @@
         "description": "",
         "operationId": "getUser",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7259,6 +7387,7 @@
         "description": "",
         "operationId": "createUser",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7313,6 +7442,7 @@
         "description": "",
         "operationId": "updateUser",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7364,6 +7494,7 @@
         "description": "",
         "operationId": "deleteUser",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7394,6 +7525,7 @@
         "description": "Returns all active widget layouts for user.",
         "operationId": "ActiveWidgetLayoutService#getServices",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7464,6 +7596,7 @@
         "description": "Updates user widget layout.",
         "operationId": "ActiveWidgetLayoutService#updateServices",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7503,6 +7636,7 @@
         "description": "Returns all authorization for user.",
         "operationId": "UserAuthorizationService#getAuthorizations",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7575,6 +7709,7 @@
         "description": "Returns user authorization details.",
         "operationId": "UserAuthorizationService#getAuthorization",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7620,6 +7755,7 @@
         "description": "Returns all privileges for user.",
         "operationId": "UserPrivilegeService#getPrivileges",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7693,6 +7829,7 @@
         "description": "Returns user privilege details.",
         "operationId": "UserPrivilegeService#getPrivilege",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7738,6 +7875,7 @@
         "description": "",
         "operationId": "getAuthenticationSources",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7822,6 +7960,7 @@
         "description": "",
         "operationId": "createAuthenticationSources",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7878,6 +8017,7 @@
         "description": "",
         "operationId": "getAuthenticationSource",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7933,6 +8073,7 @@
         "description": "",
         "operationId": "updateAuthenticationSource",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -7991,6 +8132,7 @@
         "description": "",
         "operationId": "deleteAuthenticationSource",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8037,6 +8179,7 @@
         "description": "",
         "operationId": "getViewUrls",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8118,6 +8261,7 @@
         "description": "",
         "operationId": "getViewUrl",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8168,6 +8312,7 @@
         "description": "",
         "operationId": "createUrl",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8209,6 +8354,7 @@
         "description": "",
         "operationId": "updateUrl",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8259,6 +8405,7 @@
         "description": "",
         "operationId": "deleteUrl",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8297,6 +8444,7 @@
         "description": "Returns details of all views.",
         "operationId": "getViews",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8379,6 +8527,7 @@
         "description": "",
         "operationId": "getView",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8432,6 +8581,7 @@
         "description": "",
         "operationId": "getVersions",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8520,6 +8670,7 @@
         "description": "",
         "operationId": "getVersion",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8579,6 +8730,7 @@
         "description": "",
         "operationId": "getServices",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8670,6 +8822,7 @@
         "description": "",
         "operationId": "createServices",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8726,6 +8879,7 @@
         "description": "",
         "operationId": "updateServices",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8784,6 +8938,7 @@
         "description": "",
         "operationId": "getService",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8848,6 +9003,7 @@
         "description": "",
         "operationId": "createService",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8912,6 +9068,7 @@
         "description": "",
         "operationId": "updateService",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -8976,6 +9133,7 @@
         "description": "",
         "operationId": "deleteService",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -9095,6 +9253,7 @@
         "description": "",
         "operationId": "getPrivileges",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -9195,6 +9354,7 @@
         "description": "",
         "operationId": "createPrivilege",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -9251,6 +9411,7 @@
         "description": "",
         "operationId": "updatePrivileges",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -9316,6 +9477,7 @@
         "description": "",
         "operationId": "deletePrivileges",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -9369,6 +9531,7 @@
         "description": "",
         "operationId": "getPrivilege",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -9441,6 +9604,7 @@
         "description": "",
         "operationId": "deletePrivilege",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -9501,6 +9665,7 @@
         "description": "",
         "operationId": "getPermissions",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -9596,6 +9761,7 @@
         "description": "",
         "operationId": "getPermission",
         "produces": [
+          "application/json",
           "text/plain"
         ],
         "parameters": [
@@ -10284,9 +10450,26 @@
         }
       }
     },
+    "ClusterResponseWrapperContext": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClusterResponseWrapper"
+          }
+        }
+      }
+    },
     "ClusterResponseWrapper": {
       "type": "object",
       "properties": {
+        "href": {
+          "type": "string"
+        },
         "Clusters": {
           "$ref": "#/definitions/ClusterResponse"
         }
@@ -12784,9 +12967,26 @@
         }
       }
     },
-    "ServiceResponseSwagger": {
+    "ServiceResponseWrapperContext": {
       "type": "object",
       "properties": {
+        "href": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ServiceResponseWrapper"
+          }
+        }
+      }
+    },
+    "ServiceResponseWrapper": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
         "ServiceInfo": {
           "$ref": "#/definitions/ServiceResponse"
         }
@@ -13193,6 +13393,9 @@
     "StackServiceResponseSwagger": {
       "type": "object",
       "properties": {
+        "href": {
+          "type": "string"
+        },
         "StackServices": {
           "$ref": "#/definitions/StackServiceResponse"
         }

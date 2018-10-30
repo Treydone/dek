@@ -1,12 +1,39 @@
 package fr.layer4.hhsl.commands;
 
+/*-
+ * #%L
+ * HHSL
+ * %%
+ * Copyright (C) 2018 Layer4
+ * %%
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * #L%
+ */
+
 import fr.layer4.hhsl.Cluster;
 import fr.layer4.hhsl.Constants;
+import fr.layer4.hhsl.ServiceAndVersion;
 import fr.layer4.hhsl.binaries.BinariesStore;
-import fr.layer4.hhsl.registry.Registry;
-import fr.layer4.hhsl.registry.RegistryManager;
 import fr.layer4.hhsl.info.ClusterInfoManager;
 import fr.layer4.hhsl.info.ClusterInfoResolver;
+import fr.layer4.hhsl.registry.Registry;
+import fr.layer4.hhsl.registry.RegistryManager;
 import fr.layer4.hhsl.store.Store;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +44,7 @@ import org.springframework.shell.standard.ShellMethodAvailability;
 import org.springframework.shell.standard.ShellOption;
 import org.springframework.shell.table.*;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -88,11 +116,15 @@ public class ClusterCommands {
             String url,
             @ShellOption(defaultValue = Constants.DEFAULT_BANNER) String banner) {
         Registry registry = registryManager.getFromName(registryName);
-        registry.getClusterService().addCluster(type, name, url, banner);
+        Cluster cluster = registry.getClusterService().addCluster(type, name, url, banner);
+
+        // List available services
+        ClusterInfoResolver clusterInfoResolver = clusterInfoManager.fromType(type);
+        Collection<ServiceAndVersion> availableServices = clusterInfoResolver.resolveAvailableServices(cluster);
 
         // Download missing clients
-        // TODO Use Aether to donwload clients as Maven dependency?
-        binariesStore.prepare("", "");
+        availableServices.forEach(s -> binariesStore.prepare("", s.getService(), ""));
+
     }
 
     @ShellMethod(key = {"use", "use cluster"}, value = "Use the configuration of a cluster", group = "Cluster")
@@ -113,7 +145,7 @@ public class ClusterCommands {
         // TODO
 
         // Render configuration files
-        Map<String, byte[]> files = clusterInfoResolver.renderConfigurationFiles(cluster);
+        Map<String, Map<String, byte[]>> files = clusterInfoResolver.renderConfigurationFiles(cluster);
         // TODO
     }
 }

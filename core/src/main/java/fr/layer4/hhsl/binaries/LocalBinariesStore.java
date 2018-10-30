@@ -23,12 +23,30 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl.binaries;
 
-import org.springframework.context.ApplicationEvent;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
+import java.util.List;
+
+@Slf4j
+@Component
+public class LocalBinariesStore implements BinariesStore {
+
+    public static final String ARCHIVES = "archives";
+
+    @Autowired(required = false)
+    private List<ClientPreparer> clientPreparers;
+
+    @Override
+    public void prepare(String basePath, String client, String version) {
+        ClientPreparer clientPreparer = clientPreparers.stream()
+                .filter(c -> c.isCompatible(client, version))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Unmanaged client " + client + " for version " + version));
+
+        clientPreparer.prepare(basePath, client, version);
     }
 }

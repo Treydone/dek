@@ -23,12 +23,12 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl;
 
-import org.springframework.context.ApplicationEvent;
+import lombok.Data;
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
-    }
+@Data(staticConstructor = "of")
+public class ServiceAndVersion {
+    private final String service;
+    private final String version;
 }

@@ -29,7 +29,7 @@ endif::[]
 :uri-license: {uri-rel-file-base}LICENSE
 
 HHSL allows you to easily connect to multiple Hadoop clusters by downloading the rights clients,
-settings all the environment variables and preparing the *-defaults.xml/*-site.xml files.
+settings all the environment variables and preparing the -defaults.xml/-site.xml files.
 
 HHSL has been developed by Hadoop sysadmin and developers, dealing with multiple, or even one, clusters,
 who don't want to do the boring stuff of configuring all the clients like HDFS, HBase and others on every clusters.
@@ -44,7 +44,8 @@ HHSL works on Linux, macOS and Windows and requires:
 
 == Installation
 
-Download the tarball, and just unzip it.
+* Download the tarball and just unzip it.
+* Optional: change your PATH environement variable
 
 == Getting Help
 
@@ -52,7 +53,7 @@ Download the tarball, and just unzip it.
 
 == How to
 
-On a fresh install, you first need to init the local database holding all the configuration:
+On a fresh install, you first need to initialize a local database holding all the configuration:
 
 ```
 hhsl
@@ -65,11 +66,14 @@ or directly from the command line:
 hhsl init
 ```
 
-By initiating the database, a local registry is defined. You can then add a cluster.
-For instance, we add a cluster managed by Ambari, available at http://ambari:8080 and named PROD-HDP3.0:
+By initiating the database, a local registry is defined. A registry holds the references to clusters.
+HHSL can refer multiple registries. By default, a local registry is defined, and for each commands
+using a registry, the local registry is used by default.
+
+You can then add a cluster. For instance, we add a cluster managed by Ambari, available at http://ambari:8080 and named PROD-HDP3.0:
 
 ```
-hhsl add cluster ambari PROD-HDP3.0 http://ambari:8080
+hhsl add cluster local ambari PROD-HDP3.0 http://ambari:8080
 > user:
 > password:
 ```
@@ -78,18 +82,21 @@ Verify that the cluster has been added:
 
 ```
 hhsl list cluster
+
+
+
 ```
 
 Now use it:
 
 ```
 hhsl use PROD-HDP3.0
+hhsl use cluster PROD-HDP3.0
 ```
 
 The command 'use' download the missing clients, prepare the environment variables and
-render the configuration files.
+render the configuration files. You can check them by using the 'env' command in Linux for instance:
 
-Check environment variables:
 ```
 env
 ....
@@ -100,7 +107,7 @@ HBASE_HOME=/xxxxx
 
 Also have a look on configuration files:
 ```
-
+cat
 ```
 
 == Man
@@ -113,6 +120,10 @@ Also have a look on configuration files:
 
 == FAQ
 
+=== My service is not managed by HHSL
+
+HHSL manages some services (HDFS, HBASE and many others). If your service is not yet managed by HHSL, just create an implementation of fr.layer4.hhsl.binaries.ClientPreparer. See fr.layer4.hhsl.binaries.HdfsClientPreparer for an example.
+
 === How is security managed?
 
 Kerberos authentication is not yet managed by HHSL. This feature will be added soon.
@@ -123,6 +134,9 @@ Kerberos authentication is not yet managed by HHSL. This feature will be added s
 * Manage other clients (Cassandra, MongoDB...)
 * Add MapR
 
+== Contributions
+
+Contributions are welcome! To submit a pull request you should fork the project repository, and make your change on a feature branch of your fork.
 
 == License
 

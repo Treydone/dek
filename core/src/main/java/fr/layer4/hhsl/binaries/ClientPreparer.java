@@ -23,12 +23,21 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl.binaries;
 
-import org.springframework.context.ApplicationEvent;
+/**
+ * Prepare a client compatible for a service.
+ */
+public interface ClientPreparer {
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
-    }
+    /**
+     * Return true if this client preparer can manage the specified service for a specific version.
+     *
+     * @param service
+     * @param version
+     * @return
+     */
+    boolean isCompatible(String service, String version);
+
+    void prepare(String basePath, String service, String version);
 }

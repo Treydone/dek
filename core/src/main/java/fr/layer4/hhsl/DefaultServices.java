@@ -23,12 +23,14 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl;
 
-import org.springframework.context.ApplicationEvent;
-
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
-    }
+public interface DefaultServices {
+    String HDFS = "hdfs";
+    String HBASE = "hbase";
+    String SPARK = "spark";
+    String YARN = "yarn";
+    String OOZIE = "oozie";
+    String ZOOKEEPER = "zookeeper";
+    String HIVE = "hive";
 }

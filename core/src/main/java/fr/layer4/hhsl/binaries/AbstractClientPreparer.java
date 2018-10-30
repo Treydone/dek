@@ -23,12 +23,31 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl.binaries;
 
-import org.springframework.context.ApplicationEvent;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+public abstract class AbstractClientPreparer implements ClientPreparer {
+
+    @Autowired
+    private CloseableHttpClient client;
+
+    protected void download(String path, String url) throws IOException {
+        HttpGet request = new HttpGet(url);
+        try (CloseableHttpResponse response = this.client.execute(request)) {
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                Files.copy(entity.getContent(), Paths.get(path), StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
     }
 }
