@@ -127,7 +127,7 @@ public class AmbariClusterInfoResolverTest {
         Map<String, String> envVars = resolver.resolveEnvironmentVariables(cluster);
 
         // Then
-        assertEquals(2, envVars.size());
+        assertEquals(15, envVars.size());
         assertTrue(envVars.containsKey("HADOOP_HOME"));
         assertEquals("", envVars.get("HADOOP_HOME"));
     }

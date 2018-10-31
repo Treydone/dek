@@ -10,6 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
+    <groupId>fr.layer4.hhsl.plugins</groupId>
     <artifactId>plugins</artifactId>
     <packaging>pom</packaging>
 

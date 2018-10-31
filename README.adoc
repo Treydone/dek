@@ -120,6 +120,12 @@ cat
 
 **get env**
 
+== Build
+
+=== Update third parties license file
+
+ mvn org.codehaus.mojo:license-maven-plugin:aggregate-add-third-party@aggregate-add-third-party
+
 == FAQ
 
 === My service is not managed by HHSL

@@ -19,17 +19,17 @@
             <artifactId>core</artifactId>
         </dependency>
         <dependency>
-            <groupId>fr.layer4.hhsl</groupId>
+            <groupId>fr.layer4.hhsl.plugins</groupId>
             <artifactId>ambari-cluster-resolver</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>fr.layer4.hhsl</groupId>
+            <groupId>fr.layer4.hhsl.plugins</groupId>
             <artifactId>local-store</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>fr.layer4.hhsl</groupId>
+            <groupId>fr.layer4.hhsl.plugins</groupId>
             <artifactId>local-registry</artifactId>
             <version>${project.version}</version>
         </dependency>
