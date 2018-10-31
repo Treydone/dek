@@ -161,6 +161,6 @@ public class AmbariClusterInfoResolverTest {
         Map<String, Map<String, byte[]>> configurationFiles = resolver.renderConfigurationFiles(cluster);
 
         // Then
-        assertEquals(2, configurationFiles.size());
+        assertEquals(1, configurationFiles.size());
     }
 }

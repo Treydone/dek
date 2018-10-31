@@ -20,6 +20,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
@@ -82,10 +87,13 @@
                             <library>resttemplate</library>
                             <modelPackage>fr.layer4.hhsl.ambari.api.model</modelPackage>
                             <apiPackage>fr.layer4.hhsl.ambari.api</apiPackage>
+                            <invokerPackage>fr.layer4.hhsl.ambari.api</invokerPackage>
+                            <output>${project.build.directory}/generated-sources/swagger</output>
                             <generateApiTests>false</generateApiTests>
+                            <generateModelTests >false</generateModelTests >
                             <generateApiDocumentation>false</generateApiDocumentation>
                             <configOptions>
-                                <sourceFolder>src/gen/java</sourceFolder>
+                                <sourceFolder>src/gen/java/main</sourceFolder>
                                 <java8>true</java8>
                                 <dateLibrary>java8</dateLibrary>
                             </configOptions>
@@ -106,7 +114,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/src/gen/java</source>
+                                <source>${project.build.directory}/generated-sources/swagger/src/gen/java/main</source>
                             </sources>
                         </configuration>
                     </execution>

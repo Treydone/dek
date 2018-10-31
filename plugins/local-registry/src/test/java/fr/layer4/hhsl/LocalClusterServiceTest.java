@@ -12,10 +12,10 @@ package fr.layer4.hhsl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,11 +26,24 @@ package fr.layer4.hhsl;
  * #L%
  */
 
+import fr.layer4.hhsl.prompt.Prompter;
+import fr.layer4.hhsl.store.LockableLocalStore;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class LocalClusterServiceTest {
 
     private LocalClusterService localClusterService;
+
+    private LockableLocalStore lockableLocalStore;
+    private Prompter prompter;
+
+    @Before
+    public void beforeEachTest() {
+        this.localClusterService = new LocalClusterService(lockableLocalStore, prompter);
+    }
 
     @Test
     public void getCluster_ok() {

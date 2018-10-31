@@ -26,7 +26,7 @@ package fr.layer4.hhsl;
  * #L%
  */
 
-import fr.layer4.hhsl.ambari.ApiClient;
+import fr.layer4.hhsl.ambari.api.ApiClient;
 import fr.layer4.hhsl.ambari.api.ClusterServicesApi;
 import fr.layer4.hhsl.ambari.api.ClustersApi;
 import fr.layer4.hhsl.ambari.api.StacksApi;

@@ -25,21 +25,26 @@
  */
 package fr.layer4.hhsl.binaries;
 
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+@RequiredArgsConstructor
 public abstract class AbstractClientPreparer implements ClientPreparer {
 
-    @Autowired
-    private CloseableHttpClient client;
+    private final CloseableHttpClient client;
 
     protected void download(String path, String url) throws IOException {
         HttpGet request = new HttpGet(url);
@@ -47,6 +52,38 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 Files.copy(entity.getContent(), Paths.get(path), StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+    }
+
+    protected void uncompress(String source, String dest) throws IOException {
+        File targetDir = new File(dest);
+        try (InputStream fi = Files.newInputStream(Paths.get(source));
+             InputStream bi = new BufferedInputStream(fi);
+             InputStream gzi = new GzipCompressorInputStream(bi);
+             ArchiveInputStream i = new TarArchiveInputStream(gzi)
+        ) {
+            ArchiveEntry entry;
+            while ((entry = i.getNextEntry()) != null) {
+                if (!i.canReadEntryData(entry)) {
+                    // TODO log something?
+                    continue;
+                }
+
+                File f = new File(targetDir, entry.getName());
+                if (entry.isDirectory()) {
+                    if (!f.isDirectory() && !f.mkdirs()) {
+                        throw new IOException("failed to create directory " + f);
+                    }
+                } else {
+                    File parent = f.getParentFile();
+                    if (!parent.isDirectory() && !parent.mkdirs()) {
+                        throw new IOException("failed to create directory " + parent);
+                    }
+                    try (OutputStream o = Files.newOutputStream(f.toPath())) {
+                        IOUtils.copy(i, o);
+                    }
+                }
             }
         }
     }

@@ -23,15 +23,34 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl;
+package fr.layer4.hhsl.binaries;
 
-public interface DefaultServices {
-    String HDFS = "hdfs";
-    String HBASE = "hbase";
-    String HIVE = "hive";
-    String OOZIE = "oozie";
-    String SPARK = "spark";
-    String SQOOP = "sqoop";
-    String YARN = "yarn";
-    String ZOOKEEPER = "zookeeper";
+import fr.layer4.hhsl.DefaultServices;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ZookeeperClientPreparer extends AbstractClientPreparer {
+
+    private final ApacheMirrorFinder apacheMirrorFinder;
+
+    @Autowired
+    public ZookeeperClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
+        super(client);
+        this.apacheMirrorFinder = apacheMirrorFinder;
+    }
+
+    @Override
+    public boolean isCompatible(String service, String version) {
+        return DefaultServices.ZOOKEEPER.equalsIgnoreCase(service); // Don't care about the versions
+    }
+
+    @Override
+    public void prepare(String basePath, String service, String version) {
+
+        String url = apacheMirrorFinder.resolve("zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz");
+
+        //TODO
+    }
 }

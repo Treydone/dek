@@ -26,10 +26,20 @@
 package fr.layer4.hhsl.binaries;
 
 import fr.layer4.hhsl.DefaultServices;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HbaseClientPreparer extends AbstractClientPreparer {
+
+    private final ApacheMirrorFinder apacheMirrorFinder;
+
+    @Autowired
+    public HbaseClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
+        super(client);
+        this.apacheMirrorFinder = apacheMirrorFinder;
+    }
 
     @Override
     public boolean isCompatible(String service, String version) {
@@ -38,6 +48,8 @@ public class HbaseClientPreparer extends AbstractClientPreparer {
 
     @Override
     public void prepare(String basePath, String service, String version) {
+
+        String url = apacheMirrorFinder.resolve("hbase/1.4.8/hbase-1.4.8-bin.tar.gz");
 
         //TODO
     }

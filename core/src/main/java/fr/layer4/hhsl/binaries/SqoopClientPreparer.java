@@ -23,15 +23,34 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl;
+package fr.layer4.hhsl.binaries;
 
-public interface DefaultServices {
-    String HDFS = "hdfs";
-    String HBASE = "hbase";
-    String HIVE = "hive";
-    String OOZIE = "oozie";
-    String SPARK = "spark";
-    String SQOOP = "sqoop";
-    String YARN = "yarn";
-    String ZOOKEEPER = "zookeeper";
+import fr.layer4.hhsl.DefaultServices;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SqoopClientPreparer extends AbstractClientPreparer {
+
+    private final ApacheMirrorFinder apacheMirrorFinder;
+
+    @Autowired
+    public SqoopClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
+        super(client);
+        this.apacheMirrorFinder = apacheMirrorFinder;
+    }
+
+    @Override
+    public boolean isCompatible(String service, String version) {
+        return DefaultServices.SQOOP.equalsIgnoreCase(service); // Don't care about the versions
+    }
+
+    @Override
+    public void prepare(String basePath, String service, String version) {
+
+        String url = apacheMirrorFinder.resolve("sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz");
+
+        //TODO
+    }
 }

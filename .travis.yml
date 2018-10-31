@@ -1,0 +1,9 @@
+language: java
+jdk:
+  - openjdk8
+
+branches:
+  only:
+    - master
+    # Build tags that match this regex in addition to building the master and dev branches.
+    - /^v[0-9]+\.[0-9]+\.[0-9]+/

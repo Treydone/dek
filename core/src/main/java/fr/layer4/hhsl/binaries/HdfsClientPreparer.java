@@ -26,12 +26,22 @@
 package fr.layer4.hhsl.binaries;
 
 import fr.layer4.hhsl.DefaultServices;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
 public class HdfsClientPreparer extends AbstractClientPreparer {
+
+    private final ApacheMirrorFinder apacheMirrorFinder;
+
+    @Autowired
+    public HdfsClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
+        super(client);
+        this.apacheMirrorFinder = apacheMirrorFinder;
+    }
 
     @Override
     public boolean isCompatible(String service, String version) {
@@ -41,7 +51,7 @@ public class HdfsClientPreparer extends AbstractClientPreparer {
     @Override
     public void prepare(String basePath, String service, String version) {
 
-        String url = "http://mirrors.ircam.fr/pub/apache/hadoop/common/hadoop-2.8.5/hadoop-2.8.5.tar.gz"; // TODO Take one the mirrors available
+        String url = apacheMirrorFinder.resolve("hadoop/common/hadoop-2.8.5/hadoop-2.8.5.tar.gz");
 
         // Check if archive if already present
         // TODO
