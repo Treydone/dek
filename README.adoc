@@ -28,6 +28,8 @@ endif::[]
 :uri-contribute: {uri-rel-file-base}CONTRIBUTING.adoc
 :uri-license: {uri-rel-file-base}LICENSE
 
+image:https://travis-ci.org/Treydone/hhsl.svg?branch=master["Build Status", link="https://travis-ci.org/Treydone/hhsl"]
+
 HHSL allows you to easily connect to multiple Hadoop clusters by downloading the rights clients,
 settings all the environment variables and preparing the -defaults.xml/-site.xml files.
 
