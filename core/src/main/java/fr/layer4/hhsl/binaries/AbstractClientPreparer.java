@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,12 +31,14 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -46,19 +48,35 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
 
     private final CloseableHttpClient client;
 
-    protected void download(String path, String url) throws IOException {
-        HttpGet request = new HttpGet(url);
+    /**
+     * Download the resource specified by the uri to the path, and returns the file name.
+     *
+     * @param path
+     * @param uri
+     * @return
+     * @throws IOException
+     */
+    protected String download(String path, URI uri) throws IOException {
+        String destFileName = FilenameUtils.getName(uri.getPath());
+        HttpGet request = new HttpGet(uri);
         try (CloseableHttpResponse response = this.client.execute(request)) {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
-                Files.copy(entity.getContent(), Paths.get(path), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(entity.getContent(), Paths.get(path, destFileName), StandardCopyOption.REPLACE_EXISTING);
             }
         }
+        return destFileName;
     }
 
-    protected void uncompress(String source, String dest) throws IOException {
-        File targetDir = new File(dest);
-        try (InputStream fi = Files.newInputStream(Paths.get(source));
+    /**
+     * Uncompress tar.gz files
+     *
+     * @param source
+     * @param dest
+     * @throws IOException
+     */
+    protected void uncompress(File source, File dest) throws IOException {
+        try (InputStream fi = new FileInputStream(source);
              InputStream bi = new BufferedInputStream(fi);
              InputStream gzi = new GzipCompressorInputStream(bi);
              ArchiveInputStream i = new TarArchiveInputStream(gzi)
@@ -70,7 +88,7 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
                     continue;
                 }
 
-                File f = new File(targetDir, entry.getName());
+                File f = new File(dest, entry.getName());
                 if (entry.isDirectory()) {
                     if (!f.isDirectory() && !f.mkdirs()) {
                         throw new IOException("failed to create directory " + f);

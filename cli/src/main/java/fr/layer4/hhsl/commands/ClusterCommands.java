@@ -28,7 +28,7 @@ package fr.layer4.hhsl.commands;
 
 import fr.layer4.hhsl.Cluster;
 import fr.layer4.hhsl.Constants;
-import fr.layer4.hhsl.ServiceAndVersion;
+import fr.layer4.hhsl.ServiceClientAndVersion;
 import fr.layer4.hhsl.binaries.BinariesStore;
 import fr.layer4.hhsl.info.ClusterInfoManager;
 import fr.layer4.hhsl.info.ClusterInfoResolver;
@@ -120,10 +120,10 @@ public class ClusterCommands {
 
         // List available services
         ClusterInfoResolver clusterInfoResolver = clusterInfoManager.fromType(type);
-        Collection<ServiceAndVersion> availableServices = clusterInfoResolver.resolveAvailableServices(cluster);
+        Collection<ServiceClientAndVersion> availableServices = clusterInfoResolver.resolveAvailableServiceClients(cluster);
 
         // Download missing clients
-        availableServices.forEach(s -> binariesStore.prepare("", s.getService(), ""));
+        availableServices.forEach(s -> binariesStore.prepare("", s.getService(), s.getVersion()));
 
     }
 

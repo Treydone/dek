@@ -48,7 +48,6 @@ public class LocalBinariesStore implements BinariesStore {
                 .filter(c -> c.isCompatible(client, version))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Unmanaged client " + client + " for version " + version));
-
         clientPreparer.prepare(basePath, client, version);
     }
 }

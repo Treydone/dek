@@ -12,10 +12,10 @@ package fr.layer4.hhsl.binaries;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,6 +31,8 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
 
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
 import static io.specto.hoverfly.junit.dsl.HoverflyDsl.service;
@@ -73,10 +75,10 @@ public class ApacheMirrorFinderTest {
         // Given
 
         // When
-        String resolvedPath = this.apacheMirrorFinder.resolve("hadoop/common/hadoop-2.8.5/hadoop-2.8.5.tar.gz");
+        URI resolvedPath = this.apacheMirrorFinder.resolve("hadoop/common/hadoop-2.8.5/hadoop-2.8.5.tar.gz");
 
         // Then
-        assertThat(resolvedPath).isEqualToIgnoringCase("http://mirrors.standaloneinstaller.com/apache/hadoop/common/hadoop-2.8.5/hadoop-2.8.5.tar.gz");
+        assertThat(resolvedPath).isEqualTo(URI.create("http://mirrors.standaloneinstaller.com/apache/hadoop/common/hadoop-2.8.5/hadoop-2.8.5.tar.gz"));
 
     }
 }

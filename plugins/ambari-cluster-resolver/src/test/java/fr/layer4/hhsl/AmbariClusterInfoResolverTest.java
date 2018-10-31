@@ -142,10 +142,10 @@ public class AmbariClusterInfoResolverTest {
         cluster.setPassword("le_password");
 
         // When
-        Collection<ServiceAndVersion> services = resolver.resolveAvailableServices(cluster);
+        Collection<ServiceClientAndVersion> services = resolver.resolveAvailableServiceClients(cluster);
 
         // Then
-        assertThat(services).hasSize(1).containsExactly(ServiceAndVersion.of("HIVE", "1.2.1000"));
+        assertThat(services).hasSize(1).containsExactly(ServiceClientAndVersion.of("HIVE", "1.2.1000"));
     }
 
     @Test

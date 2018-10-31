@@ -30,6 +30,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+
 @Component
 public class OozieClientPreparer extends AbstractClientPreparer {
 
@@ -49,7 +51,7 @@ public class OozieClientPreparer extends AbstractClientPreparer {
     @Override
     public void prepare(String basePath, String service, String version) {
 
-        String url = apacheMirrorFinder.resolve("oozie/4.3.1/oozie-4.3.1.tar.gz");
+        URI uri = apacheMirrorFinder.resolve("oozie/" + version + "/oozie-" + version + ".tar.gz");
 
         //TODO
     }

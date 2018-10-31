@@ -28,7 +28,7 @@ package fr.layer4.hhsl;
 import lombok.Data;
 
 @Data(staticConstructor = "of")
-public class ServiceAndVersion {
+public class ServiceClientAndVersion {
     private final String service;
     private final String version;
 }

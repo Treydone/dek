@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,6 +29,8 @@ import fr.layer4.hhsl.DefaultServices;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.net.URI;
 
 @Component
 public class ZookeeperClientPreparer extends AbstractClientPreparer {
@@ -49,7 +51,7 @@ public class ZookeeperClientPreparer extends AbstractClientPreparer {
     @Override
     public void prepare(String basePath, String service, String version) {
 
-        String url = apacheMirrorFinder.resolve("zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz");
+        URI uri = apacheMirrorFinder.resolve("zookeeper/zookeeper-" + version + "/zookeeper-" + version + ".tar.gz");
 
         //TODO
     }

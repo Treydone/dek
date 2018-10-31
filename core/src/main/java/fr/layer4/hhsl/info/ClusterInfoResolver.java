@@ -26,7 +26,7 @@
 package fr.layer4.hhsl.info;
 
 import fr.layer4.hhsl.Cluster;
-import fr.layer4.hhsl.ServiceAndVersion;
+import fr.layer4.hhsl.ServiceClientAndVersion;
 
 import java.util.Collection;
 import java.util.Map;
@@ -46,7 +46,7 @@ public interface ClusterInfoResolver {
      * @param cluster
      * @return
      */
-    Collection<ServiceAndVersion> resolveAvailableServices(Cluster cluster);
+    Collection<ServiceClientAndVersion> resolveAvailableServiceClients(Cluster cluster);
 
     /**
      * Return the environment variables mandatory to use the cluster.

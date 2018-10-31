@@ -67,7 +67,7 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
     }
 
     @Override
-    public Collection<ServiceAndVersion> resolveAvailableServices(Cluster cluster) {
+    public Collection<ServiceClientAndVersion> resolveAvailableServiceClients(Cluster cluster) {
         ApiClient apiClient = getApiClient(cluster);
 
         StacksApi stacksApi = new StacksApi(apiClient);
@@ -83,8 +83,9 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
         return serviceResponse.getItems().stream().map(s -> {
             String serviceName = s.getServiceInfo().getServiceName();
             StackServiceResponseSwagger stackServiceResponse = stacksApi.stacksServiceGetStackService("HDP", clusterResponse.getVersion().replace("HDP-", ""), serviceName, null);
-            return ServiceAndVersion.of(serviceName, stackServiceResponse.getStackServices().getServiceVersion());
+            return ServiceClientAndVersion.of(serviceName, stackServiceResponse.getStackServices().getServiceVersion());
         }).collect(Collectors.toList());
+        // TODO keep only service clients (HIVE_CLIENT, but not HIVE_METASTORE)
     }
 
     @Override
