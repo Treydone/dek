@@ -18,5 +18,7 @@
         <module>local-store</module>
         <module>local-registry</module>
         <module>ambari-cluster-resolver</module>
+        <module>cloudera-cluster-resolver</module>
+        <module>hadoop-unit-cluster-resolver</module>
     </modules>
 </project>

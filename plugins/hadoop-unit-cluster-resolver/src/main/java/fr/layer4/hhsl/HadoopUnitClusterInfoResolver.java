@@ -1,4 +1,4 @@
-package fr.layer4.hhsl.store;
+package fr.layer4.hhsl;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,13 +25,41 @@ package fr.layer4.hhsl.store;
  * THE SOFTWARE.
  * #L%
  */
+import fr.layer4.hhsl.info.ClusterInfoResolver;
+import org.springframework.stereotype.Component;
 
-public interface LocalStoreConstants {
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-    String HOME = "~/";
-    String FOLDER = ".hhsl";
+@Component
+public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
 
-    static String getRootPath() {
-        return LocalStoreConstants.HOME + LocalStoreConstants.FOLDER;
+    @Override
+    public String getType() {
+        return "hadoop-unit";
+    }
+
+    @Override
+    public Collection<ServiceClientAndVersion> resolveAvailableServiceClients(Cluster cluster) {
+        return Arrays.asList();
+    }
+
+    @Override
+    public Map<String, String> resolveEnvironmentVariables(String archivesPath, String clusterGeneratedPath, Cluster cluster) {
+
+        Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
+
+        Map<String, String> envVars = new HashMap<>();
+
+        return envVars;
+    }
+
+    @Override
+    public Map<String, Map<String, byte[]>> renderConfigurationFiles(Cluster cluster) {
+        Map<String, Map<String, byte[]>> configurationFiles = new HashMap<>();
+
+        return configurationFiles;
     }
 }

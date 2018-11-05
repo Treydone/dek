@@ -25,6 +25,8 @@
  */
 package fr.layer4.hhsl.binaries;
 
+import java.util.Map;
+
 /**
  * Prepare a client compatible for a service.
  */
@@ -39,5 +41,5 @@ public interface ClientPreparer {
      */
     boolean isCompatible(String service, String version);
 
-    void prepare(String basePath, String service, String version);
+    Map<String, String> prepare(String basePath, String service, String version, boolean force);
 }

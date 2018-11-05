@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -41,6 +42,12 @@ public class RegistryManager {
     @Autowired(required = false)
     private List<RegistryResolver> resolvers;
 
+    private Function<RegistryConnection, Registry> registryConnectionRegistryFunction = c -> {
+        Registry registry = fromType(c.getUri().getScheme()).prepare(c);
+        registry.init(c);
+        return registry;
+    };
+
     public RegistryResolver fromType(String type) {
         return this.resolvers.stream().filter(r -> type.equals(r.getType())).findFirst().get();
     }
@@ -51,8 +58,11 @@ public class RegistryManager {
 
     public Registry getFromName(String registryName) {
         RegistryConnection registryConnection = registryConnectionManager.getRegistry(registryName);
-        Registry registry = fromType(registryConnection.getUri().getScheme()).prepare(registryConnection);
-        registry.init(registryConnection);
-        return registry;
+        return registryConnectionRegistryFunction.apply(registryConnection);
+    }
+
+    public List<Registry> all() {
+        List<RegistryConnection> registryConnections = registryConnectionManager.listRegistries();
+        return registryConnections.stream().map(registryConnectionRegistryFunction).collect(Collectors.toList());
     }
 }

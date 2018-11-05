@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,23 +31,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
 public class LocalBinariesStore implements BinariesStore {
-
-    public static final String ARCHIVES = "archives";
 
     @Setter
     @Autowired(required = false)
     private List<ClientPreparer> clientPreparers;
 
     @Override
-    public void prepare(String basePath, String client, String version) {
+    public Map<String, String> prepare(String basePath, String client, String version, boolean force) {
         ClientPreparer clientPreparer = clientPreparers.stream()
                 .filter(c -> c.isCompatible(client, version))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Unmanaged client " + client + " for version " + version));
-        clientPreparer.prepare(basePath, client, version);
+        return clientPreparer.prepare(basePath, client, version, force);
     }
 }

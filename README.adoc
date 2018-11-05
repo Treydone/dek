@@ -47,7 +47,7 @@ HHSL works on Linux, macOS and Windows and requires:
 == Installation
 
 * Download the tarball and just unzip it.
-* Optional: change your PATH environement variable
+* Optional: change your PATH environment variable
 
 == Getting Help
 
@@ -120,24 +120,70 @@ cat
 
 **get env**
 
+// TODO
+
+== Architecture
+
+HHSL store all its data by default in ~/.hhsl (will be configurable in future releases, see Roadmap)
+
+```
+~/.hhsl
+
+
+```
+//TODO
+
+**archives**: contains all the binaries, compressed and uncompressed.
+
+**confs**: contains all the generated configurations done when the command 'use cluster ...' is called.
+confs is a multi level directories structured like this:
+registryconnection id > cluster id > service name
+
+**db**: the content of the local db
+
+Since both /archives and /confs contains generated content, these directories can be wiped without fear, their content will be regenerated on the next call to 'use cluster ...'
+
 == Build
 
+=== Build a distribution from sources
+
+On the root project, just run:
+
+ mvn clean package
+
+At the end, you should the final archive in cli/target/cli-X.X.X.tar.gz
+
+=== Release
+
+// TODO
+
 === Update third parties license file
+
+Update the content of the file THIRD-PARTY.txt:
 
  mvn org.codehaus.mojo:license-maven-plugin:aggregate-add-third-party@aggregate-add-third-party
 
 == FAQ
 
+=== I need to use a proxy
+
+HHSL use external resources hosted on mirrors, like the Apache mirrors. If you need to use a proxy:
+// TODO... document this part
+
 === My service is not managed by HHSL
 
 HHSL manages some services (HDFS, HBASE and many others). If your service is not yet managed by HHSL, just create an implementation of fr.layer4.hhsl.binaries.ClientPreparer. See fr.layer4.hhsl.binaries.HdfsClientPreparer for an example.
 
-=== How is security managed?
+=== How is security managed in HHSL?
 
 Kerberos authentication is not yet managed by HHSL. This feature will be added soon.
 
 == Roadmap
 
+* Allow to use a custom path for HHSL instead of the default ~/.hhsl via the configuration
+* Allow to use private binaries repositories instead of default Apache mirrors
+* Allow to skip integrity of files (specially in case of private repos)
+* Add option to skip winutils for Hadoop
 * Add security (Kerberos) switch
 * Manage other clients (Cassandra, MongoDB...)
 * Add MapR

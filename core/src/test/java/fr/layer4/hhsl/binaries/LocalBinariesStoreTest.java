@@ -69,12 +69,12 @@ public class LocalBinariesStoreTest {
         Mockito.when(this.zookeeperClientPreparer.isCompatible(Mockito.eq("zookeeper"), Mockito.anyString())).thenReturn(true);
 
         // When
-        this.localBinariesStore.prepare("", "zookeeper", "3.4.3");
+        this.localBinariesStore.prepare("", "zookeeper", "3.4.3", false);
 
         // Then
         Mockito.verify(this.zookeeperClientPreparer).isCompatible("zookeeper", "3.4.3");
         Mockito.verify(this.hbaseClientPreparer).isCompatible("zookeeper", "3.4.3");
-        Mockito.verify(this.zookeeperClientPreparer).prepare("", "zookeeper", "3.4.3");
+        Mockito.verify(this.zookeeperClientPreparer).prepare("", "zookeeper", "3.4.3", false);
     }
 
     @Test
@@ -86,7 +86,7 @@ public class LocalBinariesStoreTest {
 
         // When
         try {
-            this.localBinariesStore.prepare("", "unknown", "3.4.3");
+            this.localBinariesStore.prepare("", "unknown", "3.4.3", false);
             fail();
         } catch (RuntimeException e) {
             // Don't care

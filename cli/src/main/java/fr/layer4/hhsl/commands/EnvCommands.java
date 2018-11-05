@@ -12,10 +12,10 @@ package fr.layer4.hhsl.commands;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,12 +34,10 @@ import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellMethodAvailability;
-import org.springframework.shell.table.*;
+import org.springframework.shell.table.Table;
 
 import java.util.Iterator;
 import java.util.Map;
-
-import static org.springframework.shell.table.CellMatchers.at;
 
 @Slf4j
 @ShellComponent
@@ -70,17 +68,7 @@ public class EnvCommands {
             data[it] = new String[]{next.getKey(), next.getValue()};
             it++;
         }
-        TableModel model = new ArrayTableModel(data);
-        TableBuilder tableBuilder = new TableBuilder(model);
-
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data[i].length; j++) {
-                tableBuilder.on(at(i, j)).addAligner(SimpleHorizontalAligner.left).addSizer(new AbsoluteWidthSizeConstraints(5));
-                tableBuilder.on(at(i, j)).addAligner(SimpleVerticalAligner.middle);
-            }
-        }
-
-        return tableBuilder.build();
+        return CommandUtils.getTable(data);
     }
 
     @ShellMethod(key = "get env", value = "Get env", group = "Env")

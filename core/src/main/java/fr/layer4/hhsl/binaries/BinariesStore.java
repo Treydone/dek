@@ -25,14 +25,16 @@
  */
 package fr.layer4.hhsl.binaries;
 
+import java.util.Map;
+
 public interface BinariesStore {
 
     /**
      * Download and unpack the binaries for a client.
-     *
      * @param basePath
      * @param client
      * @param version
+     * @param force
      */
-    void prepare(String basePath, String client, String version);
+    Map<String, String> prepare(String basePath, String client, String version, boolean force);
 }

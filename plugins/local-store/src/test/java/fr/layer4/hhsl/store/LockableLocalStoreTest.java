@@ -52,7 +52,7 @@ public class LockableLocalStoreTest {
 
     @Before
     public void beforeEachTest() {
-        DeleteDbFiles.execute(LocalStoreConstants.getRootPath(), LockableLocalStore.DB, true);
+        DeleteDbFiles.execute(Constants.getRootPath(), LockableLocalStore.DB, true);
         h2LocalStore = new LockableLocalStore();
         h2LocalStore.setPrompter(prompter);
         h2LocalStore.setApplicationEventPublisher(eventPublisher);

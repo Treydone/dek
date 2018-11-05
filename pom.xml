@@ -74,6 +74,7 @@
         <spring-shell.version>2.0.1.RELEASE</spring-shell.version>
         <spring.version>4.3.18.RELEASE</spring.version>
 
+        <bouncycastle.version>1.55</bouncycastle.version>
     </properties>
 
     <dependencyManagement>
@@ -120,6 +121,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
@@ -140,6 +147,12 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${apache-commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>5.0.0</version>
             </dependency>
 
             <!-- Slf4J -->
@@ -364,7 +377,8 @@
                                     <![CDATA[GNU Affero General Public License (AGPL), Version 3.0|AGPL 3.0 license|The GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0]]></licenseMerge>
                                 <licenseMerge>
                                     <![CDATA[Apache Software License, Version 2.0|Apache License, Version 2.0|Apache License version 2.0|The Apache Software License, Version 2.0|Apache 2.0|Apache License 2.0|Apache License, version 2.0|The Apache License, Version 2.0|ASL, version 2|Apache 2]]></licenseMerge>
-                                <licenseMerge><![CDATA[BSD-Style License|BSD License|The BSD License|New BSD License]]></licenseMerge>
+                                <licenseMerge>
+                                    <![CDATA[BSD-Style License|BSD License|The BSD License|New BSD License]]></licenseMerge>
                                 <licenseMerge><![CDATA[MIT License|The MIT License|MIT]]></licenseMerge>
                                 <licenseMerge>
                                     <![CDATA[Common Public License, Version 1.0|Common Public License Version 1.0]]></licenseMerge>

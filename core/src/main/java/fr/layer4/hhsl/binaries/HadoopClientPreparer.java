@@ -25,73 +25,210 @@
  */
 package fr.layer4.hhsl.binaries;
 
+import com.jcabi.github.*;
 import fr.layer4.hhsl.DefaultServices;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.bouncycastle.util.encoders.Hex;
+import org.jline.utils.OSUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 @Component
 public class HadoopClientPreparer extends AbstractClientPreparer {
 
     private final ApacheMirrorFinder apacheMirrorFinder;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public HadoopClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
+    public HadoopClientPreparer(CloseableHttpClient client, RestTemplate restTemplate, ApacheMirrorFinder apacheMirrorFinder) {
         super(client);
         this.apacheMirrorFinder = apacheMirrorFinder;
+        this.restTemplate = restTemplate;
     }
 
     @Override
     public boolean isCompatible(String service, String version) {
-        // Contains both HDFS and Yarn client
         return DefaultServices.HDFS.equalsIgnoreCase(service)
-                || DefaultServices.YARN.equalsIgnoreCase(service); // Don't care about the versions
+                || DefaultServices.YARN.equalsIgnoreCase(service)
+                || DefaultServices.HBASE.equalsIgnoreCase(service)
+                || DefaultServices.HIVE.equalsIgnoreCase(service)
+                || DefaultServices.SQOOP.equalsIgnoreCase(service)
+                || DefaultServices.SPARK.equalsIgnoreCase(service)
+                ; // Don't care about the versions
     }
 
     @Override
-    public void prepare(String basePath, String service, String version) {
+    public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
         String archive = "hadoop-" + version + ".tar.gz";
 
-        boolean letDoIt = false;
-
         // Check if archive if already present
-//        if(!Files.exists(Paths.get(basePath, archive))) {
-//
-//        }
-        // TODO
+        if (force || !Files.exists(Paths.get(basePath, archive))) {
+            download(basePath, version, archive);
+        }
 
         // Check signature
-        // TODO
-        //https://dist.apache.org/repos/dist/release/hadoop/common/hadoop-2.8.5/hadoop-2.8.5.tar.gz.mds
-        // ex: ...
-        // SHA224 = ADF41CD6 1EC2A739 31C7ED9D 1183DB03 C5A985B5 A2296CC9 F0315C22
-        // build/source/target/artifacts/hadoop-2.8.5.tar.gz:
-        // SHA256 = F9C726DF 693CE2DA A4107886 F603270D 66E7257F 77A92C98 86502D6C D4A884A4
-        // build/source/target/artifacts/hadoop-2.8.5.tar.gz:
-        // ...
-
-        // Download
-        URI uri = apacheMirrorFinder.resolve("hadoop/common/hadoop-" + version + "/" + archive);
-        String downloadedFileName;
-        try {
-            downloadedFileName = download(basePath, uri);
-        } catch (IOException e) {
-            throw new RuntimeException("Can not download the client");
+        boolean isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
+        if (!isSameSignature) {
+            // Signature is different, try to redownload the archive
+            download(basePath, version, archive);
+            isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
+            if (!isSameSignature) {
+                throw new RuntimeException("Incorrect signature after redownload");
+            }
         }
 
         // Unpack
+        File dest = new File(basePath, FilenameUtils.getBaseName(archive));
+        if (force || !dest.exists()) {
+            try {
+                uncompress(new File(basePath, archive), dest);
+            } catch (IOException e) {
+                throw new RuntimeException("Can not extract client", e);
+            }
+        }
+
+        // Add winutils if Windows
+        if (OSUtils.IS_WINDOWS) {
+            log.info("Download winutils...");
+
+            String winutilsHadoopVersion = findWinUtilsMatchingVersion(version);
+
+            Github github = new RtGithub();
+            Repo repo = github.repos().get(new Coordinates.Simple("steveloughran", "winutils"));
+            String winutilsBin = "hadoop-" + winutilsHadoopVersion + "/bin";
+            try {
+                Iterable<Content> contents = repo.contents().iterate(winutilsBin, "master");
+                contents.forEach(c -> {
+                    try {
+                        File binFile = new File(dest, "bin" + File.separator + c.json().getString("name"));
+                        if (force || !binFile.exists()) {
+                            FileUtils.copyInputStreamToFile(c.raw(), binFile);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("Can not copy " + c.path() + " to " + dest.getAbsolutePath(), e);
+                    }
+                });
+            } catch (IOException e) {
+                throw new RuntimeException("Can not find winutils in " + winutilsBin, e);
+            }
+        }
+
+        // Update environment variables
+        Map<String, String> envVars = new HashMap<>();
+        envVars.put("HADOOP_HOME", dest.getAbsolutePath());
+        return envVars;
+    }
+
+    protected static String findWinUtilsMatchingVersion(String version) {
+        String winutilsHadoopVersion;
+        if (version.compareTo("2.6.0") <= 0) {
+            winutilsHadoopVersion = "2.6.0";
+        } else if (version.compareTo("2.6.0") > 0 && version.compareTo("2.6.3") <= 0) {
+            winutilsHadoopVersion = "2.6.3";
+        } else if (version.compareTo("2.6.3") > 0 && version.compareTo("2.7") < 0) {
+            winutilsHadoopVersion = "2.6.4";
+        } else if (version.compareTo("2.7") > 0 && version.compareTo("2.8") < 0) {
+            winutilsHadoopVersion = "2.7.1";
+        } else if (version.compareTo("2.8") > 0 && version.compareTo("2.8.3") < 0) {
+            winutilsHadoopVersion = "2.8.1";
+        } else if (version.compareTo("2.8.3") >= 0 && version.compareTo("3.0.0") < 0) {
+            winutilsHadoopVersion = "2.8.3";
+        } else if (version.compareTo("3.0.0") >= 0) {
+            winutilsHadoopVersion = "3.0.0";
+        } else {
+            throw new RuntimeException("Can not find a compatible winutils version for Hadoop version " + version);
+        }
+        return winutilsHadoopVersion;
+    }
+
+    protected boolean compareLocalAndRemoteSignature(String basePath, String archive, String version) {
+
+        // Get local SHA-256
+        String localSha256 = getLocalSha256(basePath, archive);
+
+        // Get remote SHA-256
+        String remoteSha256 = getRemoteSha256(archive, version);
+
+        return remoteSha256.equalsIgnoreCase(localSha256);
+    }
+
+    protected String getLocalSha256(String basePath, String archive) {
+        Path path = Paths.get(basePath, archive);
+        MessageDigest digest;
         try {
-            uncompress(new File(basePath, downloadedFileName), new File(basePath, FilenameUtils.getBaseName(downloadedFileName)));
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 not found...", e);
+        }
+        byte[] hash;
+        try {
+            hash = digest.digest(FileUtils.readFileToByteArray(path.toFile()));
         } catch (IOException e) {
-            throw new RuntimeException("Can not extract client");
+            throw new RuntimeException("Can not compute local SHA-256", e);
+        }
+        return new String(Hex.encode(hash));
+    }
+
+    protected String getRemoteSha256(String archive, String version) {
+        ResponseEntity<String> rawResponse = restTemplate.getForEntity("https://dist.apache.org/repos/dist/release/" + getApachePart(archive, version) + ".mds", String.class);
+        String remoteSha256 = null;
+        try (BufferedReader reader = new BufferedReader(new StringReader(rawResponse.getBody()))) {
+            for (; ; ) {
+                String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                if (("/build/source/target/artifacts/" + archive + ":").equals(line.trim())) {
+                    line = reader.readLine();
+                    if (line == null) {
+                        break;
+                    }
+                    line = line.trim();
+                    if (line.startsWith("SHA256 = ")) {
+                        remoteSha256 = line.replace("SHA256 = ", "").replace(" ", "");
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (remoteSha256 == null) {
+            throw new RuntimeException("Can not retrieve remote SHA-256");
+        }
+        return remoteSha256;
+    }
+
+    private String getApachePart(String archive, String version) {
+        return "hadoop/common/hadoop-" + version + "/" + archive;
+    }
+
+    protected String download(String basePath, String version, String archive) {
+        // Download
+        URI uri = apacheMirrorFinder.resolve(getApachePart(archive, version));
+        try {
+            return download(basePath, uri);
+        } catch (IOException e) {
+            throw new RuntimeException("Can not download the client");
         }
     }
 }

@@ -71,18 +71,7 @@ public class RegistryCommands {
             data[it] = new String[]{next.getName(), next.getUri().toString()};
             it++;
         }
-        TableModel model = new ArrayTableModel(data);
-        TableBuilder tableBuilder = new TableBuilder(model);
-        tableBuilder.addHeaderBorder(BorderStyle.fancy_double);
-
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data[i].length; j++) {
-                tableBuilder.on(at(i, j)).addAligner(SimpleHorizontalAligner.left).addSizer(new AbsoluteWidthSizeConstraints(5));
-                tableBuilder.on(at(i, j)).addAligner(SimpleVerticalAligner.middle);
-            }
-        }
-
-        return tableBuilder.build();
+        return CommandUtils.getTable(data);
     }
 
     @ShellMethod(key = "delete registry", value = "Delete a registry", group = "Registry")

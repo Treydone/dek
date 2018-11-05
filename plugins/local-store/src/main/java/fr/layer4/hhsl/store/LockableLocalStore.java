@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,12 +26,12 @@ package fr.layer4.hhsl.store;
  * #L%
  */
 
-import fr.layer4.hhsl.prompt.Prompter;
 import fr.layer4.hhsl.PropertyManager;
 import fr.layer4.hhsl.event.LockedEvent;
 import fr.layer4.hhsl.event.StoreDestroyEvent;
 import fr.layer4.hhsl.event.StoreReadyEvent;
 import fr.layer4.hhsl.event.UnlockedEvent;
+import fr.layer4.hhsl.prompt.Prompter;
 import fr.layer4.hhsl.registry.RegistryConnection;
 import fr.layer4.hhsl.registry.RegistryConnectionManager;
 import lombok.Getter;
@@ -51,6 +51,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -107,7 +108,7 @@ public class LockableLocalStore implements RegistryConnectionManager, PropertyMa
             dataSource.dispose();
         }
         log.debug("Clean local file");
-        DeleteDbFiles.execute(LocalStoreConstants.getRootPath(), DB, true);
+        DeleteDbFiles.execute(fr.layer4.hhsl.Constants.getRootPath(), DB, true);
         isReady = false;
         applicationEventPublisher.publishEvent(new StoreDestroyEvent(""));
         isUnlocked = false;
@@ -116,7 +117,7 @@ public class LockableLocalStore implements RegistryConnectionManager, PropertyMa
 
     @Override
     public void afterPropertiesSet() {
-        log.debug("Checking if database exists in {}...", LocalStoreConstants.getRootPath());
+        log.debug("Checking if database exists in {}...", fr.layer4.hhsl.Constants.getRootPath());
         List<String> files = getDatabaseFiles();
         if (files.size() == 0) {
             // Not ready
@@ -292,7 +293,7 @@ public class LockableLocalStore implements RegistryConnectionManager, PropertyMa
         String newPassword = prompter.doublePromptForPassword();
 
         try {
-            ChangeFileEncryption.execute(LocalStoreConstants.getRootPath(), DB, CIPHER, actualPassword.toCharArray(), newPassword.toCharArray(), true);
+            ChangeFileEncryption.execute(fr.layer4.hhsl.Constants.getRootPath(), DB, CIPHER, actualPassword.toCharArray(), newPassword.toCharArray(), true);
         } catch (SQLException e) {
             log.error("Can not change password", e);
             throw new RuntimeException("");
@@ -304,17 +305,17 @@ public class LockableLocalStore implements RegistryConnectionManager, PropertyMa
     }
 
     protected static String getDatabasePath() {
-        return LocalStoreConstants.getRootPath() + "/" + DB;
+        return fr.layer4.hhsl.Constants.getRootPath() + File.separator + DB;
     }
 
     protected List<String> getDatabaseFiles() {
-        List<String> files = FileLister.getDatabaseFiles(LocalStoreConstants.getRootPath(), DB, true);
+        List<String> files = FileLister.getDatabaseFiles(fr.layer4.hhsl.Constants.getRootPath(), DB, true);
         try {
             FileLister.tryUnlockDatabase(files, "encryption");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        files = FileLister.getDatabaseFiles(LocalStoreConstants.getRootPath(), DB, false);
+        files = FileLister.getDatabaseFiles(fr.layer4.hhsl.Constants.getRootPath(), DB, false);
         return files;
     }
 

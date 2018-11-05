@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.util.Map;
 
 @Component
 public class SqoopClientPreparer extends AbstractClientPreparer {
@@ -49,10 +50,11 @@ public class SqoopClientPreparer extends AbstractClientPreparer {
     }
 
     @Override
-    public void prepare(String basePath, String service, String version) {
+    public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
 
         URI uri = apacheMirrorFinder.resolve("sqoop/" + version + "/sqoop-" + version + ".bin__hadoop-2.6.0.tar.gz");
 
         //TODO
+        return null;
     }
 }

@@ -80,7 +80,9 @@
                             <copyConfigurationDirectory>true</copyConfigurationDirectory>
                             <configurationDirectory>conf</configurationDirectory>
                             <logsDirectory>logs</logsDirectory>
-                            <licenseHeaderFile>${basedir}/license-header.txt</licenseHeaderFile>
+                            <licenseHeaderFile>${basedir}/src/main/assembly/license-header.txt</licenseHeaderFile>
+                            <unixScriptTemplate>${basedir}/src/main/assembly/unixScriptTemplate</unixScriptTemplate>
+                            <windowsScriptTemplate>${basedir}/src/main/assembly/windowsScriptTemplate</windowsScriptTemplate>
                             <programs>
                                 <program>
                                     <id>hhsl</id>

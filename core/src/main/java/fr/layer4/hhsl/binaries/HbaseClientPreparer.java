@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.util.Map;
 
 @Component
 public class HbaseClientPreparer extends AbstractClientPreparer {
@@ -49,10 +50,11 @@ public class HbaseClientPreparer extends AbstractClientPreparer {
     }
 
     @Override
-    public void prepare(String basePath, String service, String version) {
+    public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
 
-        URI uri = apacheMirrorFinder.resolve("hbase/1.4.8/hbase-1.4.8-bin.tar.gz");
+        URI uri = apacheMirrorFinder.resolve("hbase/" + version + "/hbase-" + version + "-bin.tar.gz");
 
         //TODO
+        return null;
     }
 }

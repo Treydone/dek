@@ -124,7 +124,7 @@ public class AmbariClusterInfoResolverTest {
         cluster.setPassword("le_password");
 
         // When
-        Map<String, String> envVars = resolver.resolveEnvironmentVariables(cluster);
+        Map<String, String> envVars = resolver.resolveEnvironmentVariables(archivesPath, clusterGeneratedPath, cluster);
 
         // Then
         assertEquals(15, envVars.size());

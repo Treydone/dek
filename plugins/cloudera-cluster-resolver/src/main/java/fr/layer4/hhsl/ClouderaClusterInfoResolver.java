@@ -1,3 +1,5 @@
+package fr.layer4.hhsl;
+
 /*-
  * #%L
  * HHSL
@@ -23,38 +25,49 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.binaries;
 
-import fr.layer4.hhsl.DefaultServices;
-import org.apache.http.impl.client.CloseableHttpClient;
+import fr.layer4.hhsl.info.ClusterInfoResolver;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class HiveClientPreparer extends AbstractClientPreparer {
-
-    private final ApacheMirrorFinder apacheMirrorFinder;
+public class ClouderaClusterInfoResolver implements ClusterInfoResolver {
 
     @Autowired
-    public HiveClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
-        super(client);
-        this.apacheMirrorFinder = apacheMirrorFinder;
+    @Setter
+    private RestTemplate restTemplate;
+
+    @Override
+    public String getType() {
+        return "cloudera";
     }
 
     @Override
-    public boolean isCompatible(String service, String version) {
-        return DefaultServices.HIVE.equalsIgnoreCase(service); // Don't care about the versions
+    public Collection<ServiceClientAndVersion> resolveAvailableServiceClients(Cluster cluster) {
+        return Arrays.asList();
     }
 
     @Override
-    public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
+    public Map<String, String> resolveEnvironmentVariables(String archivesPath, String clusterGeneratedPath, Cluster cluster) {
 
-        URI uri = apacheMirrorFinder.resolve("hive/hive-" + version + "/apache-hive-" + version + "-bin.tar.gz");
+        Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
 
-        //TODO
-        return null;
+        Map<String, String> envVars = new HashMap<>();
+
+        return envVars;
+    }
+
+    @Override
+    public Map<String, Map<String, byte[]>> renderConfigurationFiles(Cluster cluster) {
+        Map<String, Map<String, byte[]>> configurationFiles = new HashMap<>();
+
+        return configurationFiles;
     }
 }
