@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,19 +29,19 @@ import fr.layer4.hhsl.DefaultServices;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.Map;
 
 @Component
-public class SqoopClientPreparer extends AbstractClientPreparer {
+public class SqoopClientPreparer extends AbstractApacheClientPreparer {
 
-    private final ApacheMirrorFinder apacheMirrorFinder;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public SqoopClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
-        super(client);
-        this.apacheMirrorFinder = apacheMirrorFinder;
+    public SqoopClientPreparer(CloseableHttpClient client, RestTemplate restTemplate, ApacheMirrorFinder apacheMirrorFinder) {
+        super(client, apacheMirrorFinder);
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -52,9 +52,14 @@ public class SqoopClientPreparer extends AbstractClientPreparer {
     @Override
     public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
 
-        URI uri = apacheMirrorFinder.resolve("sqoop/" + version + "/sqoop-" + version + ".bin__hadoop-2.6.0.tar.gz");
+        String archive = "sqoop-" + version + ".bin__hadoop-2.6.0.tar.gz";
 
         //TODO
         return null;
+    }
+
+    @Override
+    protected String getApachePart(String archive, String version) {
+        return "sqoop/" + version + "/" + archive;
     }
 }

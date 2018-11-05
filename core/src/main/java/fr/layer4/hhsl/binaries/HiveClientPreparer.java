@@ -29,19 +29,19 @@ import fr.layer4.hhsl.DefaultServices;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.Map;
 
 @Component
-public class HiveClientPreparer extends AbstractClientPreparer {
+public class HiveClientPreparer extends AbstractApacheClientPreparer {
 
-    private final ApacheMirrorFinder apacheMirrorFinder;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public HiveClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
-        super(client);
-        this.apacheMirrorFinder = apacheMirrorFinder;
+    public HiveClientPreparer(CloseableHttpClient client, RestTemplate restTemplate, ApacheMirrorFinder apacheMirrorFinder) {
+        super(client, apacheMirrorFinder);
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -52,9 +52,14 @@ public class HiveClientPreparer extends AbstractClientPreparer {
     @Override
     public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
 
-        URI uri = apacheMirrorFinder.resolve("hive/hive-" + version + "/apache-hive-" + version + "-bin.tar.gz");
+        String archive = "apache-hive-" + version + "-bin.tar.gz";
 
         //TODO
         return null;
+    }
+
+    @Override
+    protected String getApachePart(String archive, String version) {
+        return "hive/hive-" + version + "/" + archive;
     }
 }

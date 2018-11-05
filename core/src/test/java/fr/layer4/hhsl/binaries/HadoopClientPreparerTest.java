@@ -1,10 +1,13 @@
 package fr.layer4.hhsl.binaries;
 
+import com.google.common.io.Files;
 import io.specto.hoverfly.junit.rule.HoverflyRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.File;
 
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
 import static io.specto.hoverfly.junit.dsl.HoverflyDsl.service;
@@ -16,7 +19,6 @@ public class HadoopClientPreparerTest {
     @ClassRule
     public static HoverflyRule hoverflyRule = HoverflyRule.inSimulationMode(dsl(
             service("dist.apache.org")
-
                     .get("/repos/dist/release/hadoop/common/hadoop-2.8.5/hadoop-2.8.5.tar.gz.mds")
                     .willReturn(success()
                             .body(
@@ -35,7 +37,44 @@ public class HadoopClientPreparerTest {
                                             "         4773734B 08C9EE5A A1A24548 3A02F53A\n" +
                                             "/build/source/target/artifacts/hadoop-2.8.5.tar.gz: \n" +
                                             "SHA512 = 4174E7A6 7B614B7D 5E47A1A2 420CBE9A 57978908 F8AD0405 F1D17730 6FB36ED8\n" +
-                                            "         7C895810 F70E3C6A 6CBADC76 AFB9303F 1C49CBCA 67237E18 C799D30F 87AFA57C"))
+                                            "         7C895810 F70E3C6A 6CBADC76 AFB9303F 1C49CBCA 67237E18 C799D30F 87AFA57C")),
+
+            service("api.github.com")
+                    .get("/repos/steveloughran/winutils")
+                    .willReturn(success()
+                            .header("Content-type", "application/json; charset=utf-8")
+                            .body("{\n" +
+                                    "  \"id\": 42450016,\n" +
+                                    "  \"node_id\": \"MDEwOlJlcG9zaXRvcnk0MjQ1MDAxNg==\",\n" +
+                                    "  \"name\": \"winutils\",\n" +
+                                    "  \"full_name\": \"steveloughran/winutils\"" +
+                                    "}"))
+                    .get("/repos/steveloughran/winutils/contents/hadoop-2.8.1/bin")
+                    .queryParam("ref", "master")
+                    .willReturn(success()
+                            .header("Content-type", "application/json; charset=utf-8")
+                            .body("[\n" +
+                                    "  {\n" +
+                                    "    \"name\": \"OnOutOfMemory.cmd\",\n" +
+                                    "    \"path\": \"hadoop-2.8.1/bin/OnOutOfMemory.cmd\",\n" +
+                                    "    \"download_url\": \"https://raw.githubusercontent.com/steveloughran/winutils/master/hadoop-2.8.1/bin/OnOutOfMemory.cmd\",\n" +
+                                    "    \"type\": \"file\"" +
+                                    "  }\n," +
+                                    "  {\n" +
+                                    "    \"name\": \"hadoop\",\n" +
+                                    "    \"path\": \"hadoop-2.8.1/bin/hadoop\",\n" +
+                                    "    \"download_url\": \"https://raw.githubusercontent.com/steveloughran/winutils/master/hadoop-2.8.1/bin/hadoop\",\n" +
+                                    "    \"type\": \"file\"" +
+                                    "  }\n" +
+                                    "]"))
+
+                    .get("/repos/steveloughran/winutils/contents/hadoop-2.8.1/bin/OnOutOfMemory.cmd")
+                    .willReturn(success()
+                            .body("dummy content for OnOutOfMemory.cmd"))
+
+                    .get("/repos/steveloughran/winutils/contents/hadoop-2.8.1/bin/hadoop")
+                    .willReturn(success()
+                            .body("dummy content for hadoop"))
     ));
 
     private HadoopClientPreparer hadoopClientPreparer;
@@ -55,6 +94,24 @@ public class HadoopClientPreparerTest {
 
         // Then
         assertThat(sha256).isEqualTo("F9C726DF693CE2DAA4107886F603270D66E7257F77A92C9886502D6CD4A884A4");
+
+    }
+
+    @Test
+    public void downloadWinUtilsBinaries() {
+
+        // Given
+        File tempFile = Files.createTempDir();
+
+        // When
+        HadoopClientPreparer.downloadWinUtilsBinaries(true, tempFile, "2.8.1");
+
+        // Then
+        assertThat(tempFile).isDirectory();
+        File bin = new File(tempFile, "bin");
+        assertThat(bin.list()).containsExactlyInAnyOrder("OnOutOfMemory.cmd", "hadoop");
+        assertThat(new File(bin, "OnOutOfMemory.cmd")).hasContent("dummy content for OnOutOfMemory.cmd");
+        assertThat(new File(bin, "hadoop")).hasContent("dummy content for hadoop");
 
     }
 

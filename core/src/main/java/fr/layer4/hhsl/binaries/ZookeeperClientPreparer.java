@@ -29,19 +29,19 @@ import fr.layer4.hhsl.DefaultServices;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.Map;
 
 @Component
-public class ZookeeperClientPreparer extends AbstractClientPreparer {
+public class ZookeeperClientPreparer extends AbstractApacheClientPreparer {
 
-    private final ApacheMirrorFinder apacheMirrorFinder;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public ZookeeperClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
-        super(client);
-        this.apacheMirrorFinder = apacheMirrorFinder;
+    public ZookeeperClientPreparer(CloseableHttpClient client, RestTemplate restTemplate, ApacheMirrorFinder apacheMirrorFinder) {
+        super(client, apacheMirrorFinder);
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -52,9 +52,14 @@ public class ZookeeperClientPreparer extends AbstractClientPreparer {
     @Override
     public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
 
-        URI uri = apacheMirrorFinder.resolve("zookeeper/zookeeper-" + version + "/zookeeper-" + version + ".tar.gz");
+        String archive = "zookeeper-" + version + ".tar.gz";
 
         //TODO
         return null;
+    }
+
+    @Override
+    protected String getApachePart(String archive, String version) {
+        return "zookeeper/zookeeper-" + version + "/" + archive;
     }
 }

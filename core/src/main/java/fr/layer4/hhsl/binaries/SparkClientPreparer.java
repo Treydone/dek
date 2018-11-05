@@ -29,19 +29,19 @@ import fr.layer4.hhsl.DefaultServices;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.Map;
 
 @Component
-public class SparkClientPreparer extends AbstractClientPreparer {
+public class SparkClientPreparer extends AbstractApacheClientPreparer {
 
-    private final ApacheMirrorFinder apacheMirrorFinder;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public SparkClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
-        super(client);
-        this.apacheMirrorFinder = apacheMirrorFinder;
+    public SparkClientPreparer(CloseableHttpClient client, RestTemplate restTemplate, ApacheMirrorFinder apacheMirrorFinder) {
+        super(client, apacheMirrorFinder);
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -52,9 +52,14 @@ public class SparkClientPreparer extends AbstractClientPreparer {
     @Override
     public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
 
-        URI uri = apacheMirrorFinder.resolve("spark/spark-" + version + "/spark-" + version + "-bin-hadoop2.7.tgz");
+        String archive = "spark-" + version + "-bin-hadoop2.7.tgz";
 
         //TODO
         return null;
+    }
+
+    @Override
+    protected String getApachePart(String archive, String version) {
+        return "spark/spark-" + version + "/" + archive;
     }
 }

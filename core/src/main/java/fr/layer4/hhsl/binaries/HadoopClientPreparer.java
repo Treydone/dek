@@ -42,7 +42,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,15 +52,14 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class HadoopClientPreparer extends AbstractClientPreparer {
+public class HadoopClientPreparer extends AbstractApacheClientPreparer {
 
-    private final ApacheMirrorFinder apacheMirrorFinder;
+
     private final RestTemplate restTemplate;
 
     @Autowired
     public HadoopClientPreparer(CloseableHttpClient client, RestTemplate restTemplate, ApacheMirrorFinder apacheMirrorFinder) {
-        super(client);
-        this.apacheMirrorFinder = apacheMirrorFinder;
+        super(client, apacheMirrorFinder);
         this.restTemplate = restTemplate;
     }
 
@@ -112,30 +110,38 @@ public class HadoopClientPreparer extends AbstractClientPreparer {
 
             String winutilsHadoopVersion = findWinUtilsMatchingVersion(version);
 
-            Github github = new RtGithub();
-            Repo repo = github.repos().get(new Coordinates.Simple("steveloughran", "winutils"));
-            String winutilsBin = "hadoop-" + winutilsHadoopVersion + "/bin";
-            try {
-                Iterable<Content> contents = repo.contents().iterate(winutilsBin, "master");
-                contents.forEach(c -> {
-                    try {
-                        File binFile = new File(dest, "bin" + File.separator + c.json().getString("name"));
-                        if (force || !binFile.exists()) {
-                            FileUtils.copyInputStreamToFile(c.raw(), binFile);
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException("Can not copy " + c.path() + " to " + dest.getAbsolutePath(), e);
-                    }
-                });
-            } catch (IOException e) {
-                throw new RuntimeException("Can not find winutils in " + winutilsBin, e);
-            }
+            downloadWinUtilsBinaries(force, dest, winutilsHadoopVersion);
         }
 
         // Update environment variables
         Map<String, String> envVars = new HashMap<>();
         envVars.put("HADOOP_HOME", dest.getAbsolutePath());
         return envVars;
+    }
+
+    protected static void downloadWinUtilsBinaries(boolean force, File dest, String winutilsHadoopVersion) {
+        Github github = new RtGithub();
+        Repo repo = github.repos().get(new Coordinates.Simple("steveloughran", "winutils"));
+        String winutilsBin = "hadoop-" + winutilsHadoopVersion + "/bin";
+        try {
+            File binDirectory = new File(dest, "bin");
+            if (!binDirectory.exists()) {
+                binDirectory.mkdir();
+            }
+            Iterable<Content> contents = repo.contents().iterate(winutilsBin, "master");
+            contents.forEach(c -> {
+                try {
+                    File binFile = new File(binDirectory, c.path().replace(winutilsBin, ""));
+                    if (force || !binFile.exists()) {
+                        FileUtils.copyInputStreamToFile(c.raw(), binFile);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException("Can not copy " + c.path() + " to " + dest.getAbsolutePath(), e);
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException("Can not find winutils in " + winutilsBin, e);
+        }
     }
 
     protected static String findWinUtilsMatchingVersion(String version) {
@@ -218,17 +224,7 @@ public class HadoopClientPreparer extends AbstractClientPreparer {
         return remoteSha256;
     }
 
-    private String getApachePart(String archive, String version) {
+    protected String getApachePart(String archive, String version) {
         return "hadoop/common/hadoop-" + version + "/" + archive;
-    }
-
-    protected String download(String basePath, String version, String archive) {
-        // Download
-        URI uri = apacheMirrorFinder.resolve(getApachePart(archive, version));
-        try {
-            return download(basePath, uri);
-        } catch (IOException e) {
-            throw new RuntimeException("Can not download the client");
-        }
     }
 }

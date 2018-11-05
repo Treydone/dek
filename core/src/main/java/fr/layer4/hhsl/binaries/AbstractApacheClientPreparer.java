@@ -25,41 +25,30 @@
  */
 package fr.layer4.hhsl.binaries;
 
-import fr.layer4.hhsl.DefaultServices;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
+import java.io.IOException;
+import java.net.URI;
 
-@Component
-public class OozieClientPreparer extends AbstractApacheClientPreparer {
+public abstract class AbstractApacheClientPreparer extends AbstractClientPreparer {
 
-    private final RestTemplate restTemplate;
+    private final ApacheMirrorFinder apacheMirrorFinder;
 
-    @Autowired
-    public OozieClientPreparer(CloseableHttpClient client, RestTemplate restTemplate, ApacheMirrorFinder apacheMirrorFinder) {
-        super(client, apacheMirrorFinder);
-        this.restTemplate = restTemplate;
+    public AbstractApacheClientPreparer(CloseableHttpClient client, ApacheMirrorFinder apacheMirrorFinder) {
+        super(client);
+        this.apacheMirrorFinder = apacheMirrorFinder;
     }
 
-    @Override
-    public boolean isCompatible(String service, String version) {
-        return DefaultServices.OOZIE.equalsIgnoreCase(service); // Don't care about the versions
+    protected abstract String getApachePart(String archive, String version);
+
+    protected String download(String basePath, String version, String archive) {
+        // Download
+        URI uri = apacheMirrorFinder.resolve(getApachePart(archive, version));
+        try {
+            return download(basePath, uri);
+        } catch (IOException e) {
+            throw new RuntimeException("Can not download the client");
+        }
     }
 
-    @Override
-    public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
-
-        String archive = "oozie-" + version + ".tar.gz";
-
-        //TODO
-        return null;
-    }
-
-    @Override
-    protected String getApachePart(String archive, String version) {
-        return "oozie/" + version + "/" + archive;
-    }
 }
