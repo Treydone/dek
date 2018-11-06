@@ -178,7 +178,7 @@ public class AmbariClusterInfoResolverTest {
         byte[] expected = IOUtils.toByteArray(AmbariClusterInfoResolver.class.getClassLoader().getResourceAsStream("test.xml"));
         byte[] actual = configurationFiles.get("HIVE").get("test.xml");
         assertThat(actual)
-                .withFailMessage("Got response: " + new String(actual) + ", was expecting: " + new String(expected))
+//                .withFailMessage("Got response: " + new String(actual) + ", was expecting: " + new String(expected))
                 .isEqualTo(expected);
     }
 }
