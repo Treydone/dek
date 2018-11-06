@@ -174,8 +174,8 @@ public class AmbariClusterInfoResolverTest {
         // Then
         assertThat(configurationFiles).hasSize(1).containsOnlyKeys("HIVE");
         assertThat(configurationFiles.get("HIVE")).hasSize(1).containsOnlyKeys("test.xml");
-        assertThat(configurationFiles.get("HIVE").get("test.xml"))
+        assertThat(new String(configurationFiles.get("HIVE").get("test.xml")))
                 .withFailMessage("Got response: " + new String(configurationFiles.get("HIVE").get("test.xml")))
-                .isEqualTo(IOUtils.toByteArray(AmbariClusterInfoResolver.class.getClassLoader().getResourceAsStream("test.xml")));
+                .isEqualTo(new String(IOUtils.toByteArray(AmbariClusterInfoResolver.class.getClassLoader().getResourceAsStream("test.xml"))));
     }
 }
