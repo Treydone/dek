@@ -25,3 +25,9 @@ deploy:
     on:
       repo: Treydone/hhsl
       tags: true
+
+notifications:
+  email:
+    recipients:
+      - vincent.devillers@layer4.fr
+    on_failure: always
