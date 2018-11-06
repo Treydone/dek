@@ -12,10 +12,10 @@ package fr.layer4.hhsl.commands;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,6 +37,7 @@ import fr.layer4.hhsl.registry.RegistryConnection;
 import fr.layer4.hhsl.registry.RegistryManager;
 import fr.layer4.hhsl.store.Store;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
@@ -81,19 +82,19 @@ public class ClusterCommands {
 
     @ShellMethod(key = "list cluster", value = "List all clusters", group = "Cluster")
     public Table listClusters(@ShellOption(defaultValue = Constants.LOCAL_REGISTRY_NAME, value = "registry") String registryName) {
-
-        // TODO list cluster for all registries...
-        Registry registry = registryManager.getFromName(registryName);
-        List<Cluster> clusters = registry.getClusterService().listClusters();
+        // List cluster for all registries...
+        List<Registry> all = registryManager.all();
+        List<Pair<Registry, Cluster>> clusters = all.stream().flatMap(r -> registryManager.getFromName(registryName).getClusterService().listClusters().stream().map(c -> Pair.of(r, c)))
+                .collect(Collectors.toList());
 
         String[][] data = new String[clusters.size() + 1][];
-        data[0] = new String[]{"Name", "Type", "URI"};
+        data[0] = new String[]{"Registry", "Name", "Type", "URI"};
 
         int it = 1;
-        Iterator<Cluster> iterator = clusters.iterator();
+        Iterator<Pair<Registry, Cluster>> iterator = clusters.iterator();
         while (iterator.hasNext()) {
-            Cluster next = iterator.next();
-            data[it] = new String[]{next.getName(), next.getType(), next.getUri().toString()};
+            Pair<Registry, Cluster> pair = iterator.next();
+            data[it] = new String[]{pair.getKey().getUnderlyingConnection().getName(), pair.getValue().getName(), pair.getValue().getType(), pair.getValue().getUri().toString()};
             it++;
         }
         return CommandUtils.getTable(data);

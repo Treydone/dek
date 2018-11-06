@@ -60,7 +60,7 @@ public class LocalClusterService implements ClusterService {
         this.prompter = prompter;
 
         log.info("Create local_cluster table");
-        this.jdbcTemplate.batchUpdate("CREATE TABLE local_cluster(id INT AUTO_INCREMENT PRIMARY KEY, type VARCHAR(255), name VARCHAR(255), uri VARCHAR(255), banner text, user VARCHAR(255), password VARCHAR(255))");
+        this.jdbcTemplate.batchUpdate("CREATE TABLE IF NOT EXISTS local_cluster(id INT AUTO_INCREMENT PRIMARY KEY, type VARCHAR(255), name VARCHAR(255), uri VARCHAR(255), banner text, user VARCHAR(255), password VARCHAR(255))");
     }
 
     @Override

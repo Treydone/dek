@@ -48,7 +48,7 @@ public class LocalRegistryResolver implements RegistryResolver {
     @Override
     public Registry prepare(RegistryConnection registryConnection) {
         // Information about registry connection is not useful here
-        LocalRegistry localRegistry = new LocalRegistry(registryConnection, lockableLocalStore, prompter);
+        LocalRegistry localRegistry = new LocalRegistry(registryConnection, this.lockableLocalStore, this.prompter);
         return localRegistry;
     }
 }
