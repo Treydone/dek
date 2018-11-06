@@ -81,8 +81,8 @@
                             <configurationDirectory>conf</configurationDirectory>
                             <logsDirectory>logs</logsDirectory>
                             <licenseHeaderFile>${basedir}/src/main/assembly/license-header.txt</licenseHeaderFile>
-                            <unixScriptTemplate>${basedir}/src/main/assembly/unixScriptTemplate</unixScriptTemplate>
-                            <windowsScriptTemplate>${basedir}/src/main/assembly/windowsScriptTemplate</windowsScriptTemplate>
+                            <unixScriptTemplate>${basedir}/src/main/assembly/unixBinTemplate</unixScriptTemplate>
+                            <windowsScriptTemplate>${basedir}/src/main/assembly/windowsBinTemplate</windowsScriptTemplate>
                             <programs>
                                 <program>
                                     <id>hhsl</id>
