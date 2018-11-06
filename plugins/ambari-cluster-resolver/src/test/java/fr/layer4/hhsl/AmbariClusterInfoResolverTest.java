@@ -174,8 +174,10 @@ public class AmbariClusterInfoResolverTest {
         // Then
         assertThat(configurationFiles).hasSize(1).containsOnlyKeys("HIVE");
         assertThat(configurationFiles.get("HIVE")).hasSize(1).containsOnlyKeys("test.xml");
-        assertThat(new String(configurationFiles.get("HIVE").get("test.xml")))
-                .withFailMessage("Got response: " + new String(configurationFiles.get("HIVE").get("test.xml")))
-                .isEqualTo(new String(IOUtils.toByteArray(AmbariClusterInfoResolver.class.getClassLoader().getResourceAsStream("test.xml"))));
+        String expected = new String(IOUtils.toByteArray(AmbariClusterInfoResolver.class.getClassLoader().getResourceAsStream("test.xml")));
+        String actual = new String(configurationFiles.get("HIVE").get("test.xml"));
+        assertThat(actual)
+                .withFailMessage("Got response: " + actual + ", was expecting: " + expected)
+                .isEqualTo(expected);
     }
 }
