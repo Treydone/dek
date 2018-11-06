@@ -157,12 +157,6 @@ At the end, you should the final archive in cli/target/cli-X.X.X.tar.gz
 
 // TODO
 
-=== Update third parties license file
-
-Update the content of the file THIRD-PARTY.txt:
-
- mvn org.codehaus.mojo:license-maven-plugin:aggregate-add-third-party@aggregate-add-third-party
-
 == FAQ
 
 === I need to use a proxy
@@ -198,6 +192,18 @@ Copyright (C) 2012-2018 Vincent Devillers, and the individual contributors to HH
 Use of this software is granted under the terms of the MIT License.
 
 See the {uri-license}[LICENSE] for the full license text.
+
+=== Update third parties license file
+
+Update the content of the file THIRD-PARTY.txt:
+
+ mvn org.codehaus.mojo:license-maven-plugin:aggregate-add-third-party@aggregate-add-third-party
+
+=== Update license header on files
+
+Update licence header on files
+
+ mvn org.codehaus.mojo:license-maven-plugin:update-file-header@update-file-header
 
 == Authors
 

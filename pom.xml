@@ -447,6 +447,34 @@
                         <goals>
                             <goal>update-file-header</goal>
                         </goals>
+                        <phase>dont-execute</phase>
+                        <configuration>
+                            <licenseName>mit</licenseName>
+                            <organizationName>Layer4</organizationName>
+                            <inceptionYear>2018</inceptionYear>
+                            <projectName>HHSL</projectName>
+                            <addJavaLicenseAfterPackage>true</addJavaLicenseAfterPackage>
+                            <canUpdateCopyright>true</canUpdateCopyright>
+                            <canUpdateDescription>true</canUpdateDescription>
+                            <canUpdateLicense>true</canUpdateLicense>
+                            <roots>
+                                <root>src/main</root>
+                                <root>src/test</root>
+                            </roots>
+                            <excludes>
+                                <exclude>**/*.json</exclude>
+                                <exclude>**/*.tar.gz</exclude>
+                                <exclude>**/*.zip</exclude>
+                                <exclude>**/*.gz</exclude>
+                                <exclude>**/*.adoc</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>check-file-header</id>
+                        <goals>
+                            <goal>check-file-header</goal>
+                        </goals>
                         <phase>process-sources</phase>
                         <configuration>
                             <licenseName>mit</licenseName>
@@ -463,6 +491,9 @@
                             </roots>
                             <excludes>
                                 <exclude>**/*.json</exclude>
+                                <exclude>**/*.tar.gz</exclude>
+                                <exclude>**/*.zip</exclude>
+                                <exclude>**/*.gz</exclude>
                                 <exclude>**/*.adoc</exclude>
                             </excludes>
                         </configuration>
