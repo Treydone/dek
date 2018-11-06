@@ -143,6 +143,133 @@ registryconnection id > cluster id > service name
 
 Since both /archives and /confs contains generated content, these directories can be wiped without fear, their content will be regenerated on the next call to 'use cluster ...'
 
+== Configuration
+
+=== Binaries
+
+// TODO
+Not currently implemented
+
+.Available properties for binaries configuration
+[width="100%"]
+|===
+|Property |Default value |Mandatory |Description
+
+|binaries.check
+|true
+|no
+|
+
+|===
+
+=== URLs
+
+// TODO
+Not currently implemented
+
+.Available properties for URL configuration
+[width="100%"]
+|===
+|Property |Default value |Mandatory |Description
+
+|url.mirror.apache.enabled
+|true
+|yes
+|
+
+|url.mirror.apache
+|http://www.apache.org/dyn/closer.cgi/
+|yes
+|
+
+|url.dist.apache
+|https://dist.apache.org/repos/dist/release/
+|no
+|Used when ```mirror.enabled``` is false
+
+|url.signature.apache
+|https://dist.apache.org/repos/dist/release/
+|yes if
+|Used when ```mirror.enabled``` is false
+
+|===
+
+=== HTTP
+
+.Available properties for HTTP configuration
+[width="100%"]
+|===
+|Property |Default value |Mandatory |Description
+
+|http.socket.timeout
+|30000
+|yes
+|Socket timeout
+
+|http.connect.timeout
+|30000
+|yes
+|Connect timeout
+
+|===
+
+=== Proxy
+
+HHSL use external resources hosted on mirrors, like the Apache mirrors, and many others.
+You may need to use a proxy if your company or your private network settings requires some configuration.
+In HHSL, you can to change these properties:
+
+.Available properties for proxy configuration
+[width="100%"]
+|===
+|Property |Default value |Mandatory |Description
+
+|proxy.enabled
+|false
+|no
+|Enabled proxy configuration
+
+|proxy.host
+|-
+|*yes*
+|
+
+|proxy.port
+|-
+|*yes*
+|
+
+|proxy.auth.type
+|none
+|*yes*
+|Possible values: none, ntlm, basic
+
+|proxy.auth.ntlm.user
+|-
+|*yes* if ```proxy.auth.type``` is ntlm
+|
+
+|proxy.auth.ntlm.password
+|-
+|*yes* if ```proxy.auth.type``` is ntlm
+|
+
+|proxy.auth.ntlm.domain
+|-
+|*yes* if ```proxy.auth.type``` is ntlm
+|
+
+|proxy.auth.basic.user
+|-
+|*yes* if ```proxy.auth.type``` is basic
+|
+
+|proxy.auth.basic.password
+|-
+|*yes* if ```proxy.auth.type``` is basic
+|
+|===
+
 == Build
 
 === Build a distribution from sources
@@ -155,14 +282,14 @@ At the end, you should the final archive in cli/target/cli-X.X.X.tar.gz
 
 === Release
 
-// TODO
+ mvn --batch-mode release:clean release:prepare -Dtag=v0.1 -DreleaseVersion=0.1 -DdevelopmentVersion=0.2-SNAPSHOT
+ mvn release:perform
 
 == FAQ
 
 === I need to use a proxy
 
-HHSL use external resources hosted on mirrors, like the Apache mirrors. If you need to use a proxy:
-// TODO... document this part
+See Proxy
 
 === My service is not managed by HHSL
 
