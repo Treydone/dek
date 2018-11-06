@@ -33,6 +33,12 @@
             <groupId>com.cloudera.api</groupId>
             <artifactId>cloudera-manager-api</artifactId>
             <version>4.6.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
