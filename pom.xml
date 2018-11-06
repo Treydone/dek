@@ -387,7 +387,7 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <doclint>all,-missing</doclint>
+                            <additionalJOption>-Xdoclint:none</additionalJOption>
                             <sourcepath>${project.build.directory}/delombok</sourcepath>
                         </configuration>
                     </execution>
