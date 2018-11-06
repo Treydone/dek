@@ -20,7 +20,7 @@ deploy:
       secure: "ht2YIih4oU7j43dYoN47lpxquMA/0JbXRYyTTwMz7bm2NMGGqJV+3cchBmx0ByhwBJN42J1g75k5mm1ggvdycJcAcLK5eYrs55UBJ1FC5rpdR8OB46sUILEoVijIHtXxS50Zt7LgBzH0CT0hS1gY0apajOIbCUwZGzIpQXXb1QAuk3+WJJU4LpB4IkSE2BYmkmxtmkPWET4WjFFmyrmzo/0VhGBbVCC+65+pSl9zapLWYrceje3sxyDo8YJZs0uZkBF40l+zP+07tgGKrsKNrkxOsdVqwXtUMB/G0QKXCMm/NDgTIJioiUSPXdyVrLlpyg5f+ON8HDIEmtsXKWYWokze/ocudxnZaIyhCMkPVGmSaKhLubndnGjPFpQSEpTzIJZ5iOpOJGkIlhmU/WtjcTewmwuL5aK1aSLHfqAvMN4Bq3qqvfnYgWLNFOhgdmlAWgNj607zgx7ZMqJ2t+iImD9EAwQvgK+dlZwHzzZMJRECHksbcj+PAYl0T2A4W31dPYoXy6TDx/J/mwjpgJzncDJ10GW8u+cDsPiq+3xSvJoCFH4Q7OTL2zhKc2+XX/mSsLayPgwGr3SApJZdiP49ks39+eIOoojAsL/N+mqEYfA1rD592XiLh6WwoPPruOupEAYOjnzpF1E0ApiN92MpI0ZoVRZjj1rdlq52KWadv+U="
     file_glob: true
     file:
-      - cli/cli-*.zip
+      - cli/target/cli-*.zip
     skip_cleanup: true
     on:
       repo: Treydone/hhsl
