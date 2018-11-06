@@ -41,6 +41,7 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -53,7 +54,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
@@ -163,8 +167,8 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
                     // TODO Extract configuration files from archive
                     Map<String, byte[]> confs = new HashMap<>();
                     try (InputStream fi = new ByteArrayInputStream(bytes);
-                         InputStream bi = new BufferedInputStream(fi);
-                         InputStream gzi = new GzipCompressorInputStream(bi);
+//                         InputStream bi = new BufferedInputStream(fi);
+                         InputStream gzi = new GzipCompressorInputStream(fi);
                          ArchiveInputStream i = new TarArchiveInputStream(gzi)
                     ) {
                         ArchiveEntry entry;
@@ -173,14 +177,16 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
                                 // TODO log something?
                                 continue;
                             }
-                            confs.put(entry.getName(), IOUtils.toByteArray(i));
+                            if (!entry.isDirectory()) {
+                                confs.put(FilenameUtils.getName(entry.getName()), IOUtils.toByteArray(i));
+                            }
                         }
                     } catch (IOException e) {
                         throw new RuntimeException("Can not extract archive", e);
                     }
                     return Pair.of(sv.getService(), confs);
                 })
-        .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         return configurationFiles;
     }
