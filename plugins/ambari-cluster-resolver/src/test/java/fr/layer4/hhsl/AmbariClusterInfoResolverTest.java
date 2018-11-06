@@ -36,7 +36,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
@@ -175,6 +174,8 @@ public class AmbariClusterInfoResolverTest {
         // Then
         assertThat(configurationFiles).hasSize(1).containsOnlyKeys("HIVE");
         assertThat(configurationFiles.get("HIVE")).hasSize(1).containsOnlyKeys("test.xml");
-        assertThat(configurationFiles.get("HIVE").get("test.xml")).isEqualTo(IOUtils.toByteArray(AmbariClusterInfoResolver.class.getClassLoader().getResourceAsStream("test.xml")));
+        assertThat(configurationFiles.get("HIVE").get("test.xml"))
+                .withFailMessage("Got response: " + new String(configurationFiles.get("HIVE").get("test.xml")))
+                .isEqualTo(IOUtils.toByteArray(AmbariClusterInfoResolver.class.getClassLoader().getResourceAsStream("test.xml")));
     }
 }
