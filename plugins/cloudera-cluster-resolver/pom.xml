@@ -71,9 +71,8 @@
 
     <repositories>
         <repository>
-            <id>cdh.repo</id>
-            <url>https://repository.cloudera.com/groups/cloudera-repos</url>
-            <name>Cloudera Repository</name>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
         </repository>
     </repositories>
 
