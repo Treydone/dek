@@ -4,7 +4,7 @@
 
     <groupId>fr.layer4.hhsl</groupId>
     <artifactId>hhsl</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <packaging>pom</packaging>
     <description>An easy way to connect to multiple Hadoop clusters</description>
     <url>http://github.com/Treydone/hhsl</url>
@@ -21,7 +21,7 @@
         <connection>scm:git:git@github.com:Treydone/hhsl.git</connection>
         <developerConnection>scm:git:git@github.com:Treydone/hhsl.git</developerConnection>
         <url>http://github.com/Treydone/hhsl</url>
-        <tag>HEAD</tag>
+        <tag>v0.2</tag>
     </scm>
 
     <issueManagement>
