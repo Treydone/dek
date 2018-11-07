@@ -41,9 +41,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
-public class LockableLocalStoreTest {
+public class LocalLockableStoreTest {
 
-    private LockableLocalStore h2LocalStore;
+    private LocalLockableStore h2LocalStore;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -53,8 +53,8 @@ public class LockableLocalStoreTest {
 
     @Before
     public void beforeEachTest() {
-        DeleteDbFiles.execute(Constants.getRootPath(), LockableLocalStore.DB, true);
-        h2LocalStore = new LockableLocalStore();
+        DeleteDbFiles.execute(Constants.getRootPath(), LocalLockableStore.DB, true);
+        h2LocalStore = new LocalLockableStore();
         h2LocalStore.setPrompter(prompter);
         h2LocalStore.setApplicationEventPublisher(eventPublisher);
     }

@@ -27,7 +27,7 @@ package fr.layer4.hhsl;
  */
 
 import fr.layer4.hhsl.prompt.Prompter;
-import fr.layer4.hhsl.store.LockableLocalStore;
+import fr.layer4.hhsl.store.LocalLockableStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -50,13 +50,13 @@ public class LocalClusterService implements ClusterService {
         return cluster;
     };
 
-    private final LockableLocalStore lockableLocalStore;
+    private final LocalLockableStore localLockableStore;
     private final JdbcTemplate jdbcTemplate;
     private final Prompter prompter;
 
-    public LocalClusterService(LockableLocalStore lockableLocalStore, Prompter prompter) {
-        this.lockableLocalStore = lockableLocalStore;
-        this.jdbcTemplate = lockableLocalStore.getJdbcTemplate();
+    public LocalClusterService(LocalLockableStore localLockableStore, Prompter prompter) {
+        this.localLockableStore = localLockableStore;
+        this.jdbcTemplate = localLockableStore.getJdbcTemplate();
         this.prompter = prompter;
 
         log.info("Create local_cluster table");

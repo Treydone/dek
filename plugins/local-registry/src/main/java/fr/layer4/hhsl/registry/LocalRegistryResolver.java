@@ -27,7 +27,7 @@ package fr.layer4.hhsl.registry;
  */
 
 import fr.layer4.hhsl.prompt.Prompter;
-import fr.layer4.hhsl.store.LockableLocalStore;
+import fr.layer4.hhsl.store.LocalLockableStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class LocalRegistryResolver implements RegistryResolver {
 
     @Autowired
-    private LockableLocalStore lockableLocalStore;
+    private LocalLockableStore localLockableStore;
 
     @Autowired
     private Prompter prompter;
@@ -48,7 +48,7 @@ public class LocalRegistryResolver implements RegistryResolver {
     @Override
     public Registry prepare(RegistryConnection registryConnection) {
         // Information about registry connection is not useful here
-        LocalRegistry localRegistry = new LocalRegistry(registryConnection, this.lockableLocalStore, this.prompter);
+        LocalRegistry localRegistry = new LocalRegistry(registryConnection, this.localLockableStore, this.prompter);
         return localRegistry;
     }
 }

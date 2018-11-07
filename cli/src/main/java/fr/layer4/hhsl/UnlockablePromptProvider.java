@@ -28,15 +28,17 @@ package fr.layer4.hhsl;
 
 import fr.layer4.hhsl.store.LockableStore;
 import fr.layer4.hhsl.store.Store;
+import lombok.RequiredArgsConstructor;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.jline.PromptProvider;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UnlockablePromptProvider implements PromptProvider {
 
     @Autowired
-    private Store store;
+    private final Store store;
 
     @Override
     public AttributedString getPrompt() {

@@ -26,6 +26,7 @@
 package fr.layer4.hhsl.registry;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A service managing the connection to registries.
@@ -36,7 +37,7 @@ public interface RegistryConnectionManager {
      * @param name
      * @return
      */
-    RegistryConnection getRegistry(String name);
+    Optional<RegistryConnection> getRegistry(String name);
 
     /**
      * @param name
@@ -52,5 +53,5 @@ public interface RegistryConnectionManager {
      * @param name
      * @param uri
      */
-    void addRegistry(String name, String uri);
+    void addOrUpdateRegistry(String name, String uri);
 }

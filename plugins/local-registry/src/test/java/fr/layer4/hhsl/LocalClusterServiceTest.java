@@ -27,7 +27,7 @@ package fr.layer4.hhsl;
  */
 
 import fr.layer4.hhsl.prompt.Prompter;
-import fr.layer4.hhsl.store.LockableLocalStore;
+import fr.layer4.hhsl.store.LocalLockableStore;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,12 +37,12 @@ public class LocalClusterServiceTest {
 
     private LocalClusterService localClusterService;
 
-    private LockableLocalStore lockableLocalStore;
+    private LocalLockableStore localLockableStore;
     private Prompter prompter;
 
     @Before
     public void beforeEachTest() {
-        this.localClusterService = new LocalClusterService(lockableLocalStore, prompter);
+        this.localClusterService = new LocalClusterService(localLockableStore, prompter);
     }
 
     @Test

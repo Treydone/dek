@@ -40,8 +40,6 @@ import org.springframework.shell.table.*;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.springframework.shell.table.CellMatchers.at;
-
 @Slf4j
 @ShellComponent
 public class RegistryCommands {
@@ -83,6 +81,6 @@ public class RegistryCommands {
     public void addRegistry(
             String name,
             String uri) {
-        registryConnectionManager.addRegistry(name, uri);
+        registryConnectionManager.addOrUpdateRegistry(name, uri);
     }
 }

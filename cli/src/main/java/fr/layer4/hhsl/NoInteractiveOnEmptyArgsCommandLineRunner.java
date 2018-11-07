@@ -26,29 +26,31 @@ package fr.layer4.hhsl;
  * #L%
  */
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.shell.Shell;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Bypass InteractiveShellApplicationRunner if commmandline arguments are present.
+ */
 @Slf4j
+@Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Order(InteractiveShellApplicationRunner.PRECEDENCE - 2)
 class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 
-    private Shell shell;
-
+    private final Shell shell;
     private final ConfigurableEnvironment environment;
-
-    public NoInteractiveOnEmptyArgsCommandLineRunner(Shell shell, ConfigurableEnvironment environment) {
-        this.shell = shell;
-        this.environment = environment;
-    }
 
     @Override
     public void run(String... args) throws Exception {

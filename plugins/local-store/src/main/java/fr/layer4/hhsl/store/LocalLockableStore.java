@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,18 +26,14 @@ package fr.layer4.hhsl.store;
  * #L%
  */
 
-import fr.layer4.hhsl.PropertyManager;
 import fr.layer4.hhsl.event.LockedEvent;
 import fr.layer4.hhsl.event.StoreDestroyEvent;
 import fr.layer4.hhsl.event.StoreReadyEvent;
 import fr.layer4.hhsl.event.UnlockedEvent;
 import fr.layer4.hhsl.prompt.Prompter;
-import fr.layer4.hhsl.registry.RegistryConnection;
-import fr.layer4.hhsl.registry.RegistryConnectionManager;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.h2.engine.Constants;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.store.FileLister;
@@ -48,27 +44,22 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * http://www.h2database.com/html/features.html#file_encryption
  */
 @Slf4j
 @Component
-public class LockableLocalStore implements RegistryConnectionManager, PropertyManager, LockableStore, InitializingBean, DisposableBean {
+public class LocalLockableStore implements LockableStore, InitializingBean, DisposableBean {
 
     public static final String CIPHER = "AES";
     public static final String DB = "db";
@@ -77,14 +68,6 @@ public class LockableLocalStore implements RegistryConnectionManager, PropertyMa
     public static final String JDBC_H2 = "jdbc:h2:";
     public static final String CIPHER_EXTENSION = ";CIPHER=";
     public static final String ENCRYPT_HEADER = "H2encrypt\n";
-
-    private static final RowMapper<RegistryConnection> REGISTRY_ROW_MAPPER = (r, i) -> {
-        RegistryConnection registryConnection = new RegistryConnection();
-        registryConnection.setId(r.getLong("id"));
-        registryConnection.setName(r.getString("name"));
-        registryConnection.setUri(URI.create(r.getString("uri")));
-        return registryConnection;
-    };
 
     @Setter
     @Autowired
@@ -183,53 +166,6 @@ public class LockableLocalStore implements RegistryConnectionManager, PropertyMa
     }
 
     @Override
-    public Map<String, String> getProperty() {
-        List<Map<String, Object>> maps = jdbcTemplate.queryForList("SELECT `key`, `value` FROM env");
-        return maps.stream().map(e -> Pair.of((String) e.get("KEY"), (String) e.get("VALUE"))).collect(Collectors.toMap(Pair::getKey, Pair::getRight));
-    }
-
-    @Override
-    public Optional<String> getProperty(String key) {
-        String result = jdbcTemplate.queryForObject("SELECT `value` FROM env WHERE `key` = ?", String.class, new Object[]{key});
-        return result != null ? Optional.of(result) : Optional.empty();
-    }
-
-    @Override
-    public void setProperty(String key, String value) {
-        jdbcTemplate.update("MERGE INTO env KEY (`key`) VALUES (default, ?, ?);", key, value);
-    }
-
-    @Override
-    public void deleteProperty(String key) {
-        jdbcTemplate.update("DELETE env WHERE `key` = ?", key);
-    }
-
-
-    @Override
-    public RegistryConnection getRegistry(String name) {
-        return jdbcTemplate.queryForObject("SELECT * FROM registry WHERE `name` = ?", new Object[]{name}, REGISTRY_ROW_MAPPER);
-    }
-
-    @Override
-    public void deleteRegistry(String name) {
-        if (!fr.layer4.hhsl.Constants.LOCAL_REGISTRY_NAME.equals(name)) {
-            jdbcTemplate.update("DELETE env WHERE `name` = ?", name);
-        }
-    }
-
-    @Override
-    public List<RegistryConnection> listRegistries() {
-        return jdbcTemplate.query("SELECT * FROM registry", new Object[]{}, REGISTRY_ROW_MAPPER);
-    }
-
-    @Override
-    public void addRegistry(String name, String uri) {
-        if (!fr.layer4.hhsl.Constants.LOCAL_REGISTRY_NAME.equals(URI.create(uri).getScheme())) {
-            jdbcTemplate.update("MERGE INTO registry KEY (`name`) VALUES (default, ?, ?);", name, uri);
-        }
-    }
-
-    @Override
     public void init() {
         init(false);
     }
@@ -257,20 +193,12 @@ public class LockableLocalStore implements RegistryConnectionManager, PropertyMa
 
         jdbcTemplate = new JdbcTemplate(dataSource);
         log.debug("Create tables");
-        jdbcTemplate.batchUpdate(
-                "CREATE TABLE env(id INT AUTO_INCREMENT PRIMARY KEY, key VARCHAR(255), value VARCHAR(255))",
-                "CREATE TABLE registry(id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), uri VARCHAR(255))");
+        LocalPropertyManager.updateDdl(jdbcTemplate);
+        LocalRegistryConnectionManager.updateDdl(jdbcTemplate);
         log.debug("Create default local registry");
-        jdbcTemplate.batchUpdate(
-                "INSERT INTO registry VALUES (default, 'local', 'local://" + getDatabasePath() + "')"
-        );
+        LocalRegistryConnectionManager.updateData(jdbcTemplate, getDatabasePath());
         log.debug("Create default properties");
-        jdbcTemplate.batchUpdate(
-                "INSERT INTO env VALUES "
-                        + "(default, 'http.socket.timeout', '30000'),"
-                        + "(default, 'http.connect.timeout', '30000'),"
-                        + "(default, 'proxy.enabled', 'false')"
-        );
+        LocalPropertyManager.updateData(jdbcTemplate);
     }
 
     @Override

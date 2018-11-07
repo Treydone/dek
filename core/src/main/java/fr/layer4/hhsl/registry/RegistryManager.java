@@ -57,7 +57,7 @@ public class RegistryManager {
     }
 
     public Registry getFromName(String registryName) {
-        RegistryConnection registryConnection = registryConnectionManager.getRegistry(registryName);
+        RegistryConnection registryConnection = registryConnectionManager.getRegistry(registryName).orElseThrow(() -> new RuntimeException("Registry " + registryName + " not found"));
         return registryConnectionRegistryFunction.apply(registryConnection);
     }
 
