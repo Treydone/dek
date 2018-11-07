@@ -1,6 +1,20 @@
-banner:
-  location: classpath:banner.txt
+---
+spring:
+  profiles: debug
 logging:
   level:
     root: ERROR
     fr.layer4.hhsl: DEBUG
+
+---
+spring:
+  profiles: runtime
+logging:
+  level:
+    root: ERROR
+    fr.layer4.hhsl: WARN
+
+---
+spring:
+  profiles:
+    active: debug

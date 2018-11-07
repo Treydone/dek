@@ -23,6 +23,11 @@
         </dependency>
         <dependency>
             <groupId>fr.layer4.hhsl.plugins</groupId>
+            <artifactId>hadoop-binaries-preparers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.layer4.hhsl.plugins</groupId>
             <artifactId>local-store</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -90,8 +95,8 @@
                                         <maxMemorySize>1024m</maxMemorySize>
                                         <maxStackSize>128m</maxStackSize>
                                         <extraArguments>
-                                            <!--<extraArgument>-Dlogging.file=%APP_BASE%/logs/hhsl.log</extraArgument>-->
-                                            <!--<extraArgument>-Dlogging.mode=file</extraArgument>-->
+                                            <extraArgument>-Dlogging.file=%APP_BASE%/logs/hhsl.log</extraArgument>
+                                            <extraArgument>-Dspring.profiles.active=runtime</extraArgument>
                                             <extraArgument>-server</extraArgument>
                                             <extraArgument>-XX:+UseConcMarkSweepGC</extraArgument>
                                             <extraArgument>-XX:+CMSParallelRemarkEnabled</extraArgument>

@@ -18,5 +18,6 @@
         <module>ambari-cluster-resolver</module>
         <module>cloudera-cluster-resolver</module>
         <module>hadoop-unit-cluster-resolver</module>
+        <module>hadoop-binaries-preparers</module>
     </modules>
 </project>
