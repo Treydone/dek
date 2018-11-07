@@ -13,6 +13,15 @@ env:
 
 before_cache: rm -rf $HOME/.m2/repository/fr/layer4
 
+addons:
+  sonarcloud:
+    organization: "treydone-github"
+    token:
+      secure: "2vSVD97L7NHWivhtAtxF7EAlnSInyWmj1Um4H5M+jQrw4SA+ZEwLPxOnxK//u7+byHtWCC13Ee3zfIZwhv9rkdSW5CkcM2CcXjjjP6eJaIFwHbxgWZoXzGOT4i4EHUEtXPQbQOlTJ/DhKN0V9cej62+xp7g/JkZRvT0xKIRUoIQTrlszLW6TyUrMNADU79uAcKeJKzxdvFkh2MiYxYEBPhBprVk1bJA1AUyle65Qg9NcL2J9HelznfAvkUQRTqXHTVFJy5tCX9jZkq0iMd6F6/obGH9kCNl8EJhC27NL3gY4w9vUXS3vmsNDxT1jO0H78+ROqjatvekqICmEh2GIqGrrk6NsA510VeM8QPpZ1bLk3G8LaQfPAwTxcYcngKltYh1qcy0mww9Ur6JboE01hNqeV1bXBxOb3Puhd/IckbgQ0t5rpGw223t63hwTGuzwOB4kqgo9QH/pml/uu4o3AZbbGkOMBL/efXqtjWj62jzX0DMF9Vlni0keBimY+Ey9xBTHKwZlRmcCNp641isoddP9Kqcxt0mTesOHpQ5bQ144hR2s96mUhaX06GpDXG3Fs9NiO09gPmEiuACPJ6inNX88KCM7etOkpjHmQmvL+hCG6qo24EecTpBuZzEBxb2ZDSrXiU82mnZq2FJOC+Yyi763wXbj2Opx8dNwXKr7WCQ="
+
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+
 deploy:
   - provider: releases
     overwrite: true

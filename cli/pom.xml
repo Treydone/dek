@@ -134,6 +134,8 @@
                         <phase>package</phase>
                         <configuration>
                             <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>hhsl-${project.version]</finalName>
+                            <attach>false</attach>
                             <descriptors>
                                 <descriptor>src/main/assembly/zip.xml</descriptor>
                             </descriptors>
