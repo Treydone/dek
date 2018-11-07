@@ -12,10 +12,10 @@ package fr.layer4.hhsl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,6 +36,7 @@ import fr.layer4.hhsl.ambari.api.model.ServiceResponseWrapperContext;
 import fr.layer4.hhsl.ambari.api.model.StackServiceResponseSwagger;
 import fr.layer4.hhsl.info.ClusterInfoResolver;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -51,13 +52,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
@@ -65,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class AmbariClusterInfoResolver implements ClusterInfoResolver {
 
@@ -94,45 +94,45 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
         return serviceResponse.getItems().stream().map(s -> {
             String serviceName = s.getServiceInfo().getServiceName();
             StackServiceResponseSwagger stackServiceResponse = stacksApi.stacksServiceGetStackService("HDP", clusterResponse.getVersion().replace("HDP-", ""), serviceName, null);
-            return ServiceClientAndVersion.of(serviceName, stackServiceResponse.getStackServices().getServiceVersion());
+            return ServiceClientAndVersion.of(serviceName.toLowerCase(), stackServiceResponse.getStackServices().getServiceVersion());
         }).collect(Collectors.toList());
-        // TODO keep only service clients (HIVE_CLIENT, but not HIVE_METASTORE)
     }
 
     @Override
     public Map<String, String> resolveEnvironmentVariables(String archivesPath, String clusterGeneratedPath, Cluster cluster) {
-
         Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
+        return resolveEnvironmentVariablesFromServices(clusterGeneratedPath, serviceClientAndVersions);
+    }
 
+    protected Map<String, String> resolveEnvironmentVariablesFromServices(String clusterGeneratedPath, Collection<ServiceClientAndVersion> serviceClientAndVersions) {
         Map<String, String> envVars = new HashMap<>();
 
         // Get services and components
         // For each components, add custom entries in envVars
         serviceClientAndVersions.forEach(e -> {
-            switch (e.getService()) {
-                case "HDFS":
+            switch (e.getService().toLowerCase()) {
+                case DefaultServices.HDFS:
                     envVars.put("HADOOP_CONF_DIR", clusterGeneratedPath + File.separator + e.getService());
                     envVars.put("HADOOP_CLIENT_OPTS", "-Xmx1g");
                     envVars.put("MAPRED_DISTCP_OPTS", "-Xmx2g");
                     envVars.put("HADOOP_DISTCP_OPTS", "-Xmx2g");
                     break;
-                case "HBASE":
+                case DefaultServices.HBASE:
 //                    envVars.put("HBASE_CLASSPATH", "");
                     envVars.put("HBASE_CONF_DIR", clusterGeneratedPath + File.separator + e.getService());
                     break;
-                case "YARN":
+                case DefaultServices.YARN:
                     envVars.put("YARN_CONF_DIR", clusterGeneratedPath + File.separator + e.getService());
                     break;
-                case "ZOOKEEPER":
+                case DefaultServices.ZOOKEEPER:
                     envVars.put("ZOOKEEPER_CONF_DIR", clusterGeneratedPath + File.separator + e.getService());
                     break;
-                case "PIG":
+                case DefaultServices.PIG:
                     break;
-                case "HIVE":
+                case DefaultServices.HIVE:
                     break;
             }
         });
-
         return envVars;
     }
 
@@ -151,10 +151,13 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
         Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
         Map<String, Map<String, byte[]>> configurationFiles = serviceClientAndVersions.stream()
                 .map(sv -> {
+                    String serviceName = sv.getService().toUpperCase();
+                    String clientName = serviceName + "_CLIENT";
+
                     Map<String, Object> uriVariables = new HashMap<>();
                     uriVariables.put("clusterName", clusterName);
-                    uriVariables.put("serviceName", sv.getService()); // TODO
-                    uriVariables.put("componentName", "HIVE_CLIENT"); // TODO
+                    uriVariables.put("serviceName", serviceName);
+                    uriVariables.put("componentName", clientName);
                     String path = UriComponentsBuilder.fromPath("/clusters/{clusterName}/services/{serviceName}/components/{componentName}").buildAndExpand(uriVariables).toUriString();
 
                     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
@@ -162,27 +165,33 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
                     List<MediaType> accept = apiClient.selectHeaderAccept(new String[]{"*/*"});
                     ParameterizedTypeReference<byte[]> returnType = new ParameterizedTypeReference<byte[]>() {
                     };
-                    byte[] bytes = apiClient.invokeAPI(path, HttpMethod.GET, queryParams, null, new HttpHeaders(), null, accept, null, new String[]{"basicAuth"}, returnType);
 
-                    // TODO Extract configuration files from archive
                     Map<String, byte[]> confs = new HashMap<>();
-                    try (InputStream fi = new ByteArrayInputStream(bytes);
-//                         InputStream bi = new BufferedInputStream(fi);
-                         InputStream gzi = new GzipCompressorInputStream(fi);
-                         ArchiveInputStream i = new TarArchiveInputStream(gzi)
-                    ) {
-                        ArchiveEntry entry;
-                        while ((entry = i.getNextEntry()) != null) {
-                            if (!i.canReadEntryData(entry)) {
-                                // TODO log something?
-                                continue;
+
+                    try {
+                        byte[] bytes = apiClient.invokeAPI(path, HttpMethod.GET, queryParams, null, new HttpHeaders(), null, accept, null, new String[]{"basicAuth"}, returnType);
+
+                        // Extract configuration files from archive
+                        try (InputStream raw = new ByteArrayInputStream(bytes);
+                             InputStream buffered = new BufferedInputStream(raw);
+                             InputStream gz = new GzipCompressorInputStream(buffered);
+                             ArchiveInputStream tar = new TarArchiveInputStream(gz)
+                        ) {
+                            ArchiveEntry entry;
+                            while ((entry = tar.getNextEntry()) != null) {
+                                if (!tar.canReadEntryData(entry)) {
+                                    // TODO log something?
+                                    continue;
+                                }
+                                if (!entry.isDirectory()) {
+                                    confs.put(FilenameUtils.getName(entry.getName()), IOUtils.toByteArray(tar));
+                                }
                             }
-                            if (!entry.isDirectory()) {
-                                confs.put(FilenameUtils.getName(entry.getName()), IOUtils.toByteArray(i));
-                            }
+                        } catch (IOException e) {
+                            throw new RuntimeException("Can not extract archive", e);
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException("Can not extract archive", e);
+                    } catch (RestClientException e) {
+                        log.warn("Can not find client {} for service {}", clientName, serviceName);
                     }
                     return Pair.of(sv.getService(), confs);
                 })

@@ -34,4 +34,5 @@ public interface DefaultServices {
     String SQOOP = "sqoop";
     String YARN = "yarn";
     String ZOOKEEPER = "zookeeper";
+    String PIG = "pig";
 }
