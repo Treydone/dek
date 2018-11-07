@@ -211,6 +211,11 @@ Not currently implemented
 |yes
 |Connect timeout
 
+|http.insecure
+|false
+|yes
+|Allow insecure SSL connections and transfers.
+
 |===
 
 === Proxy
@@ -308,6 +313,8 @@ Kerberos authentication is not yet managed by HHSL. This feature will be added s
 * Add security (Kerberos) switch
 * Manage other clients (Cassandra, MongoDB...)
 * Add MapR
+* Add a Offline Mode
+* Force a version of a client for a cluster
 
 == Contributions
 
