@@ -12,10 +12,10 @@ package fr.layer4.hhsl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -50,12 +50,10 @@ public class LocalClusterService implements ClusterService {
         return cluster;
     };
 
-    private final LocalLockableStore localLockableStore;
     private final JdbcTemplate jdbcTemplate;
     private final Prompter prompter;
 
     public LocalClusterService(LocalLockableStore localLockableStore, Prompter prompter) {
-        this.localLockableStore = localLockableStore;
         this.jdbcTemplate = localLockableStore.getJdbcTemplate();
         this.prompter = prompter;
 
@@ -88,7 +86,7 @@ public class LocalClusterService implements ClusterService {
 
     @Override
     public Cluster getCluster(String name) {
-        return this.jdbcTemplate.queryForObject("SELECT * FROM local_cluster WHERE `name` = ?", CLUSTER_ROW_MAPPER, new Object[]{name});
+        return this.jdbcTemplate.queryForObject("SELECT * FROM local_cluster WHERE `name` = ?", CLUSTER_ROW_MAPPER, name);
     }
 
 }
