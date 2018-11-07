@@ -26,12 +26,15 @@ package fr.layer4.hhsl;
  * #L%
  */
 
+import fr.layer4.hhsl.store.LockableStore;
+import fr.layer4.hhsl.store.Store;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.shell.Availability;
 import org.springframework.shell.Shell;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -51,6 +54,7 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 
     private final Shell shell;
     private final ConfigurableEnvironment environment;
+    private final Store store;
 
     @Override
     public void run(String... args) throws Exception {
@@ -65,6 +69,14 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
                 System.exit(1);
             }
         }
+
+//        if (store instanceof LockableStore) {
+//            LockableStore lockableStore = (LockableStore) store;
+//            if (!lockableStore.isUnlocked()) {
+//
+//                lockableStore.unlock();
+//            }
+//        }
 
         if (!commandsToRun.isEmpty()) {
             InteractiveShellApplicationRunner.disable(environment);

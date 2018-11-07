@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.class)
 public class LocalLockableStoreTest {
 
-    private LocalLockableStore h2LocalStore;
+    private LocalLockableStore localLockableStore;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -54,9 +54,9 @@ public class LocalLockableStoreTest {
     @Before
     public void beforeEachTest() {
         DeleteDbFiles.execute(Constants.getRootPath(), LocalLockableStore.DB, true);
-        h2LocalStore = new LocalLockableStore();
-        h2LocalStore.setPrompter(prompter);
-        h2LocalStore.setApplicationEventPublisher(eventPublisher);
+        localLockableStore = new LocalLockableStore();
+        localLockableStore.setPrompter(prompter);
+        localLockableStore.setApplicationEventPublisher(eventPublisher);
     }
 
     @Test
@@ -65,11 +65,11 @@ public class LocalLockableStoreTest {
         // Given
 
         // When
-        h2LocalStore.afterPropertiesSet();
+        localLockableStore.afterPropertiesSet();
 
         // Then
-        assertFalse(h2LocalStore.isReady());
-        assertFalse(h2LocalStore.isUnlocked());
+        assertFalse(localLockableStore.isReady());
+        assertFalse(localLockableStore.isUnlocked());
 
     }
 
@@ -77,16 +77,16 @@ public class LocalLockableStoreTest {
     public void startOnExistingUnlockedDatabase() {
 
         // Given
-        h2LocalStore.afterPropertiesSet();
-        h2LocalStore.init(false);
-        h2LocalStore.destroy();
+        localLockableStore.afterPropertiesSet();
+        localLockableStore.init(false);
+        localLockableStore.destroy();
 
         // When
-        h2LocalStore.afterPropertiesSet();
+        localLockableStore.afterPropertiesSet();
 
         // Then
-        assertTrue(h2LocalStore.isReady());
-        assertTrue(h2LocalStore.isUnlocked());
+        assertTrue(localLockableStore.isReady());
+        assertTrue(localLockableStore.isUnlocked());
 
     }
 
@@ -96,16 +96,16 @@ public class LocalLockableStoreTest {
         // Given
         Mockito.when(prompter.doublePromptForPassword()).thenReturn("le_password");
 
-        h2LocalStore.afterPropertiesSet();
-        h2LocalStore.init(true);
-        h2LocalStore.destroy();
+        localLockableStore.afterPropertiesSet();
+        localLockableStore.init(true);
+        localLockableStore.destroy();
 
         // When
-        h2LocalStore.afterPropertiesSet();
+        localLockableStore.afterPropertiesSet();
 
         // Then
-        assertTrue(h2LocalStore.isReady());
-        assertFalse(h2LocalStore.isUnlocked());
+        assertTrue(localLockableStore.isReady());
+        assertFalse(localLockableStore.isUnlocked());
 
     }
 
@@ -115,18 +115,18 @@ public class LocalLockableStoreTest {
         // Given
         Mockito.when(prompter.doublePromptForPassword()).thenReturn("le_password");
 
-        h2LocalStore.afterPropertiesSet();
-        h2LocalStore.init(true);
-        h2LocalStore.destroy();
+        localLockableStore.afterPropertiesSet();
+        localLockableStore.init(true);
+        localLockableStore.destroy();
 
         // When
-        h2LocalStore.afterPropertiesSet();
+        localLockableStore.afterPropertiesSet();
         Mockito.when(prompter.promptForRootPassword()).thenReturn("le_password");
-        h2LocalStore.unlock();
+        localLockableStore.unlock();
 
         // Then
-        assertTrue(h2LocalStore.isReady());
-        assertTrue(h2LocalStore.isUnlocked());
+        assertTrue(localLockableStore.isReady());
+        assertTrue(localLockableStore.isUnlocked());
 
     }
 }

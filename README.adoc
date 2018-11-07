@@ -290,6 +290,10 @@ At the end, you should the final archive in cli/target/cli-X.X.X.tar.gz
  mvn --batch-mode release:clean release:prepare -Dtag=v0.1 -DreleaseVersion=0.1 -DdevelopmentVersion=0.2-SNAPSHOT
  mvn release:perform
 
+Or, skipping the tests
+
+ mvn --batch-mode release:clean release:prepare -Dtag=v0.1 -DreleaseVersion=0.1 -DdevelopmentVersion=0.2-SNAPSHOT -DskipTests -DskipITs -Dmaven.javadoc.skip=true -Darguments="-Dmaven.javadoc.skip=true -DskipTests -DskipITs"
+
 == FAQ
 
 === I need to use a proxy
