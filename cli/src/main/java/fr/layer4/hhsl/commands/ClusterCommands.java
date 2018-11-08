@@ -12,10 +12,10 @@ package fr.layer4.hhsl.commands;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,6 +29,8 @@ package fr.layer4.hhsl.commands;
 import fr.layer4.hhsl.Cluster;
 import fr.layer4.hhsl.Constants;
 import fr.layer4.hhsl.ServiceClientAndVersion;
+import fr.layer4.hhsl.banner.Banner;
+import fr.layer4.hhsl.banner.BannerManager;
 import fr.layer4.hhsl.binaries.BinariesStore;
 import fr.layer4.hhsl.info.ClusterInfoManager;
 import fr.layer4.hhsl.info.ClusterInfoResolver;
@@ -37,6 +39,7 @@ import fr.layer4.hhsl.registry.RegistryConnection;
 import fr.layer4.hhsl.registry.RegistryManager;
 import fr.layer4.hhsl.store.Store;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.Availability;
@@ -75,6 +78,9 @@ public class ClusterCommands {
     @Autowired
     private BinariesStore binariesStore;
 
+    @Autowired
+    private BannerManager bannerManager;
+
     @ShellMethodAvailability(value = "*")
     public Availability availabilityAfterUnlock() {
         return Avaibilities.unlockedAndReady(store);
@@ -112,8 +118,12 @@ public class ClusterCommands {
             String type,
             String name,
             String uri,
-            @ShellOption(defaultValue = Constants.DEFAULT_BANNER) String banner) {
-        Registry registry = registryManager.getFromName(registryName);
+            @ShellOption(defaultValue = "") String banner) {
+
+        // Check banner
+        banner = this.bannerManager.checkAndLoadTemplate(banner);
+
+        Registry registry = this.registryManager.getFromName(registryName);
         RegistryConnection underlyingConnection = registry.getUnderlyingConnection();
         Cluster cluster = registry.getClusterService().addOrUpdateCluster(type, name, uri, banner);
         prepare(underlyingConnection, cluster, false);
@@ -130,15 +140,27 @@ public class ClusterCommands {
     }
 
     @ShellMethod(key = {"use", "use cluster"}, value = "Use the configuration of a cluster", group = "Cluster")
-    public void useCluster(@ShellOption(defaultValue = Constants.LOCAL_REGISTRY_NAME) String registryName, String name) {
+    public Banner useCluster(@ShellOption(defaultValue = Constants.LOCAL_REGISTRY_NAME) String registryName, String name) {
         Registry registry = registryManager.getFromName(registryName);
-        Cluster cluster = registry.getClusterService().getCluster(name).orElseThrow(() -> new RuntimeException("Can not find cluster"));;
+        RegistryConnection underlyingConnection = registry.getUnderlyingConnection();
+        Cluster cluster = registry.getClusterService().getCluster(name).orElseThrow(() -> new RuntimeException("Can not find cluster"));
 
-        byte[] banner = cluster.getBanner();
+        use(underlyingConnection, cluster);
 
         // Print banner
-        // TODO
+        return new Banner(new String(cluster.getBanner()), cluster);
+    }
 
+    protected void use(RegistryConnection underlyingConnection, Cluster cluster) {
+        String basePath = Constants.getRootPath();
+        String clusterGeneratedPath = basePath + File.separator + underlyingConnection.getId().toString() + File.separator + cluster.getId().toString();
+
+        try {
+            FileUtils.copyFile(new File(clusterGeneratedPath, Constants.ENV_SH), new File(basePath, Constants.ENV_SH));
+            FileUtils.copyFile(new File(clusterGeneratedPath, Constants.ENV_BAT), new File(basePath, Constants.ENV_BAT));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected void prepare(RegistryConnection underlyingConnection, Cluster cluster, boolean force) {
@@ -156,6 +178,19 @@ public class ClusterCommands {
                 .flatMap(s -> binariesStore.prepare(archivesPath, s.getService(), s.getVersion(), force).entrySet().stream())
                 .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (a, b) -> a)); // TODO No the best way to do it...
 
+        // Render and write configuration files
+        Map<String, Map<String, byte[]>> confs = clusterInfoResolver.renderConfigurationFiles(cluster);
+        confs.forEach((service, files) -> files.forEach((filename, content) -> {
+            try {
+                Path serviceHome = Paths.get(clusterGeneratedPath, service);
+                // Create directory for the service
+                Files.createDirectory(serviceHome);
+                Files.write(serviceHome.resolve(filename), content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+
         // Print env variables in env.bat/env.sh
         env.putAll(clusterInfoResolver.resolveEnvironmentVariables(archivesPath, clusterGeneratedPath, cluster));
 
@@ -172,18 +207,5 @@ public class ClusterCommands {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        // Render and write configuration files
-        Map<String, Map<String, byte[]>> confs = clusterInfoResolver.renderConfigurationFiles(cluster);
-        confs.forEach((service, files) -> files.forEach((filename, content) -> {
-            try {
-                Path serviceHome = Paths.get(clusterGeneratedPath, service);
-                // Create directory for the service
-                Files.createDirectory(serviceHome);
-                Files.write(serviceHome.resolve(filename), content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }));
     }
 }

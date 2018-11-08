@@ -73,7 +73,6 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 //        if (store instanceof LockableStore) {
 //            LockableStore lockableStore = (LockableStore) store;
 //            if (!lockableStore.isUnlocked()) {
-//
 //                lockableStore.unlock();
 //            }
 //        }
