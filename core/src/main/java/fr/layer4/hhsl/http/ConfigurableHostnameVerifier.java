@@ -28,7 +28,6 @@ package fr.layer4.hhsl.http;
 
 import fr.layer4.hhsl.PropertyManager;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,11 +42,11 @@ public class ConfigurableHostnameVerifier implements HostnameVerifier {
     private final HostnameVerifier defaultHostnameVerifier;
 
     @Override
-    public boolean verify(String s, SSLSession sslSession) {
-        if(Boolean.valueOf(propertyManager.getProperty("http.insecure").orElse("false"))) {
-            return NoopHostnameVerifier.INSTANCE.verify(s, sslSession);
+    public boolean verify(String host, SSLSession sslSession) {
+        if (Boolean.valueOf(propertyManager.getProperty("http.insecure").orElse("false"))) {
+            return true;
         } else {
-            return this.defaultHostnameVerifier.verify(s, sslSession);
+            return this.defaultHostnameVerifier.verify(host, sslSession);
         }
     }
 }
