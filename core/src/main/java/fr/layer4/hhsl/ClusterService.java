@@ -26,6 +26,7 @@
 package fr.layer4.hhsl;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClusterService {
 
@@ -38,7 +39,7 @@ public interface ClusterService {
      * @param banner
      * @return
      */
-    Cluster addCluster(String type, String name, String uri, String banner);
+    Cluster addOrUpdateCluster(String type, String name, String uri, String banner);
 
     /**
      * Delete a cluster in the specified registry.
@@ -63,6 +64,6 @@ public interface ClusterService {
      * @param name
      * @return
      */
-    Cluster getCluster(String name);
+    Optional<Cluster> getCluster(String name);
 
 }

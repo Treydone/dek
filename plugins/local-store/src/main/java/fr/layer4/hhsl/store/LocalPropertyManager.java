@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -47,7 +47,7 @@ public class LocalPropertyManager implements PropertyManager {
 
     protected static void updateDdl(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
-                "CREATE TABLE env(id INT AUTO_INCREMENT PRIMARY KEY, key VARCHAR(255), value VARCHAR(255))");
+                "CREATE TABLE IF NOT EXISTS env(id INT AUTO_INCREMENT PRIMARY KEY, key VARCHAR(255), value VARCHAR(255))");
     }
 
     protected static void updateData(JdbcTemplate jdbcTemplate) {
@@ -68,7 +68,7 @@ public class LocalPropertyManager implements PropertyManager {
     @Override
     public Optional<String> getProperty(String key) {
         try {
-            return Optional.of(this.localLockableStore.getJdbcTemplate().queryForObject("SELECT `value` FROM env WHERE `key` = ?", String.class, new Object[]{key}));
+            return Optional.of(this.localLockableStore.getJdbcTemplate().queryForObject("SELECT `value` FROM env WHERE `key` = ?", String.class, key));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }

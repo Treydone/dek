@@ -28,14 +28,21 @@ package fr.layer4.hhsl;
 
 import fr.layer4.hhsl.prompt.Prompter;
 import fr.layer4.hhsl.store.LocalLockableStore;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
+@Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LocalClusterService implements ClusterService {
 
     public static final RowMapper<Cluster> CLUSTER_ROW_MAPPER = (r, i) -> {
@@ -47,46 +54,47 @@ public class LocalClusterService implements ClusterService {
         cluster.setPassword(r.getString("password"));
         cluster.setRegistry(Constants.LOCAL_REGISTRY_NAME);
         cluster.setUri(URI.create(r.getString("uri")));
+        cluster.setBanner(r.getString("banner").getBytes());
         return cluster;
     };
 
-    private final JdbcTemplate jdbcTemplate;
-    private final Prompter prompter;
-
-    public LocalClusterService(LocalLockableStore localLockableStore, Prompter prompter) {
-        this.jdbcTemplate = localLockableStore.getJdbcTemplate();
-        this.prompter = prompter;
-
-        log.info("Create local_cluster table");
-        this.jdbcTemplate.batchUpdate("CREATE TABLE IF NOT EXISTS local_cluster(id INT AUTO_INCREMENT PRIMARY KEY, type VARCHAR(255), name VARCHAR(255), uri VARCHAR(255), banner text, user VARCHAR(255), password VARCHAR(255))");
+    protected static void updateDdl(JdbcTemplate jdbcTemplate) {
+        jdbcTemplate.batchUpdate(
+                "CREATE TABLE IF NOT EXISTS local_cluster(id INT AUTO_INCREMENT PRIMARY KEY, type VARCHAR(255), name VARCHAR(255), uri VARCHAR(255), banner text, user VARCHAR(255), password VARCHAR(255))");
     }
 
+    private final LocalLockableStore localLockableStore;
+    private final Prompter prompter;
+
     @Override
-    public Cluster addCluster(String type, String name, String uri, String banner) {
+    public Cluster addOrUpdateCluster(String type, String name, String uri, String banner) {
 
         String user = this.prompter.prompt("User:");
         String password = this.prompter.promptForPassword("Password:");
 
-        this.jdbcTemplate.update("MERGE INTO local_cluster KEY (`name`) VALUES (default, ?, ?, ?, ?, ?, ?);", type, name, uri, banner, user, password);
+        this.localLockableStore.getJdbcTemplate().update("MERGE INTO local_cluster KEY (`name`) VALUES (default, ?, ?, ?, ?, ?, ?);", type, name, uri, banner, user, password);
 
-        return getCluster(name);
+        return getCluster(name).get();
     }
 
     @Override
     public void deleteCluster(String name) {
-        this.jdbcTemplate.update("DELETE local_cluster WHERE `name` = ?", name);
+        this.localLockableStore.getJdbcTemplate().update("DELETE local_cluster WHERE `name` = ?", name);
     }
 
     @Override
     public List<Cluster> listClusters() {
         String query = "SELECT * FROM local_cluster";
         Object[] objects = {};
-        return this.jdbcTemplate.query(query, objects, CLUSTER_ROW_MAPPER);
+        return this.localLockableStore.getJdbcTemplate().query(query, objects, CLUSTER_ROW_MAPPER);
     }
 
     @Override
-    public Cluster getCluster(String name) {
-        return this.jdbcTemplate.queryForObject("SELECT * FROM local_cluster WHERE `name` = ?", CLUSTER_ROW_MAPPER, name);
+    public Optional<Cluster> getCluster(String name) {
+        try {
+            return Optional.of(this.localLockableStore.getJdbcTemplate().queryForObject("SELECT * FROM local_cluster WHERE `name` = ?", CLUSTER_ROW_MAPPER, name));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
-
 }

@@ -12,10 +12,10 @@ package fr.layer4.hhsl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,33 +28,72 @@ package fr.layer4.hhsl;
 
 import fr.layer4.hhsl.prompt.Prompter;
 import fr.layer4.hhsl.store.LocalLockableStore;
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-@Ignore
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+
+@RunWith(MockitoJUnitRunner.class)
 public class LocalClusterServiceTest {
 
-    private LocalClusterService localClusterService;
-
+    @Mock
     private LocalLockableStore localLockableStore;
+
+    @Mock
     private Prompter prompter;
+
+    private LocalClusterService localClusterService;
+    private JdbcConnectionPool pool;
+
 
     @Before
     public void beforeEachTest() {
-        this.localClusterService = new LocalClusterService(localLockableStore, prompter);
+        this.pool = JdbcConnectionPool.create("jdbc:h2:mem:db", "sa", "sa");
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(this.pool);
+        Mockito.when(this.localLockableStore.getJdbcTemplate()).thenReturn(jdbcTemplate);
+        this.localClusterService = new LocalClusterService(this.localLockableStore, this.prompter);
+        LocalClusterService.updateDdl(jdbcTemplate);
+    }
+
+    @After
+    public void afterEachTest() {
+        this.pool.dispose();
     }
 
     @Test
     public void getCluster_ok() {
 
         // Given
+        Mockito.when(prompter.prompt("User:")).thenReturn("le_user");
+        Mockito.when(prompter.promptForPassword("Password:")).thenReturn("le_password");
+        this.localClusterService.addOrUpdateCluster("type", "test", "file:///1", "banner");
+        this.localClusterService.addOrUpdateCluster("type", "name2", "file:///2", "banner");
+        Cluster expected = new Cluster();
+        expected.setType("type");
+        expected.setName("test");
+        expected.setUri(URI.create("file:///1"));
+        expected.setBanner("banner".getBytes());
+        expected.setRegistry("local");
+        expected.setUser("le_user");
+        expected.setPassword("le_password");
 
         // When
-        Cluster cluster = localClusterService.getCluster("test");
+        Optional<Cluster> cluster = this.localClusterService.getCluster("test");
 
         // Then
-        cluster.getId();
+        assertThat(cluster).isPresent().get().isEqualToIgnoringGivenFields(expected, "id");
 
     }
 
@@ -64,47 +103,70 @@ public class LocalClusterServiceTest {
         // Given
 
         // When
-        Cluster cluster = localClusterService.getCluster("test");
+        Optional<Cluster> cluster = this.localClusterService.getCluster("test");
 
         // Then
-        cluster.getId();
+        assertThat(cluster).isNotPresent();
 
     }
 
     @Test
-    public void addCluster_ok() {
+    public void addOrUpdateCluster_ok() {
 
         // Given
+        Mockito.when(prompter.prompt("User:")).thenReturn("le_user");
+        Mockito.when(prompter.promptForPassword("Password:")).thenReturn("le_password");
 
         // When
-        Cluster cluster = localClusterService.addCluster("type", "name", "uri", "banner");
+        Cluster cluster = this.localClusterService.addOrUpdateCluster("type", "name", "uri", "banner");
 
         // Then
-        cluster.getId();
+        assertThat(cluster.getId()).isNotNull().isGreaterThan(0L);
 
     }
 
     @Test
-    public void deleteCluster_ok() {
+    public void deleteCluster_unknownCluster() {
 
         // Given
+        Mockito.when(prompter.prompt("User:")).thenReturn("le_user");
+        Mockito.when(prompter.promptForPassword("Password:")).thenReturn("le_password");
+        this.localClusterService.addOrUpdateCluster("type", "test", "file:///1", "banner");
+        this.localClusterService.addOrUpdateCluster("type", "test2", "file:///2", "banner");
 
         // When
-        localClusterService.deleteCluster("name");
+        this.localClusterService.deleteCluster("test3");
 
         // Then
+        List<Cluster> clusters = this.localClusterService.listClusters();
+        assertThat(clusters).isNotEmpty().hasSize(2);
 
     }
 
     @Test
-    public void deleteCluster_unknown() {
+    public void deleteCluster_oneCluster() {
 
         // Given
+        Mockito.when(prompter.prompt("User:")).thenReturn("le_user");
+        Mockito.when(prompter.promptForPassword("Password:")).thenReturn("le_password");
+        this.localClusterService.addOrUpdateCluster("type", "test", "file:///1", "banner");
+        this.localClusterService.addOrUpdateCluster("type", "test2", "file:///2", "banner");
+        Cluster expected = new Cluster();
+        expected.setType("type");
+        expected.setName("test");
+        expected.setUri(URI.create("file:///1"));
+        expected.setBanner("banner".getBytes());
+        expected.setRegistry("local");
+        expected.setUser("le_user");
+        expected.setPassword("le_password");
 
         // When
-        localClusterService.deleteCluster("name");
+        this.localClusterService.deleteCluster("test2");
 
         // Then
+        List<Cluster> clusters = this.localClusterService.listClusters();
+        assertThat(clusters).isNotEmpty().hasSize(1);
+        assertThat(clusters.get(0)).isEqualToIgnoringGivenFields(expected, "id");
 
     }
 }

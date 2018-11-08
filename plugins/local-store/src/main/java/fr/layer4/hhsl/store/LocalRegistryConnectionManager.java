@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -47,7 +47,7 @@ public class LocalRegistryConnectionManager implements RegistryConnectionManager
 
     protected static void updateDdl(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
-                "CREATE TABLE registry(id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), uri VARCHAR(255))");
+                "CREATE TABLE IF NOT EXISTS registry(id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), uri VARCHAR(255))");
     }
 
     protected static void updateData(JdbcTemplate jdbcTemplate, String databasePath) {
@@ -67,7 +67,7 @@ public class LocalRegistryConnectionManager implements RegistryConnectionManager
     @Override
     public Optional<RegistryConnection> getRegistry(String name) {
         try {
-            return Optional.of(this.localLockableStore.getJdbcTemplate().queryForObject("SELECT * FROM registry WHERE `name` = ?", new Object[]{name}, REGISTRY_ROW_MAPPER));
+            return Optional.of(this.localLockableStore.getJdbcTemplate().queryForObject("SELECT * FROM registry WHERE `name` = ?", REGISTRY_ROW_MAPPER, name));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }

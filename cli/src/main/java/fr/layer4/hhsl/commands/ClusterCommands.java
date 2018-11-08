@@ -115,7 +115,7 @@ public class ClusterCommands {
             @ShellOption(defaultValue = Constants.DEFAULT_BANNER) String banner) {
         Registry registry = registryManager.getFromName(registryName);
         RegistryConnection underlyingConnection = registry.getUnderlyingConnection();
-        Cluster cluster = registry.getClusterService().addCluster(type, name, uri, banner);
+        Cluster cluster = registry.getClusterService().addOrUpdateCluster(type, name, uri, banner);
         prepare(underlyingConnection, cluster, false);
     }
 
@@ -125,14 +125,14 @@ public class ClusterCommands {
             String name) {
         Registry registry = registryManager.getFromName(registryName);
         RegistryConnection underlyingConnection = registry.getUnderlyingConnection();
-        Cluster cluster = registry.getClusterService().getCluster(name);
+        Cluster cluster = registry.getClusterService().getCluster(name).orElseThrow(() -> new RuntimeException("Can not find cluster"));
         prepare(underlyingConnection, cluster, true);
     }
 
     @ShellMethod(key = {"use", "use cluster"}, value = "Use the configuration of a cluster", group = "Cluster")
     public void useCluster(@ShellOption(defaultValue = Constants.LOCAL_REGISTRY_NAME) String registryName, String name) {
         Registry registry = registryManager.getFromName(registryName);
-        Cluster cluster = registry.getClusterService().getCluster(name);
+        Cluster cluster = registry.getClusterService().getCluster(name).orElseThrow(() -> new RuntimeException("Can not find cluster"));;
 
         byte[] banner = cluster.getBanner();
 
