@@ -95,7 +95,7 @@
                                         <maxMemorySize>1024m</maxMemorySize>
                                         <maxStackSize>128m</maxStackSize>
                                         <extraArguments>
-                                            <extraArgument>-Dlogging.file=%APP_BASE%/logs/hhsl.log</extraArgument>
+                                            <extraArgument>-Dlogging.file=%BASEDIR%/logs/hhsl.log</extraArgument>
                                             <extraArgument>-Dspring.profiles.active=runtime</extraArgument>
                                             <extraArgument>-server</extraArgument>
                                             <extraArgument>-XX:+UseConcMarkSweepGC</extraArgument>
