@@ -64,6 +64,9 @@ public class LocalRegistryConnectionManagerTest {
     @After
     public void afterEachTest() {
         this.pool.dispose();
+        Mockito.verify(this.localLockableStore, Mockito.atLeast(1)).getJdbcTemplate();
+        Mockito.verifyNoMoreInteractions(this.localLockableStore);
+        Mockito.reset(this.localLockableStore);
     }
 
     @Test
