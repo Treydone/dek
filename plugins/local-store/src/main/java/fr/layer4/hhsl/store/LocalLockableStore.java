@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Paths;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
@@ -196,7 +197,7 @@ public class LocalLockableStore implements LockableStore, InitializingBean, Disp
         LocalPropertyManager.updateDdl(jdbcTemplate);
         LocalRegistryConnectionManager.updateDdl(jdbcTemplate);
         log.debug("Create default local registry");
-        LocalRegistryConnectionManager.updateData(jdbcTemplate, getDatabasePath());
+        LocalRegistryConnectionManager.updateData(jdbcTemplate, Paths.get(getDatabasePath()).toUri().toString());
         log.debug("Create default properties");
         LocalPropertyManager.updateData(jdbcTemplate);
     }
