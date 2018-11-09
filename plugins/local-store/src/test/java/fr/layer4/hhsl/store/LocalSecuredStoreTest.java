@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,6 +28,7 @@ package fr.layer4.hhsl.store;
 
 import fr.layer4.hhsl.Constants;
 import org.h2.tools.DeleteDbFiles;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +45,12 @@ public class LocalSecuredStoreTest {
     @Before
     public void beforeEachTest() {
         DeleteDbFiles.execute(Constants.getRootPath(), LocalLockableStore.DB, true);
-        localLockableStore = new LocalLockableStore();
+        this.localLockableStore = new LocalLockableStore();
+    }
+
+    @After
+    public void afterEachTest() {
+        this.localLockableStore.destroy();
     }
 
     @Test
@@ -53,10 +59,10 @@ public class LocalSecuredStoreTest {
         // Given
 
         // When
-        localLockableStore.afterPropertiesSet();
+        this.localLockableStore.afterPropertiesSet();
 
         // Then
-        assertFalse(localLockableStore.isReady());
+        assertFalse(this.localLockableStore.isReady());
 
     }
 
@@ -64,15 +70,15 @@ public class LocalSecuredStoreTest {
     public void startOnExistingUnlockedDatabase() {
 
         // Given
-        localLockableStore.afterPropertiesSet();
-        localLockableStore.init("le_passsword");
-        localLockableStore.destroy();
+        this.localLockableStore.afterPropertiesSet();
+        this.localLockableStore.init("le_passsword");
+        this.localLockableStore.destroy();
 
         // When
-        localLockableStore.afterPropertiesSet();
+        this.localLockableStore.afterPropertiesSet();
 
         // Then
-        assertTrue(localLockableStore.isReady());
+        assertTrue(this.localLockableStore.isReady());
 
     }
 
@@ -80,16 +86,16 @@ public class LocalSecuredStoreTest {
     public void startOnExistingLockedDatabase() {
 
         // Given
-        localLockableStore.afterPropertiesSet();
-        localLockableStore.init("le_password");
-        localLockableStore.destroy();
+        this.localLockableStore.afterPropertiesSet();
+        this.localLockableStore.init("le_password");
+        this.localLockableStore.destroy();
 
         // When
-        localLockableStore.afterPropertiesSet();
-        localLockableStore.unlock("le_password");
+        this.localLockableStore.afterPropertiesSet();
+        this.localLockableStore.unlock("le_password");
 
         // Then
-        assertTrue(localLockableStore.isReady());
+        assertTrue(this.localLockableStore.isReady());
 
     }
 
@@ -97,13 +103,13 @@ public class LocalSecuredStoreTest {
     public void startOnExistingLockedDatabase_wrongPassword() {
 
         // Given
-        localLockableStore.afterPropertiesSet();
-        localLockableStore.init("le_password");
-        localLockableStore.destroy();
+        this.localLockableStore.afterPropertiesSet();
+        this.localLockableStore.init("le_password");
+        this.localLockableStore.destroy();
 
         // When
-        localLockableStore.afterPropertiesSet();
-        localLockableStore.unlock("wtf?");
+        this.localLockableStore.afterPropertiesSet();
+        this.localLockableStore.unlock("wtf?");
 
         // Then
 
@@ -113,19 +119,19 @@ public class LocalSecuredStoreTest {
     public void changePassword() {
 
         // Given
-        localLockableStore.afterPropertiesSet();
-        localLockableStore.init("le_password");
-        localLockableStore.destroy();
+        this.localLockableStore.afterPropertiesSet();
+        this.localLockableStore.init("le_password");
+        this.localLockableStore.destroy();
 
         // When
-        localLockableStore.afterPropertiesSet();
-        localLockableStore.unlock("le_password");
-        localLockableStore.changePassword("le_password", "new_password");
-        assertTrue(localLockableStore.isReady());
+        this.localLockableStore.afterPropertiesSet();
+        this.localLockableStore.unlock("le_password");
+        this.localLockableStore.changePassword("le_password", "new_password");
+        assertTrue(this.localLockableStore.isReady());
 
         // Then
-        localLockableStore.destroy();
-        localLockableStore.unlock("new_password");
-        assertTrue(localLockableStore.isReady());
+        this.localLockableStore.destroy();
+        this.localLockableStore.unlock("new_password");
+        assertTrue(this.localLockableStore.isReady());
     }
 }
