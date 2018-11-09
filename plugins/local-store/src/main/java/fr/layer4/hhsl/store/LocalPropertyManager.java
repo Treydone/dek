@@ -27,6 +27,7 @@ package fr.layer4.hhsl.store;
  */
 
 import fr.layer4.hhsl.PropertyManager;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Getter
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LocalPropertyManager implements PropertyManager {

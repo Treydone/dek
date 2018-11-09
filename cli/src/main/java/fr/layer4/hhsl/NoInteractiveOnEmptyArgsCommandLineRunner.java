@@ -26,19 +26,21 @@ package fr.layer4.hhsl;
  * #L%
  */
 
-import fr.layer4.hhsl.store.LockableStore;
-import fr.layer4.hhsl.store.Store;
+import fr.layer4.hhsl.prompt.Prompter;
+import fr.layer4.hhsl.store.SecuredStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.shell.Availability;
 import org.springframework.shell.Shell;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,32 +56,48 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 
     private final Shell shell;
     private final ConfigurableEnvironment environment;
-    private final Store store;
+    private final SecuredStore store;
+    private final Prompter prompter;
 
     @Override
     public void run(String... args) throws Exception {
-        List<String> commandsToRun = Arrays.stream(args)
-                .filter(w -> !w.startsWith("@"))
-                .collect(Collectors.toList());
+        List<String> commandsToRun = Arrays.stream(args).collect(Collectors.toList());
 
-        int i = commandsToRun.indexOf("--no-prompt");
-        if (i > -1) {
-            if (i + 1 > commandsToRun.size()) {
-                log.error("Missing password");
-                System.exit(1);
+        if (!this.store.isReady()) {
+            String password = this.prompter.doublePromptForPassword();
+            store.init(password);
+        } else {
+            int i = commandsToRun.indexOf("--unlock");
+            if (i > -1) {
+                if (i + 1 > commandsToRun.size()) {
+                    throw new RuntimeException("unlock argument without value @prompt|<password>|<file:///.....>");
+                }
+                commandsToRun.remove(i);
+                String option = commandsToRun.remove(i);
+
+                String password;
+                if ("@prompt".equalsIgnoreCase(option)) {
+                    password = this.prompter.promptForPassword("Password:");
+                } else if (option.startsWith("file://")) {
+                    File file = new File(option.replace("file://", ""));
+                    if (file.exists()) {
+                        password = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+                    } else {
+                        throw new RuntimeException("File not found:" + option);
+                    }
+                } else {
+                    password = option;
+                }
+
+                this.store.unlock(password);
+            } else {
+                throw new RuntimeException("Missing unlock option");
             }
         }
 
-//        if (store instanceof LockableStore) {
-//            LockableStore lockableStore = (LockableStore) store;
-//            if (!lockableStore.isUnlocked()) {
-//                lockableStore.unlock();
-//            }
-//        }
-
         if (!commandsToRun.isEmpty()) {
-            InteractiveShellApplicationRunner.disable(environment);
-            shell.run(new StringInputProvider(commandsToRun));
+            InteractiveShellApplicationRunner.disable(this.environment);
+            this.shell.run(new StringInputProvider(commandsToRun));
         }
     }
 }

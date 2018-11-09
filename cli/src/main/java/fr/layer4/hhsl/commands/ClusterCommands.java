@@ -12,10 +12,10 @@ package fr.layer4.hhsl.commands;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,15 +37,13 @@ import fr.layer4.hhsl.info.ClusterInfoResolver;
 import fr.layer4.hhsl.registry.Registry;
 import fr.layer4.hhsl.registry.RegistryConnection;
 import fr.layer4.hhsl.registry.RegistryManager;
-import fr.layer4.hhsl.store.Store;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellMethodAvailability;
 import org.springframework.shell.standard.ShellOption;
 import org.springframework.shell.table.Table;
 
@@ -64,33 +62,19 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @ShellComponent
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ClusterCommands {
 
-    @Autowired
-    private Store store;
-
-    @Autowired
-    private RegistryManager registryManager;
-
-    @Autowired
-    private ClusterInfoManager clusterInfoManager;
-
-    @Autowired
-    private BinariesStore binariesStore;
-
-    @Autowired
-    private BannerManager bannerManager;
-
-    @ShellMethodAvailability(value = "*")
-    public Availability availabilityAfterUnlock() {
-        return Avaibilities.unlockedAndReady(store);
-    }
+    private final RegistryManager registryManager;
+    private final ClusterInfoManager clusterInfoManager;
+    private final BinariesStore binariesStore;
+    private final BannerManager bannerManager;
 
     @ShellMethod(key = "list cluster", value = "List all clusters", group = "Cluster")
     public Table listClusters(@ShellOption(defaultValue = Constants.LOCAL_REGISTRY_NAME, value = "registry") String registryName) {
         // List cluster for all registries...
-        List<Registry> all = registryManager.all();
-        List<Pair<Registry, Cluster>> clusters = all.stream().flatMap(r -> registryManager.getFromName(registryName).getClusterService().listClusters().stream().map(c -> Pair.of(r, c)))
+        List<Registry> all = this.registryManager.all();
+        List<Pair<Registry, Cluster>> clusters = all.stream().flatMap(r -> this.registryManager.getFromName(registryName).getClusterService().listClusters().stream().map(c -> Pair.of(r, c)))
                 .collect(Collectors.toList());
 
         String[][] data = new String[clusters.size() + 1][];
@@ -108,7 +92,7 @@ public class ClusterCommands {
 
     @ShellMethod(key = "delete cluster", value = "Delete a cluster inside a registry", group = "Cluster")
     public void deleteCluster(@ShellOption(defaultValue = Constants.LOCAL_REGISTRY_NAME) String registryName, String name) {
-        Registry registry = registryManager.getFromName(registryName);
+        Registry registry = this.registryManager.getFromName(registryName);
         registry.getClusterService().deleteCluster(name);
     }
 
@@ -133,7 +117,7 @@ public class ClusterCommands {
     public void updateCluster(
             @ShellOption(defaultValue = Constants.LOCAL_REGISTRY_NAME) String registryName,
             String name) {
-        Registry registry = registryManager.getFromName(registryName);
+        Registry registry = this.registryManager.getFromName(registryName);
         RegistryConnection underlyingConnection = registry.getUnderlyingConnection();
         Cluster cluster = registry.getClusterService().getCluster(name).orElseThrow(() -> new RuntimeException("Can not find cluster"));
         prepare(underlyingConnection, cluster, true);
@@ -141,7 +125,7 @@ public class ClusterCommands {
 
     @ShellMethod(key = {"use", "use cluster"}, value = "Use the configuration of a cluster", group = "Cluster")
     public Banner useCluster(@ShellOption(defaultValue = Constants.LOCAL_REGISTRY_NAME) String registryName, String name) {
-        Registry registry = registryManager.getFromName(registryName);
+        Registry registry = this.registryManager.getFromName(registryName);
         RegistryConnection underlyingConnection = registry.getUnderlyingConnection();
         Cluster cluster = registry.getClusterService().getCluster(name).orElseThrow(() -> new RuntimeException("Can not find cluster"));
 
@@ -170,12 +154,12 @@ public class ClusterCommands {
         String archivesPath = basePath + File.separator + Constants.ARCHIVES;
 
         // List available services
-        ClusterInfoResolver clusterInfoResolver = clusterInfoManager.fromType(cluster.getType());
+        ClusterInfoResolver clusterInfoResolver = this.clusterInfoManager.fromType(cluster.getType());
         Collection<ServiceClientAndVersion> availableServices = clusterInfoResolver.resolveAvailableServiceClients(cluster);
 
         // Download missing clients in archives and prepare some env
         Map<String, String> env = availableServices.stream()
-                .flatMap(s -> binariesStore.prepare(archivesPath, s.getService(), s.getVersion(), force).entrySet().stream())
+                .flatMap(s -> this.binariesStore.prepare(archivesPath, s.getService(), s.getVersion(), force).entrySet().stream())
                 .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (a, b) -> a)); // TODO No the best way to do it...
 
         // Render and write configuration files

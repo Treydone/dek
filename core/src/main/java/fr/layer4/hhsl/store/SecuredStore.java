@@ -23,12 +23,25 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.hhsl.event;
+package fr.layer4.hhsl.store;
 
-import org.springframework.context.ApplicationEvent;
+public interface SecuredStore {
 
-public class LockedEvent extends ApplicationEvent {
-    public LockedEvent(Object source) {
-        super(source);
-    }
+    /**
+     * Clear all the data and metadata in the store.
+     */
+    void purge();
+
+    boolean isReady();
+
+    /**
+     * Unlock a previously secured store.
+     *
+     * @param password
+     */
+    void unlock(String password);
+
+    void init(String password);
+
+    void changePassword(String actualPassword, String newPassword);
 }

@@ -27,11 +27,11 @@ package fr.layer4.hhsl.commands;
  */
 
 import fr.layer4.hhsl.Constants;
-import fr.layer4.hhsl.store.LockableStore;
-import fr.layer4.hhsl.store.Store;
+import fr.layer4.hhsl.prompt.Prompter;
+import fr.layer4.hhsl.store.SecuredStore;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
@@ -42,26 +42,11 @@ import java.nio.file.Paths;
 
 @Slf4j
 @ShellComponent
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AdminCommands {
 
-    @Autowired
-    private Store store;
-
-    @ShellMethod(key = "init", value = "Init local database", group = "Configuration")
-    public void init(boolean secured) {
-        if (store instanceof LockableStore) {
-            LockableStore lockableStore = (LockableStore) store;
-            lockableStore.init(secured);
-        } else {
-            store.init();
-        }
-    }
-
-    public Availability initAvailability() {
-        return !store.isReady()
-                ? Availability.available()
-                : Availability.unavailable("Local database is already ready, use clean before re-init");
-    }
+    private final SecuredStore store;
+    private final Prompter prompter;
 
     @ShellMethod(key = "clean", value = "Clean all", group = "Configuration")
     public void clean() throws IOException {
@@ -71,7 +56,9 @@ public class AdminCommands {
 
     @ShellMethod(key = "clean store", value = "Clean local database", group = "Configuration")
     public void cleanStore() {
-        store.purge();
+        this.store.purge();
+        // Have to leave the shell
+        System.exit(0);
     }
 
     @ShellMethod(key = "clean archive", value = "Clean archives", group = "Configuration")
@@ -81,17 +68,10 @@ public class AdminCommands {
         Files.deleteIfExists(Paths.get(archivesPath));
     }
 
-    public Availability cleanStoreAvailability() {
-        return store.isReady()
-                ? Availability.available()
-                : Availability.unavailable("Local database is not ready");
-    }
-
-    @ShellMethod(key = "change-password", value = "Init local database", group = "Configuration")
+    @ShellMethod(key = "password", value = "Change root password", group = "Configuration")
     public void change() {
-        if (store instanceof LockableStore) {
-            LockableStore lockableStore = (LockableStore) store;
-            lockableStore.changePassword();
-        }
+        String actualPassword = this.prompter.promptForRootPassword();
+        String newPassword = this.prompter.doublePromptForPassword();
+        this.store.changePassword(actualPassword, newPassword);
     }
 }

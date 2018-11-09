@@ -28,36 +28,26 @@ package fr.layer4.hhsl.commands;
 
 import fr.layer4.hhsl.registry.RegistryConnection;
 import fr.layer4.hhsl.registry.RegistryConnectionManager;
-import fr.layer4.hhsl.store.Store;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellMethodAvailability;
-import org.springframework.shell.table.*;
+import org.springframework.shell.table.Table;
 
 import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
 @ShellComponent
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RegistryCommands {
 
-    @Autowired
-    private RegistryConnectionManager registryConnectionManager;
-
-    @Autowired
-    private Store store;
-
-    @ShellMethodAvailability(value = "*")
-    public Availability availabilityAfterUnlock() {
-        return Avaibilities.unlockedAndReady(store);
-    }
+    private final RegistryConnectionManager registryConnectionManager;
 
     @ShellMethod(key = "list registry", value = "List all registries", group = "Registry")
     public Table listRegistries() {
-        List<RegistryConnection> registries = registryConnectionManager.listRegistries();
+        List<RegistryConnection> registries = this.registryConnectionManager.listRegistries();
 
         String[][] data = new String[registries.size() + 1][];
         data[0] = new String[]{"Name", "URI"};
@@ -74,13 +64,13 @@ public class RegistryCommands {
 
     @ShellMethod(key = "delete registry", value = "Delete a registry", group = "Registry")
     public void deleteRegistry(String name) {
-        registryConnectionManager.deleteRegistry(name);
+        this.registryConnectionManager.deleteRegistry(name);
     }
 
     @ShellMethod(key = "add registry", value = "Add a registry", group = "Registry")
     public void addRegistry(
             String name,
             String uri) {
-        registryConnectionManager.addOrUpdateRegistry(name, uri);
+        this.registryConnectionManager.addOrUpdateRegistry(name, uri);
     }
 }

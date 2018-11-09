@@ -26,8 +26,6 @@ package fr.layer4.hhsl;
  * #L%
  */
 
-import fr.layer4.hhsl.store.LockableStore;
-import fr.layer4.hhsl.store.Store;
 import lombok.RequiredArgsConstructor;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
@@ -37,23 +35,9 @@ import org.springframework.shell.jline.PromptProvider;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UnlockablePromptProvider implements PromptProvider {
 
-    @Autowired
-    private final Store store;
-
     @Override
     public AttributedString getPrompt() {
-        if (store instanceof LockableStore) {
-            LockableStore lockableStore = (LockableStore) this.store;
-            if (lockableStore.isUnlocked()) {
-                return new AttributedString("hhsl:>",
-                        AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW));
-            } else {
-                return new AttributedString("locked:>",
-                        AttributedStyle.DEFAULT.foreground(AttributedStyle.RED));
-            }
-        } else {
-            return new AttributedString("hhsl:>",
-                    AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE));
-        }
+        return new AttributedString("hhsl:>",
+                AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE));
     }
 }

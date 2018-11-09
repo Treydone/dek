@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,15 +26,11 @@ package fr.layer4.hhsl.store;
  * #L%
  */
 
-import fr.layer4.hhsl.event.LockedEvent;
-import fr.layer4.hhsl.event.StoreDestroyEvent;
-import fr.layer4.hhsl.event.StoreReadyEvent;
-import fr.layer4.hhsl.event.UnlockedEvent;
-import fr.layer4.hhsl.prompt.Prompter;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.h2.engine.Constants;
+import org.h2.jdbc.JdbcSQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.store.FileLister;
 import org.h2.tools.ChangeFileEncryption;
@@ -42,7 +38,7 @@ import org.h2.tools.DeleteDbFiles;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -51,16 +47,17 @@ import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 
 /**
  * http://www.h2database.com/html/features.html#file_encryption
  */
+@Getter
 @Slf4j
 @Component
-public class LocalLockableStore implements LockableStore, InitializingBean, DisposableBean {
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+public class LocalLockableStore implements SecuredStore, InitializingBean, DisposableBean {
 
     public static final String CIPHER = "AES";
     public static final String DB = "db";
@@ -70,33 +67,19 @@ public class LocalLockableStore implements LockableStore, InitializingBean, Disp
     public static final String CIPHER_EXTENSION = ";CIPHER=";
     public static final String ENCRYPT_HEADER = "H2encrypt\n";
 
-    @Setter
-    @Autowired
-    private Prompter prompter;
-
-    @Setter
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-
-    @Getter
     private JdbcConnectionPool dataSource;
-    @Getter
     private JdbcTemplate jdbcTemplate;
 
-    private boolean isUnlocked = false;
     private boolean isReady = false;
 
     public void purge() {
         if (dataSource != null) {
             log.debug("Dispose database");
-            dataSource.dispose();
+            this.dataSource.dispose();
         }
         log.debug("Clean local file");
         DeleteDbFiles.execute(fr.layer4.hhsl.Constants.getRootPath(), DB, true);
         isReady = false;
-        applicationEventPublisher.publishEvent(new StoreDestroyEvent(""));
-        isUnlocked = false;
-        applicationEventPublisher.publishEvent(new LockedEvent(""));
     }
 
     @Override
@@ -112,47 +95,42 @@ public class LocalLockableStore implements LockableStore, InitializingBean, Disp
         // Ready!
         log.debug("Database is ready");
         isReady = true;
-        applicationEventPublisher.publishEvent(new StoreReadyEvent(""));
 
         log.debug("Checking if database is encrypted...");
-
         boolean encrypted = isEncrypted(files);
-
-        if (encrypted) {
+        if (!encrypted) {
             // Lock!
-            isUnlocked = false;
-            applicationEventPublisher.publishEvent(new LockedEvent(""));
-            return;
+            throw new RuntimeException("Local database doesn't seems to be encrypted");
         }
-        log.debug("Database is unprotected");
-        isUnlocked = true;
-        applicationEventPublisher.publishEvent(new UnlockedEvent(""));
-
-        dataSource = JdbcConnectionPool.create(JDBC_H2 + getDatabasePath(), USER, PASSWORD);
-        jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Override
-    public void unlock() {
-        String password = prompter.promptForRootPassword();
+    public void unlock(String password) {
+        password += " " + PASSWORD;
 
-        List<String> databaseFiles = getDatabaseFiles();
-        boolean encrypted = isEncrypted(databaseFiles);
+        this.dataSource = JdbcConnectionPool.create(JDBC_H2 + getDatabasePath() + CIPHER_EXTENSION + CIPHER, USER, password);
+        this.jdbcTemplate = new JdbcTemplate(this.dataSource);
+        checkUnlockWithPassword();
+    }
 
-        if (encrypted) {
-            password += " " + PASSWORD;
+    protected void checkUnlockWithPassword() {
+        try {
+            this.jdbcTemplate.execute("select 1");
+        } catch (DataAccessException e) {
+            if (e.getCause() instanceof JdbcSQLException) {
+                JdbcSQLException jdbcSQLException = (JdbcSQLException) e.getCause();
+                if (jdbcSQLException.getErrorCode() == 90049) {
+                    throw new RuntimeException("Wrong password");
+                }
+            }
+            throw e;
         }
-
-        dataSource = JdbcConnectionPool.create(JDBC_H2 + getDatabasePath() + CIPHER_EXTENSION + CIPHER, USER, password);
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        isUnlocked = true;
-        applicationEventPublisher.publishEvent(new UnlockedEvent(""));
     }
 
     @Override
     public void destroy() {
-        if (dataSource != null) {
-            dataSource.dispose();
+        if (this.dataSource != null) {
+            this.dataSource.dispose();
         }
     }
 
@@ -162,84 +140,46 @@ public class LocalLockableStore implements LockableStore, InitializingBean, Disp
     }
 
     @Override
-    public boolean isUnlocked() {
-        return isUnlocked;
-    }
-
-    @Override
-    public void init() {
-        init(false);
-    }
-
-    @Override
-    public void init(boolean secured) {
+    public void init(String password) {
         // Prepare location of database
         purge();
 
-        String extension = "";
-        String password = PASSWORD;
-        // Ask for root password if needed
-        if (secured) {
-            password = prompter.doublePromptForPassword() + " " + PASSWORD;
-            extension += CIPHER_EXTENSION + CIPHER;
-        }
+        // Ask for root password
+        this.dataSource = JdbcConnectionPool.create(JDBC_H2 + getDatabasePath() + CIPHER_EXTENSION + CIPHER, USER, password + " " + PASSWORD);
+        this.isReady = true;
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
 
-        log.info("Create database (secured:{})", secured);
-        dataSource = JdbcConnectionPool.create(JDBC_H2 + getDatabasePath() + extension, USER, password);
-
-        isReady = true;
-        applicationEventPublisher.publishEvent(new StoreReadyEvent(""));
-        isUnlocked = true;
-        applicationEventPublisher.publishEvent(new UnlockedEvent(""));
-
-        jdbcTemplate = new JdbcTemplate(dataSource);
         log.debug("Create tables");
-        LocalPropertyManager.updateDdl(jdbcTemplate);
-        LocalRegistryConnectionManager.updateDdl(jdbcTemplate);
+        LocalPropertyManager.updateDdl(this.jdbcTemplate);
+        LocalRegistryConnectionManager.updateDdl(this.jdbcTemplate);
         log.debug("Create default local registry");
-        LocalRegistryConnectionManager.updateData(jdbcTemplate, Paths.get(getDatabasePath()).toUri().toString());
+        LocalRegistryConnectionManager.updateData(this.jdbcTemplate, Paths.get(getDatabasePath()).toUri().toString());
         log.debug("Create default properties");
-        LocalPropertyManager.updateData(jdbcTemplate);
+        LocalPropertyManager.updateData(this.jdbcTemplate);
     }
 
     @Override
-    public void changePassword() {
-        isUnlocked = false;
-        applicationEventPublisher.publishEvent(new LockedEvent(""));
-        isReady = false;
-        applicationEventPublisher.publishEvent(new StoreDestroyEvent(""));
-
-        // Check if encrypted or not
-        List<String> databaseFiles = getDatabaseFiles();
-        boolean encrypted = isEncrypted(databaseFiles);
-
-        if (!encrypted) {
-            log.warn("Database is not encrypted");
-            return;
-        }
-
-        String actualPassword = prompter.promptForRootPassword();
+    public void changePassword(String actualPassword, String newPassword) {
+        this.isReady = false;
 
         // Test connection with provided password
+        checkUnlockWithPassword();
+
+        // Dispose current datasource
+        this.dataSource.dispose();
+
+        // Change encryption password
         try {
-            DriverManager.getConnection(JDBC_H2 + getDatabasePath() + CIPHER_EXTENSION + CIPHER, USER, actualPassword);
+            ChangeFileEncryption.execute(fr.layer4.hhsl.Constants.getRootPath(), DB, CIPHER_EXTENSION + CIPHER, actualPassword.toCharArray(), newPassword.toCharArray(), true);
         } catch (SQLException e) {
-            log.error("Oups", e);
-            throw new RuntimeException("");
+            throw new RuntimeException("Can not change password", e);
         }
 
-        String newPassword = prompter.doublePromptForPassword();
+        // Create new datasource and jdbctemplate
+        this.dataSource = JdbcConnectionPool.create(JDBC_H2 + getDatabasePath() + CIPHER_EXTENSION + CIPHER, USER, newPassword + " " + PASSWORD);
+        this.jdbcTemplate = new JdbcTemplate(this.dataSource);
 
-        try {
-            ChangeFileEncryption.execute(fr.layer4.hhsl.Constants.getRootPath(), DB, CIPHER, actualPassword.toCharArray(), newPassword.toCharArray(), true);
-        } catch (SQLException e) {
-            log.error("Can not change password", e);
-            throw new RuntimeException("");
-        }
-        isUnlocked = true;
-        applicationEventPublisher.publishEvent(new UnlockedEvent(""));
-        isReady = true;
-        applicationEventPublisher.publishEvent(new StoreReadyEvent(""));
+        this.isReady = true;
     }
 
     protected static String getDatabasePath() {

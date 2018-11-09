@@ -57,14 +57,19 @@ HHSL works on Linux, macOS and Windows and requires:
 
 == How to
 
-On a fresh install, you first need to initialize a local database holding all the configuration:
+// TODO security!!!
 
-```
-hhsl
-hhsl:> init
-```
+Preferred way to unlock the secured store, prompt asks the user to enter the root password
+--unlock @prompt
 
-or directly from the command line:
+For background process or automatic filling of the root password, you can use the following values
+--unlock <some password>
+Be aware that your commands will be store in the history of your shell..
+--unlock file:///...
+Use a file containing the root password. Ensure to protect this file with some restrictions (chown+chmod 700)
+
+
+On a fresh install, you first need to initialize a local database holding all the configuration.
 
 ```
 hhsl init

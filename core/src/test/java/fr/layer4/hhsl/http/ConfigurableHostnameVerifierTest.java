@@ -40,7 +40,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurableHostnameVerifierTest {
 
@@ -62,7 +61,6 @@ public class ConfigurableHostnameVerifierTest {
         Mockito.verifyNoMoreInteractions(this.propertyManager, this.defaultHostnameVerifier);
         Mockito.reset(this.propertyManager, this.defaultHostnameVerifier);
     }
-
 
     @Test
     public void defaultConf() {

@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,6 +28,7 @@ package fr.layer4.hhsl.store;
 
 import fr.layer4.hhsl.registry.RegistryConnection;
 import fr.layer4.hhsl.registry.RegistryConnectionManager;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -39,6 +40,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+@Getter
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LocalRegistryConnectionManager implements RegistryConnectionManager {
