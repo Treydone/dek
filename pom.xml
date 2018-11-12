@@ -496,7 +496,7 @@
                             <canUpdateLicense>true</canUpdateLicense>
                             <roots>
                                 <root>src/main</root>
-                                <root>src/test</root>
+                                <root>src/test/java</root>
                             </roots>
                             <excludes>
                                 <exclude>**/*.json</exclude>
