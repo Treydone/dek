@@ -29,7 +29,7 @@ package fr.layer4.hhsl.registry;
 import fr.layer4.hhsl.ClusterService;
 import fr.layer4.hhsl.LocalClusterService;
 import fr.layer4.hhsl.prompt.Prompter;
-import fr.layer4.hhsl.store.LocalLockableStore;
+import fr.layer4.hhsl.store.LocalSecuredStore;
 import lombok.Data;
 
 @Data
@@ -38,7 +38,7 @@ public class LocalRegistry implements Registry {
     private LocalClusterService localClusterService;
 
     private final RegistryConnection registryConnection;
-    private final LocalLockableStore localLockableStore;
+    private final LocalSecuredStore localSecuredStore;
     private final Prompter prompter;
 
     @Override
@@ -48,7 +48,7 @@ public class LocalRegistry implements Registry {
 
     @Override
     public void init(RegistryConnection registryConnection) {
-        this.localClusterService = new LocalClusterService(this.localLockableStore, this.prompter);
+        this.localClusterService = new LocalClusterService(this.localSecuredStore, this.prompter);
     }
 
     @Override

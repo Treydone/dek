@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,26 +26,31 @@ package fr.layer4.hhsl.store;
  * #L%
  */
 
+import fr.layer4.hhsl.events.StoreReadyEvent;
 import fr.layer4.hhsl.registry.RegistryConnection;
 import fr.layer4.hhsl.registry.RegistryConnectionManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+
+import static fr.layer4.hhsl.store.LocalSecuredStore.getDatabasePath;
 
 @Getter
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class LocalRegistryConnectionManager implements RegistryConnectionManager {
+public class LocalRegistryConnectionManager implements RegistryConnectionManager, ApplicationListener<StoreReadyEvent> {
 
-    private final LocalLockableStore localLockableStore;
+    private final LocalSecuredStore localSecuredStore;
 
     protected static void updateDdl(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
@@ -65,9 +70,15 @@ public class LocalRegistryConnectionManager implements RegistryConnectionManager
     };
 
     @Override
+    public void onApplicationEvent(StoreReadyEvent storeReadyEvent) {
+        updateDdl(this.localSecuredStore.getJdbcTemplate());
+        updateData(this.localSecuredStore.getJdbcTemplate(), Paths.get(getDatabasePath()).toUri().toString());
+    }
+
+    @Override
     public Optional<RegistryConnection> getRegistry(String name) {
         try {
-            return Optional.of(this.localLockableStore.getJdbcTemplate().queryForObject("SELECT * FROM registry WHERE `name` = ?", REGISTRY_ROW_MAPPER, name));
+            return Optional.of(this.localSecuredStore.getJdbcTemplate().queryForObject("SELECT * FROM registry WHERE `name` = ?", REGISTRY_ROW_MAPPER, name));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -76,19 +87,19 @@ public class LocalRegistryConnectionManager implements RegistryConnectionManager
     @Override
     public void deleteRegistry(String name) {
         if (!fr.layer4.hhsl.Constants.LOCAL_REGISTRY_NAME.equals(name)) {
-            this.localLockableStore.getJdbcTemplate().update("DELETE registry WHERE `name` = ?", name);
+            this.localSecuredStore.getJdbcTemplate().update("DELETE registry WHERE `name` = ?", name);
         }
     }
 
     @Override
     public List<RegistryConnection> listRegistries() {
-        return this.localLockableStore.getJdbcTemplate().query("SELECT * FROM registry", new Object[]{}, REGISTRY_ROW_MAPPER);
+        return this.localSecuredStore.getJdbcTemplate().query("SELECT * FROM registry", new Object[]{}, REGISTRY_ROW_MAPPER);
     }
 
     @Override
     public void addOrUpdateRegistry(String name, String uri) {
         if (!fr.layer4.hhsl.Constants.LOCAL_REGISTRY_NAME.equals(URI.create(uri).getScheme())) {
-            this.localLockableStore.getJdbcTemplate().update("MERGE INTO registry KEY (`name`) VALUES (default, ?, ?);", name, uri);
+            this.localSecuredStore.getJdbcTemplate().update("MERGE INTO registry KEY (`name`) VALUES (default, ?, ?);", name, uri);
         }
     }
 }

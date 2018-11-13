@@ -27,7 +27,7 @@ package fr.layer4.hhsl;
  */
 
 import fr.layer4.hhsl.prompt.Prompter;
-import fr.layer4.hhsl.store.LocalLockableStore;
+import fr.layer4.hhsl.store.LocalSecuredStore;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.After;
 import org.junit.Before;
@@ -49,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LocalClusterServiceTest {
 
     @Mock
-    private LocalLockableStore localLockableStore;
+    private LocalSecuredStore localSecuredStore;
 
     @Mock
     private Prompter prompter;
@@ -62,17 +62,17 @@ public class LocalClusterServiceTest {
     public void beforeEachTest() {
         this.pool = JdbcConnectionPool.create("jdbc:h2:mem:db", "sa", "sa");
         JdbcTemplate jdbcTemplate = new JdbcTemplate(this.pool);
-        Mockito.when(this.localLockableStore.getJdbcTemplate()).thenReturn(jdbcTemplate);
-        this.localClusterService = new LocalClusterService(this.localLockableStore, this.prompter);
+        Mockito.when(this.localSecuredStore.getJdbcTemplate()).thenReturn(jdbcTemplate);
+        this.localClusterService = new LocalClusterService(this.localSecuredStore, this.prompter);
         LocalClusterService.updateDdl(jdbcTemplate);
     }
 
     @After
     public void afterEachTest() {
         this.pool.dispose();
-        Mockito.verify(this.localLockableStore, Mockito.atLeast(1)).getJdbcTemplate();
-        Mockito.verifyNoMoreInteractions(this.prompter, this.localLockableStore);
-        Mockito.reset(this.prompter, this.localLockableStore);
+        Mockito.verify(this.localSecuredStore, Mockito.atLeast(1)).getJdbcTemplate();
+        Mockito.verifyNoMoreInteractions(this.prompter, this.localSecuredStore);
+        Mockito.reset(this.prompter, this.localSecuredStore);
     }
 
     @Test

@@ -12,10 +12,10 @@ package fr.layer4.hhsl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,22 +27,19 @@ package fr.layer4.hhsl;
  */
 
 import fr.layer4.hhsl.prompt.Prompter;
-import fr.layer4.hhsl.store.LocalLockableStore;
+import fr.layer4.hhsl.store.LocalSecuredStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class LocalClusterService implements ClusterService {
 
     public static final RowMapper<Cluster> CLUSTER_ROW_MAPPER = (r, i) -> {
@@ -58,12 +55,12 @@ public class LocalClusterService implements ClusterService {
         return cluster;
     };
 
-    protected static void updateDdl(JdbcTemplate jdbcTemplate) {
+    public static void updateDdl(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
                 "CREATE TABLE IF NOT EXISTS local_cluster(id INT AUTO_INCREMENT PRIMARY KEY, type VARCHAR(255), name VARCHAR(255), uri VARCHAR(255), banner text, user VARCHAR(255), password VARCHAR(255))");
     }
 
-    private final LocalLockableStore localLockableStore;
+    private final LocalSecuredStore localSecuredStore;
     private final Prompter prompter;
 
     @Override
@@ -72,27 +69,27 @@ public class LocalClusterService implements ClusterService {
         String user = this.prompter.prompt("User:");
         String password = this.prompter.promptForPassword("Password:");
 
-        this.localLockableStore.getJdbcTemplate().update("MERGE INTO local_cluster KEY (`name`) VALUES (default, ?, ?, ?, ?, ?, ?);", type, name, uri, banner, user, password);
+        this.localSecuredStore.getJdbcTemplate().update("MERGE INTO local_cluster KEY (`name`) VALUES (default, ?, ?, ?, ?, ?, ?);", type, name, uri, banner, user, password);
 
         return getCluster(name).get();
     }
 
     @Override
     public void deleteCluster(String name) {
-        this.localLockableStore.getJdbcTemplate().update("DELETE local_cluster WHERE `name` = ?", name);
+        this.localSecuredStore.getJdbcTemplate().update("DELETE local_cluster WHERE `name` = ?", name);
     }
 
     @Override
     public List<Cluster> listClusters() {
         String query = "SELECT * FROM local_cluster";
         Object[] objects = {};
-        return this.localLockableStore.getJdbcTemplate().query(query, objects, CLUSTER_ROW_MAPPER);
+        return this.localSecuredStore.getJdbcTemplate().query(query, objects, CLUSTER_ROW_MAPPER);
     }
 
     @Override
     public Optional<Cluster> getCluster(String name) {
         try {
-            return Optional.of(this.localLockableStore.getJdbcTemplate().queryForObject("SELECT * FROM local_cluster WHERE `name` = ?", CLUSTER_ROW_MAPPER, name));
+            return Optional.of(this.localSecuredStore.getJdbcTemplate().queryForObject("SELECT * FROM local_cluster WHERE `name` = ?", CLUSTER_ROW_MAPPER, name));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }

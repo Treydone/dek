@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,10 +27,12 @@ package fr.layer4.hhsl.store;
  */
 
 import fr.layer4.hhsl.PropertyManager;
+import fr.layer4.hhsl.events.StoreReadyEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -43,9 +45,9 @@ import java.util.stream.Collectors;
 @Getter
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class LocalPropertyManager implements PropertyManager {
+public class LocalPropertyManager implements PropertyManager, ApplicationListener<StoreReadyEvent> {
 
-    private final LocalLockableStore localLockableStore;
+    private final LocalSecuredStore localSecuredStore;
 
     protected static void updateDdl(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
@@ -62,15 +64,21 @@ public class LocalPropertyManager implements PropertyManager {
     }
 
     @Override
+    public void onApplicationEvent(StoreReadyEvent storeReadyEvent) {
+        updateDdl(this.localSecuredStore.getJdbcTemplate());
+        updateData(this.localSecuredStore.getJdbcTemplate());
+    }
+
+    @Override
     public Map<String, String> getProperty() {
-        List<Map<String, Object>> maps = this.localLockableStore.getJdbcTemplate().queryForList("SELECT `key`, `value` FROM env");
+        List<Map<String, Object>> maps = this.localSecuredStore.getJdbcTemplate().queryForList("SELECT `key`, `value` FROM env");
         return maps.stream().map(e -> Pair.of((String) e.get("KEY"), (String) e.get("VALUE"))).collect(Collectors.toMap(Pair::getKey, Pair::getRight));
     }
 
     @Override
     public Optional<String> getProperty(String key) {
         try {
-            return Optional.of(this.localLockableStore.getJdbcTemplate().queryForObject("SELECT `value` FROM env WHERE `key` = ?", String.class, key));
+            return Optional.of(this.localSecuredStore.getJdbcTemplate().queryForObject("SELECT `value` FROM env WHERE `key` = ?", String.class, key));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -78,12 +86,11 @@ public class LocalPropertyManager implements PropertyManager {
 
     @Override
     public void setProperty(String key, String value) {
-        this.localLockableStore.getJdbcTemplate().update("MERGE INTO env KEY (`key`) VALUES (default, ?, ?);", key, value);
+        this.localSecuredStore.getJdbcTemplate().update("MERGE INTO env KEY (`key`) VALUES (default, ?, ?);", key, value);
     }
 
     @Override
     public void deleteProperty(String key) {
-        this.localLockableStore.getJdbcTemplate().update("DELETE env WHERE `key` = ?", key);
+        this.localSecuredStore.getJdbcTemplate().update("DELETE env WHERE `key` = ?", key);
     }
-
 }

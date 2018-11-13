@@ -12,10 +12,10 @@ package fr.layer4.hhsl.store;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,6 +26,7 @@ package fr.layer4.hhsl.store;
  * #L%
  */
 
+import fr.layer4.hhsl.events.StoreReadyEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ import org.h2.tools.DeleteDbFiles;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -46,7 +48,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -57,7 +58,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class LocalLockableStore implements SecuredStore, InitializingBean, DisposableBean {
+public class LocalSecuredStore implements SecuredStore, InitializingBean, DisposableBean {
 
     public static final String CIPHER = "AES";
     public static final String DB = "db";
@@ -67,19 +68,20 @@ public class LocalLockableStore implements SecuredStore, InitializingBean, Dispo
     public static final String CIPHER_EXTENSION = ";CIPHER=";
     public static final String ENCRYPT_HEADER = "H2encrypt\n";
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private JdbcConnectionPool dataSource;
     private JdbcTemplate jdbcTemplate;
 
     private boolean isReady = false;
 
     public void purge() {
-        if (dataSource != null) {
+        if (this.dataSource != null) {
             log.debug("Dispose database");
             this.dataSource.dispose();
         }
         log.debug("Clean local file");
         DeleteDbFiles.execute(fr.layer4.hhsl.Constants.getRootPath(), DB, true);
-        isReady = false;
+        this.isReady = false;
     }
 
     @Override
@@ -94,7 +96,7 @@ public class LocalLockableStore implements SecuredStore, InitializingBean, Dispo
 
         // Ready!
         log.debug("Database is ready");
-        isReady = true;
+        this.isReady = true;
 
         log.debug("Checking if database is encrypted...");
         boolean encrypted = isEncrypted(files);
@@ -136,7 +138,7 @@ public class LocalLockableStore implements SecuredStore, InitializingBean, Dispo
 
     @Override
     public boolean isReady() {
-        return isReady;
+        return this.isReady;
     }
 
     @Override
@@ -147,15 +149,8 @@ public class LocalLockableStore implements SecuredStore, InitializingBean, Dispo
         // Ask for root password
         this.dataSource = JdbcConnectionPool.create(JDBC_H2 + getDatabasePath() + CIPHER_EXTENSION + CIPHER, USER, password + " " + PASSWORD);
         this.isReady = true;
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-
-        log.debug("Create tables");
-        LocalPropertyManager.updateDdl(this.jdbcTemplate);
-        LocalRegistryConnectionManager.updateDdl(this.jdbcTemplate);
-        log.debug("Create default local registry");
-        LocalRegistryConnectionManager.updateData(this.jdbcTemplate, Paths.get(getDatabasePath()).toUri().toString());
-        log.debug("Create default properties");
-        LocalPropertyManager.updateData(this.jdbcTemplate);
+        this.jdbcTemplate = new JdbcTemplate(this.dataSource);
+        this.applicationEventPublisher.publishEvent(new StoreReadyEvent(this.jdbcTemplate));
     }
 
     @Override
@@ -207,7 +202,7 @@ public class LocalLockableStore implements SecuredStore, InitializingBean, Dispo
 
             if (ENCRYPT_HEADER.equals(res)) {
                 // Lock!
-                log.warn("Database is locked, use 'unlock' command");
+                log.debug("Database is encrypted");
                 return true;
             }
             log.debug("Database is unprotected");

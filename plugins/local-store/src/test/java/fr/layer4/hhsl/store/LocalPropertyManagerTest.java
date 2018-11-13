@@ -45,7 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LocalPropertyManagerTest {
 
     @Mock
-    private LocalLockableStore localLockableStore;
+    private LocalSecuredStore localSecuredStore;
 
     private LocalPropertyManager propertyManager;
     private JdbcConnectionPool pool;
@@ -54,17 +54,17 @@ public class LocalPropertyManagerTest {
     public void beforeEachTest() {
         this.pool = JdbcConnectionPool.create("jdbc:h2:mem:db", "sa", "sa");
         JdbcTemplate jdbcTemplate = new JdbcTemplate(this.pool);
-        Mockito.when(this.localLockableStore.getJdbcTemplate()).thenReturn(jdbcTemplate);
-        this.propertyManager = new LocalPropertyManager(this.localLockableStore);
+        Mockito.when(this.localSecuredStore.getJdbcTemplate()).thenReturn(jdbcTemplate);
+        this.propertyManager = new LocalPropertyManager(this.localSecuredStore);
         LocalPropertyManager.updateDdl(jdbcTemplate);
     }
 
     @After
     public void afterEachTest() {
         this.pool.dispose();
-        Mockito.verify(this.localLockableStore, Mockito.atLeast(1)).getJdbcTemplate();
-        Mockito.verifyNoMoreInteractions(this.localLockableStore);
-        Mockito.reset(this.localLockableStore);
+        Mockito.verify(this.localSecuredStore, Mockito.atLeast(1)).getJdbcTemplate();
+        Mockito.verifyNoMoreInteractions(this.localSecuredStore);
+        Mockito.reset(this.localSecuredStore);
     }
 
     @Test
@@ -165,7 +165,7 @@ public class LocalPropertyManagerTest {
     public void getProperty_default() {
 
         // Given
-        LocalPropertyManager.updateData(this.localLockableStore.getJdbcTemplate());
+        LocalPropertyManager.updateData(this.localSecuredStore.getJdbcTemplate());
 
         // When
 

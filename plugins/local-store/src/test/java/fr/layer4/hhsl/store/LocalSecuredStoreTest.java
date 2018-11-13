@@ -32,7 +32,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.context.ApplicationEventPublisher;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -40,17 +43,22 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.class)
 public class LocalSecuredStoreTest {
 
-    private LocalLockableStore localLockableStore;
+    private LocalSecuredStore localSecuredStore;
+
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Before
     public void beforeEachTest() {
-        DeleteDbFiles.execute(Constants.getRootPath(), LocalLockableStore.DB, true);
-        this.localLockableStore = new LocalLockableStore();
+        DeleteDbFiles.execute(Constants.getRootPath(), LocalSecuredStore.DB, true);
+        this.localSecuredStore = new LocalSecuredStore(applicationEventPublisher);
     }
 
     @After
     public void afterEachTest() {
-        this.localLockableStore.destroy();
+        this.localSecuredStore.destroy();
+        Mockito.verifyNoMoreInteractions(this.applicationEventPublisher);
+        Mockito.reset(this.applicationEventPublisher);
     }
 
     @Test
@@ -59,10 +67,10 @@ public class LocalSecuredStoreTest {
         // Given
 
         // When
-        this.localLockableStore.afterPropertiesSet();
+        this.localSecuredStore.afterPropertiesSet();
 
         // Then
-        assertFalse(this.localLockableStore.isReady());
+        assertFalse(this.localSecuredStore.isReady());
 
     }
 
@@ -70,15 +78,16 @@ public class LocalSecuredStoreTest {
     public void startOnExistingUnlockedDatabase() {
 
         // Given
-        this.localLockableStore.afterPropertiesSet();
-        this.localLockableStore.init("le_passsword");
-        this.localLockableStore.destroy();
+        this.localSecuredStore.afterPropertiesSet();
+        this.localSecuredStore.init("le_passsword");
+        this.localSecuredStore.destroy();
+        Mockito.verify(this.applicationEventPublisher).publishEvent(Mockito.any());
 
         // When
-        this.localLockableStore.afterPropertiesSet();
+        this.localSecuredStore.afterPropertiesSet();
 
         // Then
-        assertTrue(this.localLockableStore.isReady());
+        assertTrue(this.localSecuredStore.isReady());
 
     }
 
@@ -86,16 +95,17 @@ public class LocalSecuredStoreTest {
     public void startOnExistingLockedDatabase() {
 
         // Given
-        this.localLockableStore.afterPropertiesSet();
-        this.localLockableStore.init("le_password");
-        this.localLockableStore.destroy();
+        this.localSecuredStore.afterPropertiesSet();
+        this.localSecuredStore.init("le_password");
+        this.localSecuredStore.destroy();
+        Mockito.verify(this.applicationEventPublisher).publishEvent(Mockito.any());
 
         // When
-        this.localLockableStore.afterPropertiesSet();
-        this.localLockableStore.unlock("le_password");
+        this.localSecuredStore.afterPropertiesSet();
+        this.localSecuredStore.unlock("le_password");
 
         // Then
-        assertTrue(this.localLockableStore.isReady());
+        assertTrue(this.localSecuredStore.isReady());
 
     }
 
@@ -103,13 +113,15 @@ public class LocalSecuredStoreTest {
     public void startOnExistingLockedDatabase_wrongPassword() {
 
         // Given
-        this.localLockableStore.afterPropertiesSet();
-        this.localLockableStore.init("le_password");
-        this.localLockableStore.destroy();
+        this.localSecuredStore.afterPropertiesSet();
+        this.localSecuredStore.init("le_password");
+        LocalRegistryConnectionManager.updateDdl(this.localSecuredStore.getJdbcTemplate()); // Seems like we need to create a table first to encrypt the whole db...
+        this.localSecuredStore.destroy();
+        Mockito.verify(this.applicationEventPublisher).publishEvent(Mockito.any());
 
         // When
-        this.localLockableStore.afterPropertiesSet();
-        this.localLockableStore.unlock("wtf?");
+        this.localSecuredStore.afterPropertiesSet();
+        this.localSecuredStore.unlock("wtf?");
 
         // Then
 
@@ -119,19 +131,20 @@ public class LocalSecuredStoreTest {
     public void changePassword() {
 
         // Given
-        this.localLockableStore.afterPropertiesSet();
-        this.localLockableStore.init("le_password");
-        this.localLockableStore.destroy();
+        this.localSecuredStore.afterPropertiesSet();
+        this.localSecuredStore.init("le_password");
+        this.localSecuredStore.destroy();
+        Mockito.verify(this.applicationEventPublisher).publishEvent(Mockito.any());
 
         // When
-        this.localLockableStore.afterPropertiesSet();
-        this.localLockableStore.unlock("le_password");
-        this.localLockableStore.changePassword("le_password", "new_password");
-        assertTrue(this.localLockableStore.isReady());
+        this.localSecuredStore.afterPropertiesSet();
+        this.localSecuredStore.unlock("le_password");
+        this.localSecuredStore.changePassword("le_password", "new_password");
+        assertTrue(this.localSecuredStore.isReady());
 
         // Then
-        this.localLockableStore.destroy();
-        this.localLockableStore.unlock("new_password");
-        assertTrue(this.localLockableStore.isReady());
+        this.localSecuredStore.destroy();
+        this.localSecuredStore.unlock("new_password");
+        assertTrue(this.localSecuredStore.isReady());
     }
 }

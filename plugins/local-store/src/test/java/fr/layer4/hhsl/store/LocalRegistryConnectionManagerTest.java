@@ -47,7 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LocalRegistryConnectionManagerTest {
 
     @Mock
-    private LocalLockableStore localLockableStore;
+    private LocalSecuredStore localSecuredStore;
 
     private LocalRegistryConnectionManager registryConnectionManager;
     private JdbcConnectionPool pool;
@@ -56,17 +56,17 @@ public class LocalRegistryConnectionManagerTest {
     public void beforeEachTest() {
         this.pool = JdbcConnectionPool.create("jdbc:h2:mem:db", "sa", "sa");
         JdbcTemplate jdbcTemplate = new JdbcTemplate(this.pool);
-        Mockito.when(this.localLockableStore.getJdbcTemplate()).thenReturn(jdbcTemplate);
-        this.registryConnectionManager = new LocalRegistryConnectionManager(this.localLockableStore);
+        Mockito.when(this.localSecuredStore.getJdbcTemplate()).thenReturn(jdbcTemplate);
+        this.registryConnectionManager = new LocalRegistryConnectionManager(this.localSecuredStore);
         LocalRegistryConnectionManager.updateDdl(jdbcTemplate);
     }
 
     @After
     public void afterEachTest() {
         this.pool.dispose();
-        Mockito.verify(this.localLockableStore, Mockito.atLeast(1)).getJdbcTemplate();
-        Mockito.verifyNoMoreInteractions(this.localLockableStore);
-        Mockito.reset(this.localLockableStore);
+        Mockito.verify(this.localSecuredStore, Mockito.atLeast(1)).getJdbcTemplate();
+        Mockito.verifyNoMoreInteractions(this.localSecuredStore);
+        Mockito.reset(this.localSecuredStore);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class LocalRegistryConnectionManagerTest {
     public void getRegistry_default() {
 
         // Given
-        LocalRegistryConnectionManager.updateData(this.localLockableStore.getJdbcTemplate(), "/test");
+        LocalRegistryConnectionManager.updateData(this.localSecuredStore.getJdbcTemplate(), "/test");
         RegistryConnection expected = new RegistryConnection();
         expected.setId(1L);
         expected.setName("local");

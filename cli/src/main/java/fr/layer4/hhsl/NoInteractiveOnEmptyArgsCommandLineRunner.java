@@ -12,10 +12,10 @@ package fr.layer4.hhsl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.shell.Shell;
@@ -58,42 +60,54 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
     private final ConfigurableEnvironment environment;
     private final SecuredStore store;
     private final Prompter prompter;
+    private final ConfigurableApplicationContext context;
 
     @Override
     public void run(String... args) throws Exception {
         List<String> commandsToRun = Arrays.stream(args).collect(Collectors.toList());
 
-        if (!this.store.isReady()) {
-            String password = this.prompter.doublePromptForPassword();
-            store.init(password);
-        } else {
-            int i = commandsToRun.indexOf("--unlock");
-            if (i > -1) {
-                if (i + 1 > commandsToRun.size()) {
-                    throw new RuntimeException("unlock argument without value @prompt|<password>|<file:///.....>");
-                }
-                commandsToRun.remove(i);
-                String option = commandsToRun.remove(i);
-
-                String password;
-                if ("@prompt".equalsIgnoreCase(option)) {
-                    password = this.prompter.promptForPassword("Password:");
-                } else if (option.startsWith("file://")) {
-                    File file = new File(option.replace("file://", ""));
-                    if (file.exists()) {
-                        password = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                    } else {
-                        throw new RuntimeException("File not found:" + option);
-                    }
-                } else {
-                    password = option;
-                }
-
-                this.store.unlock(password);
+        if (commandsToRun.contains("init")) {
+            if (commandsToRun.size() > 1) {
+                throw new RuntimeException("'init' doesn't accept parameter");
             } else {
-                throw new RuntimeException("Missing unlock option");
+                // Init the store, and purge before if necessary, then stop
+                String password = this.prompter.doublePromptForPassword();
+                this.store.init(password);
+                System.exit(SpringApplication.exit(context));
             }
         }
+
+        if (!this.store.isReady()) {
+            throw new RuntimeException("Store not ready, please run 'hhsl init' before");
+        }
+
+        int i = commandsToRun.indexOf("--unlock");
+        if (i > -1) {
+            if (i + 1 > commandsToRun.size()) {
+                throw new RuntimeException("unlock argument without value @prompt|<password>|<file:///.....>");
+            }
+            commandsToRun.remove(i);
+            String option = commandsToRun.remove(i);
+
+            String password;
+            if ("@prompt".equalsIgnoreCase(option)) {
+                password = this.prompter.promptForPassword("Password:");
+            } else if (option.startsWith("file://")) {
+                File file = new File(option.replace("file://", ""));
+                if (file.exists()) {
+                    password = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+                } else {
+                    throw new RuntimeException("File not found:" + option);
+                }
+            } else {
+                password = option;
+            }
+
+            this.store.unlock(password);
+        } else {
+            throw new RuntimeException("Missing unlock option");
+        }
+
 
         if (!commandsToRun.isEmpty()) {
             InteractiveShellApplicationRunner.disable(this.environment);

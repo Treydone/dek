@@ -12,10 +12,10 @@ package fr.layer4.hhsl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -62,7 +62,7 @@ public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
 
     @Before
     public void beforeEachTest() {
-        this.noInteractiveOnEmptyArgsCommandLineRunner = new NoInteractiveOnEmptyArgsCommandLineRunner(this.shell, this.environment, this.store, this.prompter);
+        this.noInteractiveOnEmptyArgsCommandLineRunner = new NoInteractiveOnEmptyArgsCommandLineRunner(this.shell, this.environment, this.store, this.prompter, null);
     }
 
     @After
@@ -76,15 +76,16 @@ public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
 
         // Given
         Mockito.when(this.store.isReady()).thenReturn(false);
-        Mockito.when(this.prompter.doublePromptForPassword()).thenReturn("le_password");
 
-        // When
-        this.noInteractiveOnEmptyArgsCommandLineRunner.run();
+        try {
+            this.noInteractiveOnEmptyArgsCommandLineRunner.run();
+            fail();
+        } catch (RuntimeException e) {
+
+        }
 
         // Then
         Mockito.verify(this.store).isReady();
-        Mockito.verify(this.prompter).doublePromptForPassword();
-        Mockito.verify(this.store).init("le_password");
     }
 
     @Test
