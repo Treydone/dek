@@ -77,7 +77,8 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
             }
         }
 
-        if (!this.store.isReady()) {
+        boolean info = commandsToRun.size() > 0 && commandsToRun.get(0).equals("info");
+        if (!info && !this.store.isReady()) {
             throw new RuntimeException("Store not ready, please run 'hhsl init' before");
         }
 
@@ -105,9 +106,10 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 
             this.store.unlock(password);
         } else {
-            throw new RuntimeException("Missing unlock option");
+            if (!info) {
+                throw new RuntimeException("Missing unlock option");
+            }
         }
-
 
         if (!commandsToRun.isEmpty()) {
             InteractiveShellApplicationRunner.disable(this.environment);

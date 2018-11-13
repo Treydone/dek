@@ -66,7 +66,7 @@ public class BannerManagerTest {
         String template = this.bannerManager.checkAndLoadTemplate(path);
 
         // Then
-        assertThat(template).isEqualTo(Banner.DEFAULT_BANNER);
+        assertThat(template).isEqualTo(Banner.DEFAULT_CLUSTER_BANNER);
     }
 
     @Test(expected = RuntimeException.class)

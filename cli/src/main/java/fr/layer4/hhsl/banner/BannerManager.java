@@ -12,10 +12,10 @@ package fr.layer4.hhsl.banner;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 @Component
 public class BannerManager {
@@ -63,13 +64,13 @@ public class BannerManager {
                 } catch (IOException e) {
                     throw new RuntimeException("Can not read banner file", e);
                 }
-                new Banner(template, cluster).render(DEFAULT_TERMINAL_WIDTH);
+                new Banner(template, Collections.singletonMap("cluster", cluster)).render(DEFAULT_TERMINAL_WIDTH);
 
                 return template;
             }
         } else {
             // Set to default banner
-            return Banner.DEFAULT_BANNER;
+            return Banner.DEFAULT_CLUSTER_BANNER;
         }
     }
 }

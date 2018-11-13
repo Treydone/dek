@@ -28,6 +28,7 @@ package fr.layer4.hhsl;
 
 import fr.layer4.hhsl.prompt.Prompter;
 import fr.layer4.hhsl.store.SecuredStore;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,13 +37,21 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.shell.Input;
 import org.springframework.shell.Shell;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.springframework.shell.jline.InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED;
 
+@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
 
@@ -58,17 +67,21 @@ public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
     @Mock
     private Prompter prompter;
 
+    @Mock
+    private MutablePropertySources propertySources;
+
     private NoInteractiveOnEmptyArgsCommandLineRunner noInteractiveOnEmptyArgsCommandLineRunner;
 
     @Before
     public void beforeEachTest() {
         this.noInteractiveOnEmptyArgsCommandLineRunner = new NoInteractiveOnEmptyArgsCommandLineRunner(this.shell, this.environment, this.store, this.prompter, null);
+        Mockito.when(this.environment.getPropertySources()).thenReturn(this.propertySources);
     }
 
     @After
     public void afterEachTest() {
-        Mockito.verifyNoMoreInteractions(this.shell, this.environment, this.store, this.prompter);
-        Mockito.reset(this.shell, this.environment, this.store, this.prompter);
+        Mockito.verifyNoMoreInteractions(this.shell, this.environment, this.store, this.prompter, this.propertySources);
+        Mockito.reset(this.shell, this.environment, this.store, this.prompter, this.propertySources);
     }
 
     @Test
@@ -104,6 +117,32 @@ public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
 
         // Then
         Mockito.verify(this.store).isReady();
+    }
+
+    @Test
+    public void info() throws Exception {
+
+        // Given
+
+        // When
+        this.noInteractiveOnEmptyArgsCommandLineRunner.run("info");
+
+        // Then
+        Mockito.verify(this.environment).getPropertySources();
+        Mockito.verify(this.propertySources).addFirst(new MapPropertySource("interactive.override", Collections.singletonMap(SPRING_SHELL_INTERACTIVE_ENABLED, "false")));
+        Mockito.verify(this.shell).run(argThat(inputProvider -> {
+            Input input = inputProvider.readInput();
+            if (input != null) {
+                try {
+                    assertThat(input.words()).containsExactly("info");
+                    return true;
+                } catch (Exception e) {
+                    log.error("Nope...", e);
+                    return false;
+                }
+            }
+            return true;
+        }));
     }
 
     @Test

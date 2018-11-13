@@ -1,4 +1,4 @@
-package fr.layer4.hhsl.banner;
+package fr.layer4.hhsl.commands;
 
 /*-
  * #%L
@@ -26,20 +26,27 @@ package fr.layer4.hhsl.banner;
  * #L%
  */
 
-import fr.layer4.hhsl.Cluster;
-import org.assertj.core.api.Assertions;
-import org.jline.terminal.TerminalBuilder;
-import org.junit.Test;
+import fr.layer4.hhsl.banner.Banner;
+import lombok.extern.slf4j.Slf4j;
+import org.jline.terminal.Terminal;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
 
-import java.io.IOException;
 import java.util.Collections;
 
-public class BannerTest {
+@Slf4j
+@ShellComponent
+public class InfoCommands {
 
-    @Test
-    public void render_testBannerFromTerminal() throws IOException {
+    @Autowired
+    @Lazy
+    private Terminal terminal;
 
-        System.err.println(new Banner(
+    @ShellMethod(key = "info", value = "Info", group = "Others")
+    public Banner info() {
+        return new Banner(
                 "<#list 1..width as x>-</#list>\n" +
                         " HHSL\n" +
                         " Version: TODO\n" +
@@ -49,22 +56,7 @@ public class BannerTest {
                         " - type: ${terminal.type}\n" +
                         " - attributes: ${terminal.attributes}\n" +
                         "<#list 1..width as x>-</#list>\n",
-                Collections.singletonMap("terminal", TerminalBuilder.terminal())).render(200));
-    }
-
-    @Test
-    public void render_defaultBanner() {
-
-        // Given
-        Cluster cluster = new Cluster();
-        cluster.setName("Test Cluster HDP");
-        Banner banner = new Banner(Banner.DEFAULT_CLUSTER_BANNER, Collections.singletonMap("cluster", cluster));
-
-        // When
-        CharSequence render = banner.render(8);
-
-        // Then
-        Assertions.assertThat(render).isEqualTo("--------\nUsing Test Cluster HDP\n--------");
-
+                Collections.singletonMap("terminal", this.terminal)
+        );
     }
 }

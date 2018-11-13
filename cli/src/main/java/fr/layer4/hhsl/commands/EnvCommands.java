@@ -49,9 +49,10 @@ public class EnvCommands {
         log.debug("List all env");
         Map<String, String> env = this.propertyManager.getProperty();
 
-        String[][] data = new String[env.size()][];
+        String[][] data = new String[env.size() + 1][];
+        data[0] = new String[]{"Key", "Value"};
 
-        int it = 0;
+        int it = 1;
         Iterator<Map.Entry<String, String>> iterator = env.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> next = iterator.next();
