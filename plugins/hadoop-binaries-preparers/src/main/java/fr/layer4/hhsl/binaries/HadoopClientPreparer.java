@@ -59,6 +59,16 @@ import java.util.Map;
 @Component
 public class HadoopClientPreparer extends AbstractApacheClientPreparer {
 
+    public static final String HDP_260 = "2.6.0";
+    public static final String HDP_263 = "2.6.3";
+    public static final String HDP_264 = "2.6.4";
+    public static final String HDP_27 = "2.7";
+    public static final String HDP_28 = "2.8";
+    public static final String HDP_283 = "2.8.3";
+    public static final String HDP_300 = "3.0.0";
+    public static final String HDP_281 = "2.8.1";
+    public static final String HDP_271 = "2.7.1";
+
     private final RestTemplate restTemplate;
 
     @Autowired
@@ -155,20 +165,20 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
 
     protected static String findWinUtilsMatchingVersion(String version) {
         String winutilsHadoopVersion;
-        if (version.compareTo("2.6.0") <= 0) {
-            winutilsHadoopVersion = "2.6.0";
-        } else if (version.compareTo("2.6.0") > 0 && version.compareTo("2.6.3") <= 0) {
-            winutilsHadoopVersion = "2.6.3";
-        } else if (version.compareTo("2.6.3") > 0 && version.compareTo("2.7") < 0) {
-            winutilsHadoopVersion = "2.6.4";
-        } else if (version.compareTo("2.7") > 0 && version.compareTo("2.8") < 0) {
-            winutilsHadoopVersion = "2.7.1";
-        } else if (version.compareTo("2.8") > 0 && version.compareTo("2.8.3") < 0) {
-            winutilsHadoopVersion = "2.8.1";
-        } else if (version.compareTo("2.8.3") >= 0 && version.compareTo("3.0.0") < 0) {
-            winutilsHadoopVersion = "2.8.3";
-        } else if (version.compareTo("3.0.0") >= 0) {
-            winutilsHadoopVersion = "3.0.0";
+        if (version.compareTo(HDP_260) <= 0) {
+            winutilsHadoopVersion = HDP_260;
+        } else if (version.compareTo(HDP_260) > 0 && version.compareTo(HDP_263) <= 0) {
+            winutilsHadoopVersion = HDP_263;
+        } else if (version.compareTo(HDP_263) > 0 && version.compareTo(HDP_27) < 0) {
+            winutilsHadoopVersion = HDP_264;
+        } else if (version.compareTo(HDP_27) > 0 && version.compareTo(HDP_28) < 0) {
+            winutilsHadoopVersion = HDP_271;
+        } else if (version.compareTo(HDP_28) > 0 && version.compareTo(HDP_283) < 0) {
+            winutilsHadoopVersion = HDP_281;
+        } else if (version.compareTo(HDP_283) >= 0 && version.compareTo(HDP_300) < 0) {
+            winutilsHadoopVersion = HDP_283;
+        } else if (version.compareTo(HDP_300) >= 0) {
+            winutilsHadoopVersion = HDP_300;
         } else {
             throw new RuntimeException("Can not find a compatible winutils version for Hadoop version " + version);
         }

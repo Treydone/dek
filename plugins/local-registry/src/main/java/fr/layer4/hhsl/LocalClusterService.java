@@ -71,7 +71,7 @@ public class LocalClusterService implements ClusterService {
 
         this.localSecuredStore.getJdbcTemplate().update("MERGE INTO local_cluster KEY (`name`) VALUES (default, ?, ?, ?, ?, ?, ?);", type, name, uri, banner, user, password);
 
-        return getCluster(name).get();
+        return getCluster(name).orElseThrow(() -> new RuntimeException("Can get cluster"));
     }
 
     @Override

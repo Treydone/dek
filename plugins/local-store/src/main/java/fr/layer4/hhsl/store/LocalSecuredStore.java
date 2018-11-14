@@ -194,19 +194,21 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
 
     protected boolean isEncrypted(List<String> files) {
         try {
-            FileChannel fileChannel = new FileInputStream(files.stream().filter(f -> f.endsWith(Constants.SUFFIX_MV_FILE)).findFirst().get()).getChannel();
-            ByteBuffer buffer = ByteBuffer.allocate(ENCRYPT_HEADER.getBytes().length);
-            fileChannel.read(buffer);
-            buffer.flip();
-            String res = new String(buffer.array());
+            String name = files.stream().filter(f -> f.endsWith(Constants.SUFFIX_MV_FILE)).findFirst().get();
+            try (FileChannel fileChannel = new FileInputStream(name).getChannel()) {
+                ByteBuffer buffer = ByteBuffer.allocate(ENCRYPT_HEADER.getBytes().length);
+                fileChannel.read(buffer);
+                buffer.flip();
+                String res = new String(buffer.array());
 
-            if (ENCRYPT_HEADER.equals(res)) {
-                // Lock!
-                log.debug("Database is encrypted");
-                return true;
+                if (ENCRYPT_HEADER.equals(res)) {
+                    // Lock!
+                    log.debug("Database is encrypted");
+                    return true;
+                }
+                log.debug("Database is unprotected");
+                return false;
             }
-            log.debug("Database is unprotected");
-            return false;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
