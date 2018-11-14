@@ -12,10 +12,10 @@ package fr.layer4.hhsl.binaries;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,7 +26,6 @@ package fr.layer4.hhsl.binaries;
  * #L%
  */
 
-import com.google.common.io.Files;
 import io.specto.hoverfly.junit.rule.HoverflyRule;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -34,6 +33,8 @@ import org.junit.Test;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
 import static io.specto.hoverfly.junit.dsl.HoverflyDsl.service;
@@ -66,15 +67,6 @@ public class HadoopClientPreparerTest {
                                             "         7C895810 F70E3C6A 6CBADC76 AFB9303F 1C49CBCA 67237E18 C799D30F 87AFA57C")),
 
             service("api.github.com")
-                    .get("/repos/steveloughran/winutils")
-                    .willReturn(success()
-                            .header("Content-type", "application/json; charset=utf-8")
-                            .body("{\n" +
-                                    "  \"id\": 42450016,\n" +
-                                    "  \"node_id\": \"MDEwOlJlcG9zaXRvcnk0MjQ1MDAxNg==\",\n" +
-                                    "  \"name\": \"winutils\",\n" +
-                                    "  \"full_name\": \"steveloughran/winutils\"" +
-                                    "}"))
                     .get("/repos/steveloughran/winutils/contents/hadoop-2.8.1/bin")
                     .queryParam("ref", "master")
                     .willReturn(success()
@@ -92,13 +84,14 @@ public class HadoopClientPreparerTest {
                                     "    \"download_url\": \"https://raw.githubusercontent.com/steveloughran/winutils/master/hadoop-2.8.1/bin/hadoop\",\n" +
                                     "    \"type\": \"file\"" +
                                     "  }\n" +
-                                    "]"))
+                                    "]")),
 
-                    .get("/repos/steveloughran/winutils/contents/hadoop-2.8.1/bin/OnOutOfMemory.cmd")
+            service("raw.githubusercontent.com")
+                    .get("/steveloughran/winutils/master/hadoop-2.8.1/bin/OnOutOfMemory.cmd")
                     .willReturn(success()
                             .body("dummy content for OnOutOfMemory.cmd"))
 
-                    .get("/repos/steveloughran/winutils/contents/hadoop-2.8.1/bin/hadoop")
+                    .get("/steveloughran/winutils/master/hadoop-2.8.1/bin/hadoop")
                     .willReturn(success()
                             .body("dummy content for hadoop"))
     ));
@@ -124,13 +117,13 @@ public class HadoopClientPreparerTest {
     }
 
     @Test
-    public void downloadWinUtilsBinaries() {
+    public void downloadWinUtilsBinaries() throws IOException {
 
         // Given
-        File tempFile = Files.createTempDir();
+        File tempFile = Files.createTempDirectory("winutils").toFile();
 
         // When
-        HadoopClientPreparer.downloadWinUtilsBinaries(true, tempFile, "2.8.1");
+        HadoopClientPreparer.downloadWinUtilsBinaries(new RestTemplate(), true, tempFile, "2.8.1");
 
         // Then
         assertThat(tempFile).isDirectory();

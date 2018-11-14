@@ -41,6 +41,16 @@
         <dependency>
             <groupId>org.springframework.shell</groupId>
             <artifactId>spring-shell-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-shell-jcommander-adapter</artifactId>
+                    <groupId>org.springframework.shell</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-shell-shell1-adapter</artifactId>
+                    <groupId>org.springframework.shell</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -52,6 +62,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hamcrest-core</artifactId>
+                    <groupId>org.hamcrest</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

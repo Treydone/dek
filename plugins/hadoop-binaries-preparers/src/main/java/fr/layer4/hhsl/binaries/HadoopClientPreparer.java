@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,8 +25,9 @@
  */
 package fr.layer4.hhsl.binaries;
 
-import com.jcabi.github.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.layer4.hhsl.DefaultServices;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -34,6 +35,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.bouncycastle.util.encoders.Hex;
 import org.jline.utils.OSUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -42,12 +45,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -109,7 +114,7 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
 
             String winutilsHadoopVersion = findWinUtilsMatchingVersion(version);
 
-            downloadWinUtilsBinaries(force, dest, winutilsHadoopVersion);
+            downloadWinUtilsBinaries(this.restTemplate, force, dest, winutilsHadoopVersion);
         }
 
         // Update environment variables
@@ -118,29 +123,34 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
         return envVars;
     }
 
-    protected static void downloadWinUtilsBinaries(boolean force, File dest, String winutilsHadoopVersion) {
-        Github github = new RtGithub();
-        Repo repo = github.repos().get(new Coordinates.Simple("steveloughran", "winutils"));
-        String winutilsBin = "hadoop-" + winutilsHadoopVersion + "/bin";
-        try {
-            File binDirectory = new File(dest, "bin");
-            if (!binDirectory.exists()) {
-                binDirectory.mkdir();
-            }
-            Iterable<Content> contents = repo.contents().iterate(winutilsBin, "master");
-            contents.forEach(c -> {
-                try {
-                    File binFile = new File(binDirectory, c.path().replace(winutilsBin, ""));
-                    if (force || !binFile.exists()) {
-                        FileUtils.copyInputStreamToFile(c.raw(), binFile);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException("Can not copy " + c.path() + " to " + dest.getAbsolutePath(), e);
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException("Can not find winutils in " + winutilsBin, e);
+
+    @Data
+    public static class Content {
+        private String name;
+        private String path;
+        @JsonProperty("download_url")
+        private String downloadUrl;
+        private String type;
+    }
+
+    protected static void downloadWinUtilsBinaries(RestTemplate restTemplate, boolean force, File dest, String winutilsHadoopVersion) {
+
+        File binDirectory = new File(dest, "bin");
+        if (!binDirectory.exists()) {
+            binDirectory.mkdir();
         }
+        ResponseEntity<List<Content>> contents = restTemplate.exchange("https://api.github.com/repos/steveloughran/winutils/contents/hadoop-" + winutilsHadoopVersion + "/bin?ref=master", HttpMethod.GET, null, new ParameterizedTypeReference<List<Content>>() {
+        });
+        contents.getBody().forEach(c -> {
+            try {
+                File binFile = new File(binDirectory, c.getName());
+                if (force || !binFile.exists()) {
+                    FileUtils.copyInputStreamToFile(restTemplate.getRequestFactory().createRequest(URI.create(c.getDownloadUrl()), HttpMethod.GET).execute().getBody(), binFile);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Can not copy " + c.getPath() + " to " + dest.getAbsolutePath(), e);
+            }
+        });
     }
 
     protected static String findWinUtilsMatchingVersion(String version) {
