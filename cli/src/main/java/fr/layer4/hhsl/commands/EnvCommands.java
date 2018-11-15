@@ -12,10 +12,10 @@ package fr.layer4.hhsl.commands;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -56,10 +56,19 @@ public class EnvCommands {
         Iterator<Map.Entry<String, String>> iterator = env.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> next = iterator.next();
-            data[it] = new String[]{next.getKey(), next.getValue()};
+            data[it] = new String[]{next.getKey(), hiveSensibleData(next)};
             it++;
         }
         return CommandUtils.getTable(data);
+    }
+
+    protected String hiveSensibleData(Map.Entry<String, String> next) {
+        if (next.getKey().contains("password")
+                || next.getKey().contains("secret")
+                || next.getKey().contains("private")) {
+            return "********";
+        }
+        return next.getValue();
     }
 
     @ShellMethod(key = "get env", value = "Get env", group = "Env")
