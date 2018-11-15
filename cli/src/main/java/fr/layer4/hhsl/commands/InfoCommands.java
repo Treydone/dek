@@ -26,6 +26,8 @@ package fr.layer4.hhsl.commands;
  * #L%
  */
 
+import fr.layer4.hhsl.GitProperties;
+import fr.layer4.hhsl.SpringUtils;
 import fr.layer4.hhsl.banner.Banner;
 import lombok.extern.slf4j.Slf4j;
 import org.jline.terminal.Terminal;
@@ -34,7 +36,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @ShellComponent
@@ -44,19 +47,28 @@ public class InfoCommands {
     @Lazy
     private Terminal terminal;
 
+    @Autowired
+    private GitProperties gitProperties;
+
     @ShellMethod(key = "info", value = "Info", group = "Others")
-    public Banner info() {
+    public Banner info() throws Exception {
+        Map<String, Object> model = new HashMap<>();
+        model.put("terminal", SpringUtils.getTargetObject(this.terminal));
+        model.put("git", this.gitProperties);
+
         return new Banner(
                 "<#list 1..width as x>-</#list>\n" +
                         " HHSL\n" +
-                        " Version: TODO\n" +
+                        " Version: ${git.version}\n" +
+                        " Commit: ${git.commit.id} (${git.remote})\n" +
+                        " Build: ${git.build.time}\n" +
                         " Terminal\n" +
                         " - size: ${terminal.size}\n" +
-                        " - class: ${statics['org.springframework.aop.support.AopUtils'].getTargetClass(terminal)}\n" +
+                        " - class: ${terminal.kind}\n" +
                         " - type: ${terminal.type}\n" +
                         " - attributes: ${terminal.attributes}\n" +
                         "<#list 1..width as x>-</#list>\n",
-                Collections.singletonMap("terminal", this.terminal)
+                model
         );
     }
 }

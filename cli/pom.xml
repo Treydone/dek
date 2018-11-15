@@ -52,6 +52,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -75,7 +79,40 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>application.yml</include>
+                </includes>
+                <targetPath>${project.build.directory}/conf</targetPath>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>application.yml</exclude>
+                </excludes>
+                <targetPath>${project.build.directory}/conf</targetPath>
+            </resource>
+        </resources>
         <plugins>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.2.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dotGitDirectory>${project.basedir}/../.git</dotGitDirectory>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
@@ -90,7 +127,7 @@
                         <configuration>
                             <repositoryLayout>flat</repositoryLayout>
                             <repositoryName>lib</repositoryName>
-                            <configurationSourceDirectory>src/main/resources</configurationSourceDirectory>
+                            <configurationSourceDirectory>${project.build.directory}/conf</configurationSourceDirectory>
                             <copyConfigurationDirectory>true</copyConfigurationDirectory>
                             <configurationDirectory>conf</configurationDirectory>
                             <logsDirectory>logs</logsDirectory>
