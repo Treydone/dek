@@ -42,6 +42,7 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.shell.Input;
 import org.springframework.shell.Shell;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -128,13 +129,29 @@ public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
         this.noInteractiveOnEmptyArgsCommandLineRunner.run("info");
 
         // Then
+        verifyExecution("info");
+    }
+
+    @Test
+    public void install() throws Exception {
+
+        // Given
+
+        // When
+        this.noInteractiveOnEmptyArgsCommandLineRunner.run("install", "hadoop", "2.7.7");
+
+        // Then
+        verifyExecution("install", "hadoop", "2.7.7");
+    }
+
+    protected void verifyExecution(String... args) throws IOException {
         Mockito.verify(this.environment).getPropertySources();
         Mockito.verify(this.propertySources).addFirst(new MapPropertySource("interactive.override", Collections.singletonMap(SPRING_SHELL_INTERACTIVE_ENABLED, "false")));
         Mockito.verify(this.shell).run(argThat(inputProvider -> {
             Input input = inputProvider.readInput();
             if (input != null) {
                 try {
-                    assertThat(input.words()).containsExactly("info");
+                    assertThat(input.words()).containsExactly(args);
                     return true;
                 } catch (Exception e) {
                     log.error("Nope...", e);
