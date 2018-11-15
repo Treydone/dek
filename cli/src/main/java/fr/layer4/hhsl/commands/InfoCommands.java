@@ -59,9 +59,9 @@ public class InfoCommands {
         return new Banner(
                 "<#list 1..width as x>-</#list>\n" +
                         " HHSL\n" +
-                        " Version: ${git.version}\n" +
-                        " Commit: ${git.commit.id} (${git.remote})\n" +
-                        " Build: ${git.build.time}\n" +
+                        " Version: ${(git.version)!}\n" +
+                        " Commit: ${(git.commit.id)!} (${(git.remote)!})\n" +
+                        " Build: ${(git.build.time)!}\n" +
                         " Terminal\n" +
                         " - size: ${terminal.size}\n" +
                         " - class: ${terminal.kind}\n" +
