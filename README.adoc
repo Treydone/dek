@@ -28,9 +28,9 @@ endif::[]
 :uri-contribute: {uri-rel-file-base}CONTRIBUTING.adoc
 :uri-license: {uri-rel-file-base}LICENSE
 
-image:https://travis-ci.org/Treydone/hhsl.svg?branch=master[https://travis-ci.org/Treydone/hhsl]
-image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.hhsl%3Ahhsl&metric=alert_status[https://sonarcloud.io/dashboard?id=fr.layer4.hhsl%3Ahhsl]
-image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.hhsl%3Ahhsl&metric=reliability_rating[https://sonarcloud.io/dashboard?id=fr.layer4.hhsl%3Ahhsl]
+image:https://travis-ci.org/Treydone/hhsl.svg?branch=master[link=https://travis-ci.org/Treydone/hhsl]
+image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.hhsl%3Ahhsl&metric=alert_status[link=https://sonarcloud.io/dashboard?id=fr.layer4.hhsl%3Ahhsl]
+image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.hhsl%3Ahhsl&metric=reliability_rating[link=https://sonarcloud.io/dashboard?id=fr.layer4.hhsl%3Ahhsl]
 
 HHSL allows you to easily connect to multiple Hadoop clusters by downloading the rights clients,
 settings all the environment variables and preparing the -defaults.xml/-site.xml files.
