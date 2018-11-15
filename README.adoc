@@ -121,6 +121,11 @@ Also have a look on configuration files:
 cat
 ```
 
+HHSL can be used to just install binaries, ie without cluster configuration or environment management:
+
+ hhsl install hadoop 2.7.7
+
+
 // TODO Banners
 
 == About security
@@ -337,7 +342,7 @@ Or, skipping the tests
 Force update the version:
 
  mvn --batch-mode release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=0.4-SNAPSHOT
- 
+
 == FAQ
 
 === I need to use a proxy
