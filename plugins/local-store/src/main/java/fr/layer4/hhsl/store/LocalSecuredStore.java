@@ -50,6 +50,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * http://www.h2database.com/html/features.html#file_encryption
@@ -63,6 +64,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
     public static final String CIPHER = "AES";
     public static final String DB = "db";
     public static final String USER = "sa";
+    @SuppressWarnings("squid:S2068")
     public static final String PASSWORD = "sa";
     public static final String JDBC_H2 = "jdbc:h2:";
     public static final String CIPHER_EXTENSION = ";CIPHER=";
@@ -194,7 +196,12 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
 
     protected boolean isEncrypted(List<String> files) {
         try {
-            String name = files.stream().filter(f -> f.endsWith(Constants.SUFFIX_MV_FILE)).findFirst().get();
+            Optional<String> file = files.stream().filter(f -> f.endsWith(Constants.SUFFIX_MV_FILE)).findFirst();
+            if (!file.isPresent()) {
+                return false;
+            }
+
+            String name = file.get();
             try (FileChannel fileChannel = new FileInputStream(name).getChannel()) {
                 ByteBuffer buffer = ByteBuffer.allocate(ENCRYPT_HEADER.getBytes().length);
                 fileChannel.read(buffer);

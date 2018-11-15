@@ -61,10 +61,10 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
         Path hadoopUnitDefaultPropertiesPath = Paths.get(uri).resolve(Paths.get("conf", "hadoop-unit-default.properties"));
 
         // Check hadoop.properties and hadoop-unit-default.properties
-        if (!Files.exists(hadoopPropertiesPath)) {
+        if (!hadoopPropertiesPath.toFile().exists()) {
             throw new RuntimeException("Can not find hadoop.properties at :" + hadoopPropertiesPath.toString());
         }
-        if (!Files.exists(hadoopUnitDefaultPropertiesPath)) {
+        if (!hadoopUnitDefaultPropertiesPath.toFile().exists()) {
             throw new RuntimeException("Can not find hadoop-unit-default.properties at :" + hadoopUnitDefaultPropertiesPath.toString());
         }
 

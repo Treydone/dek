@@ -25,6 +25,7 @@
  */
 package fr.layer4.hhsl;
 
+@SuppressWarnings("squid:S2068")
 public interface DefaultServices {
     String HDFS = "hdfs";
     String HBASE = "hbase";
