@@ -42,7 +42,7 @@ public class WithProxyAuthCredentialsProviderTest {
         // Given
         Mockito.when(this.propertyManager.getProperty(HttpProperties.PROXY_ENABLED)).thenReturn(Optional.empty());
         AuthScope authScope = new AuthScope("hhsl.fr", 80);
-        this.withProxyAuthCredentialsProvider.init();
+        
 
         // When
         Credentials credentials = this.withProxyAuthCredentialsProvider.getCredentials(authScope);
@@ -60,7 +60,7 @@ public class WithProxyAuthCredentialsProviderTest {
         Mockito.when(this.propertyManager.getProperty(HttpProperties.PROXY_HOST)).thenReturn(Optional.of("leproxy.fr"));
         Mockito.when(this.propertyManager.getProperty(HttpProperties.PROXY_PORT)).thenReturn(Optional.of("546"));
         AuthScope authScope = new AuthScope("leproxy.fr", 546);
-        this.withProxyAuthCredentialsProvider.init();
+        
 
         // When
         Credentials credentials = this.withProxyAuthCredentialsProvider.getCredentials(authScope);
@@ -84,7 +84,7 @@ public class WithProxyAuthCredentialsProviderTest {
         Mockito.when(this.propertyManager.getProperty(HttpProperties.PROXY_AUTH_BASIC_USER)).thenReturn(Optional.of("le_user"));
         Mockito.when(this.propertyManager.getProperty(HttpProperties.PROXY_AUTH_BASIC_PASSWORD)).thenReturn(Optional.of("le_password"));
         AuthScope authScope = new AuthScope("leproxy.fr", 546);
-        this.withProxyAuthCredentialsProvider.init();
+        
 
         // When
         Credentials credentials = this.withProxyAuthCredentialsProvider.getCredentials(authScope);

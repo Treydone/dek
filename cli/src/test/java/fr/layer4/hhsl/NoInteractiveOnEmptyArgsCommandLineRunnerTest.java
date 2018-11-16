@@ -36,6 +36,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.ExitCodeGenerator;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
@@ -71,18 +73,21 @@ public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
     @Mock
     private MutablePropertySources propertySources;
 
+    @Mock
+    private ConfigurableApplicationContext context;
+
     private NoInteractiveOnEmptyArgsCommandLineRunner noInteractiveOnEmptyArgsCommandLineRunner;
 
     @Before
     public void beforeEachTest() {
-        this.noInteractiveOnEmptyArgsCommandLineRunner = new NoInteractiveOnEmptyArgsCommandLineRunner(this.shell, this.environment, this.store, this.prompter, null);
+        this.noInteractiveOnEmptyArgsCommandLineRunner = new NoInteractiveOnEmptyArgsCommandLineRunner(this.shell, this.environment, this.store, this.prompter, context);
         Mockito.when(this.environment.getPropertySources()).thenReturn(this.propertySources);
     }
 
     @After
     public void afterEachTest() {
-        Mockito.verifyNoMoreInteractions(this.shell, this.environment, this.store, this.prompter, this.propertySources);
-        Mockito.reset(this.shell, this.environment, this.store, this.prompter, this.propertySources);
+        Mockito.verifyNoMoreInteractions(this.shell, this.environment, this.store, this.prompter, this.propertySources, this.context);
+        Mockito.reset(this.shell, this.environment, this.store, this.prompter, this.propertySources, this.context);
     }
 
     @Test
@@ -124,24 +129,18 @@ public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
     public void info() throws Exception {
 
         // Given
+        Mockito.when(this.store.isReady()).thenReturn(true);
 
         // When
-        this.noInteractiveOnEmptyArgsCommandLineRunner.run("info");
+        this.noInteractiveOnEmptyArgsCommandLineRunner.run("info", "--unlock", "password");
 
         // Then
+        Mockito.verify(this.store).isReady();
+        Mockito.verify(this.store).unlock("password");
+        Mockito.verify(this.context).getBeansOfType(ExitCodeGenerator.class);
+        Mockito.verify(this.context).close();
         verifyExecution("info");
-    }
 
-    @Test
-    public void install() throws Exception {
-
-        // Given
-
-        // When
-        this.noInteractiveOnEmptyArgsCommandLineRunner.run("install", "hadoop", "2.7.7");
-
-        // Then
-        verifyExecution("install", "hadoop", "2.7.7");
     }
 
     protected void verifyExecution(String... args) throws IOException {

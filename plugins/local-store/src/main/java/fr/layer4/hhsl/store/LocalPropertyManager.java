@@ -49,12 +49,12 @@ public class LocalPropertyManager implements PropertyManager, ApplicationListene
 
     private final LocalSecuredStore localSecuredStore;
 
-    protected static void updateDdl(JdbcTemplate jdbcTemplate) {
+    public static void updateDdl(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
                 "CREATE TABLE IF NOT EXISTS env(id INT AUTO_INCREMENT PRIMARY KEY, key VARCHAR(255), value VARCHAR(255))");
     }
 
-    protected static void updateData(JdbcTemplate jdbcTemplate) {
+    public static void updateData(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
                 "INSERT INTO env VALUES "
                         + "(default, 'http.socket.timeout', '30000'),"

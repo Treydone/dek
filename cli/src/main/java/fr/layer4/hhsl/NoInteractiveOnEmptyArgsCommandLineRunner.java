@@ -77,10 +77,7 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
             }
         }
 
-        boolean unsecuredCommand = commandsToRun.size() > 0 &&
-                (commandsToRun.get(0).equals("info")
-                        || commandsToRun.get(0).equals("install"));
-        if (!unsecuredCommand && !this.store.isReady()) {
+        if (!this.store.isReady()) {
             throw new RuntimeException("Store not ready, please run 'hhsl init' before");
         }
 
@@ -108,14 +105,13 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 
             this.store.unlock(password);
         } else {
-            if (!unsecuredCommand) {
-                throw new RuntimeException("Missing unlock option");
-            }
+            throw new RuntimeException("Missing unlock option");
         }
 
         if (!commandsToRun.isEmpty()) {
             InteractiveShellApplicationRunner.disable(this.environment);
             this.shell.run(new StringInputProvider(commandsToRun));
+            SpringApplication.exit(context);
         }
     }
 }

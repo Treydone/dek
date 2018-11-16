@@ -64,13 +64,15 @@ public class HttpClientConfiguration {
                 .setSSLHostnameVerifier(configurableHostnameVerifier)
                 .setRoutePlanner(nonProxyRoutePlanner)
                 .setDefaultCredentialsProvider(withProxyAuthCredentialsProvider)
-                .setDefaultRequestConfig(
-                        RequestConfig.custom()
-                                .setSocketTimeout(Integer.valueOf(propertyManager.getProperty("http.socket.timeout").orElse("30000")))
-                                .setConnectTimeout(Integer.valueOf(propertyManager.getProperty("http.connect.timeout").orElse("30000")))
-                                .setProxyPreferredAuthSchemes(Arrays.asList("basic", "ntlm"))
-                                .build()
-                ).setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy())
+                // TODO
+//                .setDefaultRequestConfig(
+//                        RequestConfig.custom()
+//                                .setSocketTimeout(Integer.valueOf(propertyManager.getProperty("http.socket.timeout").orElse("30000")))
+//                                .setConnectTimeout(Integer.valueOf(propertyManager.getProperty("http.connect.timeout").orElse("30000")))
+//                                .setProxyPreferredAuthSchemes(Arrays.asList("basic", "ntlm"))
+//                                .build()
+//                )
+                .setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy())
                 .build();
     }
 

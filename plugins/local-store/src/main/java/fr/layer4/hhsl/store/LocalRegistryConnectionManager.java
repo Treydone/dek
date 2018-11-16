@@ -52,12 +52,12 @@ public class LocalRegistryConnectionManager implements RegistryConnectionManager
 
     private final LocalSecuredStore localSecuredStore;
 
-    protected static void updateDdl(JdbcTemplate jdbcTemplate) {
+    public static void updateDdl(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
                 "CREATE TABLE IF NOT EXISTS registry(id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), uri VARCHAR(255))");
     }
 
-    protected static void updateData(JdbcTemplate jdbcTemplate, String databasePath) {
+    public static void updateData(JdbcTemplate jdbcTemplate, String databasePath) {
         jdbcTemplate.update("INSERT INTO registry VALUES (default, 'local', concat('local://', ?))", databasePath);
     }
 

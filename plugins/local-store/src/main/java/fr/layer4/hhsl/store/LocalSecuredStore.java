@@ -179,7 +179,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
         this.isReady = true;
     }
 
-    protected static String getDatabasePath() {
+    public static String getDatabasePath() {
         return fr.layer4.hhsl.Constants.getRootPath() + File.separator + DB;
     }
 
