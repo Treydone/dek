@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,18 +25,25 @@
  */
 package fr.layer4.hhsl.config;
 
+import fr.layer4.hhsl.PropertyManager;
 import fr.layer4.hhsl.http.ConfigurableHostnameVerifier;
-import fr.layer4.hhsl.http.ProxyInterceptor;
+import fr.layer4.hhsl.http.NonProxyRoutePlanner;
+import fr.layer4.hhsl.http.WithProxyAuthCredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.conn.SchemePortResolver;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.util.PublicSuffixMatcherLoader;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.ProxyAuthenticationStrategy;
+import org.apache.http.impl.conn.DefaultSchemePortResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.HostnameVerifier;
+import java.util.Arrays;
 
 @Configuration
 public class HttpClientConfiguration {
@@ -47,10 +54,23 @@ public class HttpClientConfiguration {
     }
 
     @Bean
-    public CloseableHttpClient httpClient(ProxyInterceptor proxyInterceptor, ConfigurableHostnameVerifier configurableHostnameVerifier) {
+    public SchemePortResolver schemePortResolver() {
+        return new DefaultSchemePortResolver();
+    }
+
+    @Bean
+    public CloseableHttpClient httpClient(PropertyManager propertyManager, WithProxyAuthCredentialsProvider withProxyAuthCredentialsProvider, NonProxyRoutePlanner nonProxyRoutePlanner, ConfigurableHostnameVerifier configurableHostnameVerifier) {
         return HttpClientBuilder.create()
-                .addInterceptorFirst(proxyInterceptor)
                 .setSSLHostnameVerifier(configurableHostnameVerifier)
+                .setRoutePlanner(nonProxyRoutePlanner)
+                .setDefaultCredentialsProvider(withProxyAuthCredentialsProvider)
+                .setDefaultRequestConfig(
+                        RequestConfig.custom()
+                                .setSocketTimeout(Integer.valueOf(propertyManager.getProperty("http.socket.timeout").orElse("30000")))
+                                .setConnectTimeout(Integer.valueOf(propertyManager.getProperty("http.connect.timeout").orElse("30000")))
+                                .setProxyPreferredAuthSchemes(Arrays.asList("basic", "ntlm"))
+                                .build()
+                ).setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy())
                 .build();
     }
 
