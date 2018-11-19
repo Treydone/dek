@@ -91,6 +91,8 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
     @Override
     public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
         String archive = "hadoop-" + version + ".tar.gz";
+        File dest = new File(basePath, FilenameUtils.getBaseName(archive));
+        log.debug("Preparing {} to {}", archive, dest);
 
         // Check if archive if already present
         if (force || !Files.exists(Paths.get(basePath, archive))) {
@@ -109,10 +111,11 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
         }
 
         // Unpack
-        File dest = new File(basePath, FilenameUtils.getBaseName(archive));
+        File source = new File(basePath, archive);
+        log.debug("Uncompress {} to {]", source, dest);
         if (force || !dest.exists()) {
             try {
-                uncompress(new File(basePath, archive), dest);
+                uncompress(source, dest);
             } catch (IOException e) {
                 throw new RuntimeException("Can not extract client", e);
             }
@@ -144,8 +147,8 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
     }
 
     protected static void downloadWinUtilsBinaries(RestTemplate restTemplate, boolean force, File dest, String winutilsHadoopVersion) {
-
         File binDirectory = new File(dest, "bin");
+        log.debug("Download winutils {} to {}", winutilsHadoopVersion, binDirectory);
         if (!binDirectory.exists()) {
             binDirectory.mkdir();
         }
