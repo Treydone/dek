@@ -56,13 +56,13 @@ public class EnvCommands {
         Iterator<Map.Entry<String, String>> iterator = env.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> next = iterator.next();
-            data[it] = new String[]{next.getKey(), hiveSensibleData(next)};
+            data[it] = new String[]{next.getKey(), hideSensibleData(next)};
             it++;
         }
         return CommandUtils.getTable(data);
     }
 
-    protected String hiveSensibleData(Map.Entry<String, String> next) {
+    protected String hideSensibleData(Map.Entry<String, String> next) {
         if (next.getKey().contains("password")
                 || next.getKey().contains("secret")
                 || next.getKey().contains("private")) {
