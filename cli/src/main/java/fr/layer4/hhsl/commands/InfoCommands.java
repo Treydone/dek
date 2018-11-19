@@ -29,6 +29,7 @@ package fr.layer4.hhsl.commands;
 import fr.layer4.hhsl.GitProperties;
 import fr.layer4.hhsl.SpringUtils;
 import fr.layer4.hhsl.banner.Banner;
+import fr.layer4.hhsl.info.ClusterInfoManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jline.terminal.Terminal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +51,15 @@ public class InfoCommands {
     @Autowired
     private GitProperties gitProperties;
 
+    @Autowired
+    private ClusterInfoManager clusterInfoManager;
+
     @ShellMethod(key = "info", value = "Info", group = "Others")
     public Banner info() throws Exception {
         Map<String, Object> model = new HashMap<>();
         model.put("terminal", SpringUtils.getTargetObject(this.terminal));
         model.put("git", this.gitProperties);
+        model.put("plugins", this.clusterInfoManager.getAvailableTypes());
 
         return new Banner(
                 "<#list 1..width as x>-</#list>\n" +
@@ -62,6 +67,7 @@ public class InfoCommands {
                         " Version: ${(git.version)!}\n" +
                         " Commit: ${(git.commit.id)!} (${(git.remote)!})\n" +
                         " Build: ${(git.build.time)!}\n" +
+                        " Available plugins: <#list plugins as plugin>${plugin}<#sep>,</#sep></#list>\n" +
                         " Terminal\n" +
                         " - size: ${terminal.size}\n" +
                         " - class: ${terminal.kind}\n" +
