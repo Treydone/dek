@@ -64,6 +64,7 @@
         <!-- General Properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <quick>false</quick>
 
         <apache-commons-compress.version>1.18</apache-commons-compress.version>
         <apache-commons-io.version>2.6</apache-commons-io.version>
@@ -314,6 +315,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.12.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.0</version>
                 </plugin>
@@ -359,6 +365,13 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>${quick}</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
@@ -368,6 +381,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <skipSource>${quick}</skipSource>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -382,6 +398,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <skip>${quick}</skip>
                     <addOutputDirectory>false</addOutputDirectory>
                     <outputDirectory>${project.build.directory}/delombok</outputDirectory>
                     <sourceDirectory>src/main/java</sourceDirectory>
@@ -398,6 +415,7 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
+                            <skip>${quick}</skip>
                             <additionalJOption>-Xdoclint:none</additionalJOption>
                             <sourcepath>${project.build.directory}/delombok</sourcepath>
                         </configuration>
@@ -425,6 +443,7 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
+                            <skip>${quick}</skip>
                             <rules>
                                 <bannedDependencies>
                                     <searchTransitive>true</searchTransitive>
@@ -519,6 +538,7 @@
                         </goals>
                         <phase>process-sources</phase>
                         <configuration>
+                            <skipCheckLicense>${quick}</skipCheckLicense>
                             <licenseName>mit</licenseName>
                             <organizationName>Layer4</organizationName>
                             <inceptionYear>2018</inceptionYear>
