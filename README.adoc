@@ -53,82 +53,9 @@ HHSL works on Linux, macOS and Windows and requires:
 
 // TODO offer some curl | bash option
 
-== How to
-
-Check the version:
-
- > hhsl info
- -----------------------------------------------------------------------------
-  HHSL
-  Version: 0.3-SNAPSHOT
-  Commit: 181c0a9e0415efe0fd01b3cc088f9e97ed78845a ()
-  Build: 2018-11-15T07:29:44+0000
-  Terminal
-  - size: Size[cols=77, rows=30]
-  - class: PosixSysTerminal
-  - type: xterm-256color
-  - attributes: Attributes[lflags: echoke echoe echok echo echoctl isig icanon, iflags: brkint icrnl ixon ixany imaxbel iutf8, oflags: opost onlcr, cflags: cs6 cs7 cs8 cread hupcl, cchars: eof=^D eol=<undef> eol2=<undef> erase=^? werase=^W kill=^U reprint=^R intr=^C quit=^\ susp=^Z dsusp=<undef> start=^Q stop=^S lnext=^V discard=^O min=1 time=0 status=<undef>]
- -----------------------------------------------------------------------------
-
- > hhsl init
- password: ****
- retype password: ****
-
-By initiating the database, a local registry is defined. A registry holds the references to clusters.
-HHSL can refer multiple registries. By default, a local registry is defined, and for each commands
-using a registry, that local registry is used.
-
-You can then add a cluster. For instance, we add a cluster managed by Ambari, available at http://ambari:8080 and named PROD-HDP3.0:
-
-```
-hhsl add cluster local ambari PROD-HDP3.0 http://ambari:8080
-> user:
-> password:
-```
-
-Verify that the cluster has been added:
-
-```
-hhsl list cluster
-
-┌────────┬───────────┬──────┬──────────────────┐
-│Registry│Name       │Type  │URI               │
-├────────┼───────────┼──────┼──────────────────┤
-│local   │PROD-HDP3.0│ambari│http://ambari:8080│
-└────────┴───────────┴──────┴──────────────────┘
-```
-
-Now use it:
-
-```
-hhsl use PROD-HDP3.0
-# or hhsl use cluster PROD-HDP3.0
-```
-
-The command 'use' download the missing clients, prepare the environment variables and
-render the configuration files. You can check them by using the 'env' command in Linux for instance:
-
-```
-env
-....
-HADOOP_HOME=/xxxxx
-SPARK_HOME=/xxxx
-HBASE_HOME=/xxxxx
-```
-
-Also have a look on configuration files:
-```
-cat
-```
-
-HHSL can be used to just install binaries, ie without cluster configuration or environment management:
-
- hhsl install hadoop 2.7.7
-
-
-// TODO Banners
-
 == About security
+
+// TODO provide default file containing the password
 
 HHSL uses a secure storage in order to manage secrets and credentials for registries and resolvers.
 Most HHSL resolvers require credentials to interact with a third-party service managing their configuration: Ambari for Hortonworks, Cloudera Manager for Cloudera...
@@ -153,19 +80,92 @@ For background process or automatic filling of the root password, you can use th
 Be aware that your commands will be store in the history of your shell if you use direct password...
 The file option allows you to use a file containing the root password. Ensure to protect this file with some restrictions (chown+chmod 700)
 
-== Man
+== How to
 
-**install**
+ > hhsl init
+ password: ****
+ retype password: ****
+
+By initiating the database, a local registry is defined. A registry holds the references to clusters.
+HHSL can refer multiple registries. By default, a local registry is defined, and for each commands
+using a registry, that local registry is used.
+
+Display the info:
+
+ > hhsl info --unlock XXX
+ -----------------------------------------------------------------------------
+  HHSL
+  Version: 0.3-SNAPSHOT
+  Commit: 181c0a9e0415efe0fd01b3cc088f9e97ed78845a ()
+  Build: 2018-11-15T07:29:44+0000
+  Terminal
+  - size: Size[cols=77, rows=30]
+  - class: PosixSysTerminal
+  - type: xterm-256color
+  - attributes: Attributes[lflags: echoke echoe echok echo echoctl isig icanon, iflags: brkint icrnl ixon ixany imaxbel iutf8, oflags: opost onlcr, cflags: cs6 cs7 cs8 cread hupcl, cchars: eof=^D eol=<undef> eol2=<undef> erase=^? werase=^W kill=^U reprint=^R intr=^C quit=^\ susp=^Z dsusp=<undef> start=^Q stop=^S lnext=^V discard=^O min=1 time=0 status=<undef>]
+ -----------------------------------------------------------------------------
+
+You can then add a cluster. For instance, we add a cluster managed by Ambari, available at http://ambari:8080 and named PROD-HDP3.0:
+
+```
+hhsl add cluster local ambari PROD-HDP3.0 http://ambari:8080 --unlock XXX
+> user:
+> password:
+```
+
+Verify that the cluster has been added:
+
+```
+hhsl list cluster --unlock XXX
+
+┌────────┬───────────┬──────┬──────────────────┐
+│Registry│Name       │Type  │URI               │
+├────────┼───────────┼──────┼──────────────────┤
+│local   │PROD-HDP3.0│ambari│http://ambari:8080│
+└────────┴───────────┴──────┴──────────────────┘
+```
+
+Now use it:
+
+```
+hhsl use PROD-HDP3.0 --unlock XXX
+# or hhsl use cluster PROD-HDP3.0
+```
+
+The command 'use' download the missing clients, prepare the environment variables and
+render the configuration files. You can check them by using the 'env' command in Linux for instance:
+
+```
+env
+....
+HADOOP_HOME=/xxxxx
+SPARK_HOME=/xxxx
+HBASE_HOME=/xxxxx
+```
+
+Also have a look on configuration files:
+```
+cat
+```
+
+HHSL can be used to just install binaries, ie without cluster configuration or environment management:
+
+ hhsl install hadoop 2.7.7 --unlock XXX
+
+
+
+== Man
 
 **init**
 
-**env**
+**install**
+
+**list env**
 
 **set env**
 
 **get env**
 
-// TODO
 
 == Architecture
 
