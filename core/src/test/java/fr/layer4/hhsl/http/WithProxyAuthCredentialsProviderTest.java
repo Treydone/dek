@@ -28,6 +28,7 @@ public class WithProxyAuthCredentialsProviderTest {
     @Before
     public void beforeEachTest() {
         this.withProxyAuthCredentialsProvider = new WithProxyAuthCredentialsProvider(this.propertyManager);
+        this.withProxyAuthCredentialsProvider.init();
     }
 
     @After

@@ -64,6 +64,7 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        log.info("Running with raw args {}", args);
         List<String> commandsToRun = Arrays.stream(args).collect(Collectors.toList());
 
         if (commandsToRun.contains("init")) {
@@ -110,6 +111,7 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 
         if (!commandsToRun.isEmpty()) {
             InteractiveShellApplicationRunner.disable(this.environment);
+            log.info("Running with args {}", args);
             this.shell.run(new StringInputProvider(commandsToRun));
             SpringApplication.exit(context);
         }
