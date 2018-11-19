@@ -47,6 +47,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -70,7 +71,7 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
         this.restTemplate = new RestTemplate(restTemplate.getRequestFactory());
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         mappingJackson2HttpMessageConverter.setSupportedMediaTypes(Arrays.asList(new MediaType("text", "plain")));
-        this.restTemplate.setMessageConverters(Arrays.asList(mappingJackson2HttpMessageConverter));
+        this.restTemplate.setMessageConverters(Arrays.asList(mappingJackson2HttpMessageConverter, new ByteArrayHttpMessageConverter()));
     }
 
     @Override
