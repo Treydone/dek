@@ -23,8 +23,15 @@ public class MainIntegrationTest {
         init();
 
         Main.main("info", "--unlock", PASSWORD);
+
         Main.main("list", "registry", "--unlock", PASSWORD);
         Main.main("list", "cluster", "--unlock", PASSWORD);
+
+        Main.main("list", "env", "--unlock", PASSWORD);
+        Main.main("set", "env", "test-key", "test-value", "--unlock", PASSWORD);
+        Main.main("set", "env", "test-key", "test-value2", "--unlock", PASSWORD);
+        Main.main("get", "env", "test-key", "--unlock", PASSWORD);
+        Main.main("list", "env", "--unlock", PASSWORD);
 
     }
 
