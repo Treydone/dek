@@ -12,10 +12,10 @@ package fr.layer4.hhsl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,7 +35,6 @@ import fr.layer4.hhsl.ambari.api.model.ClusterResponseWrapperContext;
 import fr.layer4.hhsl.ambari.api.model.ServiceResponseWrapperContext;
 import fr.layer4.hhsl.ambari.api.model.StackServiceResponseSwagger;
 import fr.layer4.hhsl.info.ClusterInfoResolver;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -44,11 +43,11 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -58,19 +57,21 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
 import java.net.URI;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class AmbariClusterInfoResolver implements ClusterInfoResolver {
 
-    @Autowired
-    @Setter
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    public AmbariClusterInfoResolver(RestTemplate restTemplate) {
+        this.restTemplate = new RestTemplate(restTemplate.getRequestFactory());
+        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        mappingJackson2HttpMessageConverter.setSupportedMediaTypes(Arrays.asList(new MediaType("text", "plain")));
+        this.restTemplate.setMessageConverters(Arrays.asList(mappingJackson2HttpMessageConverter));
+    }
 
     @Override
     public String getType() {

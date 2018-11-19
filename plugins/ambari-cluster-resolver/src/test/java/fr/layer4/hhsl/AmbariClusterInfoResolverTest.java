@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -62,7 +62,7 @@ public class AmbariClusterInfoResolverTest {
                             .get("/api/v1/clusters")
                             .header("authorization", "Basic bGVfdXNlcjpsZV9wYXNzd29yZA==")
                             .willReturn(success()
-                                    .header("content-type", "application/json")
+                                    .header("content-type", "text/plain")
                                     .body("{" +
                                             "\"href\": \"hrefffff\"," +
                                             "\"items\": [" +
@@ -80,7 +80,7 @@ public class AmbariClusterInfoResolverTest {
                             .get("/api/v1/clusters/SAMPLE_DEV/services")
                             .header("authorization", "Basic bGVfdXNlcjpsZV9wYXNzd29yZA==")
                             .willReturn(success()
-                                    .header("content-type", "application/json")
+                                    .header("content-type", "text/plain")
                                     .body("{" +
                                             "\"href\": \"hrefffff\"," +
                                             "\"items\": [" +
@@ -106,7 +106,7 @@ public class AmbariClusterInfoResolverTest {
                             .get("/api/v1/stacks/HDP/versions/2.6/services/HIVE")
                             .header("authorization", "Basic bGVfdXNlcjpsZV9wYXNzd29yZA==")
                             .willReturn(success()
-                                    .header("content-type", "application/json")
+                                    .header("content-type", "text/plain")
                                     .body("{" +
                                             "\"href\": \"hrefffff\"," +
                                             "\"StackServices\":" +
@@ -118,7 +118,7 @@ public class AmbariClusterInfoResolverTest {
                             .get("/api/v1/stacks/HDP/versions/2.6/services/SERVICE_WITH_NOT_CLIENT")
                             .header("authorization", "Basic bGVfdXNlcjpsZV9wYXNzd29yZA==")
                             .willReturn(success()
-                                    .header("content-type", "application/json")
+                                    .header("content-type", "text/plain")
                                     .body("{" +
                                             "\"href\": \"hrefffff\"," +
                                             "\"StackServices\":" +
@@ -149,10 +149,7 @@ public class AmbariClusterInfoResolverTest {
 
     @Before
     public void init() {
-        resolver = new AmbariClusterInfoResolver();
-        RestTemplate restTemplate = new RestTemplate();
-
-        resolver.setRestTemplate(restTemplate);
+        resolver = new AmbariClusterInfoResolver(new RestTemplate());
     }
 
     @Test
