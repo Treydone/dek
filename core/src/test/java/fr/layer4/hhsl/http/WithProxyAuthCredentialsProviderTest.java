@@ -28,7 +28,6 @@ public class WithProxyAuthCredentialsProviderTest {
     @Before
     public void beforeEachTest() {
         this.withProxyAuthCredentialsProvider = new WithProxyAuthCredentialsProvider(this.propertyManager);
-        this.withProxyAuthCredentialsProvider.init();
     }
 
     @After
@@ -46,6 +45,7 @@ public class WithProxyAuthCredentialsProviderTest {
         
 
         // When
+        this.withProxyAuthCredentialsProvider.init();
         Credentials credentials = this.withProxyAuthCredentialsProvider.getCredentials(authScope);
 
         // Then
@@ -64,6 +64,7 @@ public class WithProxyAuthCredentialsProviderTest {
         
 
         // When
+        this.withProxyAuthCredentialsProvider.init();
         Credentials credentials = this.withProxyAuthCredentialsProvider.getCredentials(authScope);
 
         // Then
@@ -88,6 +89,7 @@ public class WithProxyAuthCredentialsProviderTest {
         
 
         // When
+        this.withProxyAuthCredentialsProvider.init();
         Credentials credentials = this.withProxyAuthCredentialsProvider.getCredentials(authScope);
 
         // Then
