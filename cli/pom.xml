@@ -23,6 +23,16 @@
         </dependency>
         <dependency>
             <groupId>fr.layer4.hhsl.plugins</groupId>
+            <artifactId>cloudera-cluster-resolver</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.layer4.hhsl.plugins</groupId>
+            <artifactId>hadoop-unit-cluster-resolver</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.layer4.hhsl.plugins</groupId>
             <artifactId>hadoop-binaries-preparers</artifactId>
             <version>${project.version}</version>
         </dependency>
