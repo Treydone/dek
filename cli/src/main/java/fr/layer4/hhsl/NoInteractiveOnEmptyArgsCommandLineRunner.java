@@ -42,6 +42,8 @@ import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,20 +72,14 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
         List<String> commandsToRun = Arrays.stream(args).collect(Collectors.toList());
 
         if (commandsToRun.contains("init")) {
-            if (commandsToRun.size() > 1) {
-                throw new RuntimeException("'init' doesn't accept parameter");
-            } else {
-                // Init the store, and purge before if necessary, then stop
-                String password = this.prompter.doublePromptForPassword();
-                this.store.init(password);
-                System.exit(SpringApplication.exit(context));
-            }
+            init(commandsToRun);
         }
 
         if (!this.store.isReady()) {
             throw new RuntimeException("Store not ready, please run 'hhsl init' before");
         }
 
+        // Ensure archives folder exists in root
         Path archives = Constants.getRootPath().resolve(Constants.ARCHIVES);
         if (!Files.exists(archives)) {
             Files.createDirectory(archives);
@@ -91,38 +87,71 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
             throw new RuntimeException("Invalid path " + archives);
         }
 
+        // Unlock via option --unlock or via secret file
         int i = commandsToRun.indexOf("--unlock");
+        String password;
         if (i > -1) {
-            if (i + 1 > commandsToRun.size()) {
-                throw new RuntimeException("unlock argument without value @prompt|<password>|<file:///.....>");
-            }
-            commandsToRun.remove(i);
-            String option = commandsToRun.remove(i);
-
-            String password;
-            if ("@prompt".equalsIgnoreCase(option)) {
-                password = this.prompter.promptForPassword("Password:");
-            } else if (option.startsWith("file://")) {
-                File file = new File(option.replace("file://", ""));
-                if (file.exists()) {
-                    password = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                } else {
-                    throw new RuntimeException("File not found:" + option);
-                }
-            } else {
-                password = option;
-            }
-
-            this.store.unlock(password);
+            password = unlockViaOption(commandsToRun, i);
+        } else if (Files.exists(Constants.getRootPath().resolve(Constants.SECRET))) {
+            password = unlockViaDefaultSecretFile();
         } else {
-            throw new RuntimeException("Missing unlock option");
+            throw new RuntimeException("Missing unlock option and default secret file is missing");
         }
+
+        this.store.unlock(password);
 
         if (!commandsToRun.isEmpty()) {
             InteractiveShellApplicationRunner.disable(this.environment);
             log.info("Running with args {}", args);
             this.shell.run(new StringInputProvider(commandsToRun));
             SpringApplication.exit(context);
+        }
+    }
+
+    protected String unlockViaDefaultSecretFile() throws IOException {
+        return FileUtils.readFileToString(Constants.getRootPath().resolve(Constants.SECRET).toFile(), StandardCharsets.UTF_8).replaceAll("(\\r|\\n)", "");
+    }
+
+    protected String unlockViaOption(List<String> commandsToRun, int i) throws IOException {
+        String password;
+        if (i + 1 > commandsToRun.size()) {
+            throw new RuntimeException("unlock argument without value @prompt|<password>|<file:///.....>");
+        }
+        commandsToRun.remove(i);
+        String option = commandsToRun.remove(i);
+
+        if ("@prompt".equalsIgnoreCase(option)) {
+            password = this.prompter.promptForPassword("Password:");
+        } else if (option.startsWith("file://")) {
+            File file = new File(option.replace("file://", ""));
+            if (file.exists()) {
+                password = FileUtils.readFileToString(file, StandardCharsets.UTF_8).replaceAll("(\\r|\\n)", "");
+            } else {
+                throw new RuntimeException("File not found:" + option);
+            }
+        } else {
+            password = option;
+        }
+        return password;
+    }
+
+    protected void init(List<String> commandsToRun) throws IOException {
+        if (commandsToRun.size() > 1) {
+            throw new RuntimeException("'init' doesn't accept parameter");
+        } else {
+            // Init the store, and purge before if necessary, then stop
+            String password = this.prompter.doublePromptForPassword();
+            this.store.init(password);
+
+            // Store the secret if asked
+            Path secretPath = Constants.getRootPath().resolve(Constants.SECRET).toAbsolutePath();
+            if (this.prompter.promptForQuestion("Do you want to store the password in " + secretPath.toString() + "?[Y/n]")) {
+                try (FileWriter fileWriter = new FileWriter(secretPath.toFile(), false)) {
+                    fileWriter.write(password);
+                }
+            }
+
+            System.exit(SpringApplication.exit(context));
         }
     }
 }

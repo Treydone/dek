@@ -35,6 +35,7 @@ public interface Constants {
     String HOME = System.getProperty("user.home", "~");
     String FOLDER = ".hhsl";
     String ARCHIVES = "archives";
+    String SECRET = "secret";
     String ENV_SH = "env.sh";
     String ENV_BAT = "env.bat";
 

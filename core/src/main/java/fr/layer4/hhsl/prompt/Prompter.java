@@ -34,4 +34,6 @@ public interface Prompter {
     String promptForPassword(String message);
 
     String prompt(String message);
+
+    boolean promptForQuestion(String message);
 }

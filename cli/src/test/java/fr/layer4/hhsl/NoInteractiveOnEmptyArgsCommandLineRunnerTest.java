@@ -79,9 +79,10 @@ public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
     private NoInteractiveOnEmptyArgsCommandLineRunner noInteractiveOnEmptyArgsCommandLineRunner;
 
     @Before
-    public void beforeEachTest() {
+    public void beforeEachTest() throws IOException {
         this.noInteractiveOnEmptyArgsCommandLineRunner = new NoInteractiveOnEmptyArgsCommandLineRunner(this.shell, this.environment, this.store, this.prompter, context);
         Mockito.when(this.environment.getPropertySources()).thenReturn(this.propertySources);
+        Files.deleteIfExists(Constants.getRootPath().resolve(Constants.SECRET));
     }
 
     @After
@@ -207,5 +208,20 @@ public class NoInteractiveOnEmptyArgsCommandLineRunnerTest {
         // Then
         Mockito.verify(this.store).isReady();
         Mockito.verify(this.store).unlock("password in file");
+    }
+
+    @Test
+    public void storeReady_unlockWithDefaultSecretFile() throws Exception {
+
+        // Given
+        Mockito.when(this.store.isReady()).thenReturn(true);
+        Files.write(Constants.getRootPath().resolve(Constants.SECRET), "password in secret file".getBytes());
+
+        // When
+        this.noInteractiveOnEmptyArgsCommandLineRunner.run();
+
+        // Then
+        Mockito.verify(this.store).isReady();
+        Mockito.verify(this.store).unlock("password in secret file");
     }
 }

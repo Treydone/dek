@@ -62,29 +62,31 @@ Most HHSL resolvers require credentials to interact with a third-party service m
 HHSL has a simple mechanism to protect secrets: it use by default an implementation of a secure storage based on a H2 encrypted database (see plugins/local-store).
 Therefor, if you want to use HHSL, you need to specify a key to unlock the store. The first you use HHSL, you will be prompted to enter the root password.
 
-With HHSL, you can unlock the store in 3 ways with the ```--unlock``` options:
+With HHSL, you can unlock the store in 4 ways with the ```--unlock``` options:
 - direct password
-- file, if you enter an option starting with "file://..."
 - prompt, if you enter ```@prompt```
+- file, if you enter an option starting with "file://..."
+- default secret file, if a file named 'secret' exists in the root path of HHSL
 
 The preferred way to unlock the secured store is @prompt, which asks the user to enter the root password:
 
  hhsl ... --unlock @prompt
  Root password:>
 
-For background process or automatic filling of the root password, you can use the file or direct password options:
+For background process or automatic filling of the root password, you can use the file (or default secret file) or direct password options:
 
  hhsl ... --unlock <some password>
  hhsl ... --unlock file:///...
 
 Be aware that your commands will be store in the history of your shell if you use direct password...
-The file option allows you to use a file containing the root password. Ensure to protect this file with some restrictions (chown+chmod 700)
+The file option and default secret file option allow you to use a file containing the root password. Ensure to protect this file with some restrictions (chown+chmod 700)
 
 == How to
 
  > hhsl init
  password: ****
  retype password: ****
+ Do you want to store the password in ~/.hhsl/secret?[Y/n]
 
 By initiating the database, a local registry is defined. A registry holds the references to clusters.
 HHSL can refer multiple registries. By default, a local registry is defined, and for each commands
@@ -92,7 +94,7 @@ using a registry, that local registry is used.
 
 Display the info:
 
- > hhsl info --unlock XXX
+ > hhsl info
  -----------------------------------------------------------------------------
   HHSL
   Version: 0.3-SNAPSHOT
@@ -108,7 +110,17 @@ Display the info:
 You can then add a cluster. For instance, we add a cluster managed by Ambari, available at http://ambari:8080 and named PROD-HDP3.0:
 
 ```
-hhsl add cluster local ambari PROD-HDP3.0 http://ambari:8080 --unlock XXX
+hhsl add cluster local ambari PROD-HDP3.0 http://ambari:8080
+> user:
+> password:
+
+#or
+
+hhsl add cluster local hadoop-unit LOCAL-HU file:///home/devil/tools/hadoop-unit-standalone-2.9
+
+#or
+
+hhsl add cluster local cloudera PROD-CDH http://cloudera-manager:8080
 > user:
 > password:
 ```
@@ -116,7 +128,7 @@ hhsl add cluster local ambari PROD-HDP3.0 http://ambari:8080 --unlock XXX
 Verify that the cluster has been added:
 
 ```
-hhsl list cluster --unlock XXX
+hhsl list cluster
 
 ┌────────┬───────────┬──────┬──────────────────┐
 │Registry│Name       │Type  │URI               │
@@ -128,7 +140,7 @@ hhsl list cluster --unlock XXX
 Now use it:
 
 ```
-hhsl use PROD-HDP3.0 --unlock XXX
+hhsl use PROD-HDP3.0
 # or hhsl use cluster PROD-HDP3.0
 ```
 
@@ -150,7 +162,7 @@ cat
 
 HHSL can be used to just install binaries, ie without cluster configuration or environment management:
 
- hhsl install hadoop 2.7.7 --unlock XXX
+ hhsl install hadoop 2.7.7
 
 
 

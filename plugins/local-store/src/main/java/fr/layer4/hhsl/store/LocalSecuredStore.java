@@ -114,17 +114,17 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
 
         this.dataSource = JdbcConnectionPool.create(JDBC_H2 + getDatabasePath() + CIPHER_EXTENSION + CIPHER, USER, password);
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
-        checkUnlockWithPassword();
+        checkUnlockWithPassword(password);
     }
 
-    protected void checkUnlockWithPassword() {
+    protected void checkUnlockWithPassword(String password) {
         try {
             this.jdbcTemplate.execute("select 1");
         } catch (DataAccessException e) {
             if (e.getCause() instanceof JdbcSQLException) {
                 JdbcSQLException jdbcSQLException = (JdbcSQLException) e.getCause();
                 if (jdbcSQLException.getErrorCode() == 90049) {
-                    throw new RuntimeException("Wrong password");
+                    throw new RuntimeException("Wrong password: '" + password + "'");
                 }
             }
             throw e;
@@ -160,7 +160,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
         this.isReady = false;
 
         // Test connection with provided password
-        checkUnlockWithPassword();
+        checkUnlockWithPassword(actualPassword);
 
         // Dispose current datasource
         this.dataSource.dispose();

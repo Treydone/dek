@@ -174,8 +174,8 @@ public class ClusterCommands {
         // Print env variables in env.bat/env.sh
         env.putAll(clusterInfoResolver.resolveEnvironmentVariables(archivesPath, clusterGeneratedPath, cluster));
 
-        try (FileWriter unixFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_SH).toFile());
-             FileWriter windowsFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_BAT).toFile())) {
+        try (FileWriter unixFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_SH).toFile(), false);
+             FileWriter windowsFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_BAT).toFile(), false)) {
             env.entrySet().forEach(i -> {
                 try {
                     unixFileWriter.append("export " + i.getKey() + "=" + i.getValue() + ";\n");
