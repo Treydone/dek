@@ -16,9 +16,11 @@ public interface HttpProperties {
     String PROXY_AUTH_BASIC = "basic";
 
     String PROXY_AUTH_NTLM_USER = "proxy.auth.ntlm.user";
+    @SuppressWarnings("squid:S2068")
     String PROXY_AUTH_NTLM_PASSWORD = "proxy.auth.ntlm.password";
     String PROXY_AUTH_NTLM_DOMAIN = "proxy.auth.ntlm.domain";
 
     String PROXY_AUTH_BASIC_USER = "proxy.auth.basic.user";
+    @SuppressWarnings("squid:S2068")
     String PROXY_AUTH_BASIC_PASSWORD = "proxy.auth.basic.password";
 }

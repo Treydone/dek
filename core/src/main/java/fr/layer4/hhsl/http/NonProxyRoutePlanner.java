@@ -32,8 +32,7 @@ public class NonProxyRoutePlanner extends DefaultRoutePlanner {
                 String host = propertyManager.getProperty(HttpProperties.PROXY_HOST).orElseThrow(() -> new RuntimeException("Proxy is enabled but host is missing"));
                 Integer port = Integer.valueOf(propertyManager.getProperty(HttpProperties.PROXY_PORT).orElseThrow(() -> new RuntimeException("Proxy is enabled but port is missing")));
 
-                HttpHost proxy = new HttpHost(host, port);
-                return proxy;
+                return new HttpHost(host, port);
             }
         }
         return null;

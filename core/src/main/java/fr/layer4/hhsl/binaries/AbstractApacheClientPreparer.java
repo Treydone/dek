@@ -28,7 +28,6 @@ package fr.layer4.hhsl.binaries;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.net.URI;

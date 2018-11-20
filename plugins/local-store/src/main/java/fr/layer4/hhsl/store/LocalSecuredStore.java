@@ -43,6 +43,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -90,7 +91,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
     public void afterPropertiesSet() {
         log.debug("Checking if database exists in {}...", fr.layer4.hhsl.Constants.getRootPath());
         List<String> files = getDatabaseFiles();
-        if (files.size() == 0) {
+        if (CollectionUtils.isEmpty(files)) {
             // Not ready
             log.warn("Database is not initialised");
             return;

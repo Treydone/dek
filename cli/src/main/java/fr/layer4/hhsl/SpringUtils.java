@@ -5,6 +5,10 @@ import org.springframework.aop.support.AopUtils;
 
 public class SpringUtils {
 
+    private SpringUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static <T> T getTargetObject(Object proxy) throws Exception {
         while (AopUtils.isJdkDynamicProxy(proxy)) {
             return getTargetObject(((Advised) proxy).getTargetSource().getTarget());

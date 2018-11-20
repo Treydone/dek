@@ -42,6 +42,7 @@ import org.springframework.shell.ExitRequest;
 @EnableConfigurationProperties(GitProperties.class)
 public class Main {
 
+    @SuppressWarnings("squid:S4823")
     public static void main(String... args) {
         SpringApplication app = new SpringApplication(Main.class);
         app.setBannerMode(Banner.Mode.OFF);
