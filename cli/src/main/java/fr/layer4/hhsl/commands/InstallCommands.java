@@ -46,8 +46,7 @@ public class InstallCommands {
 
     @ShellMethod(key = "install", value = "Install a client binaries", group = "Others")
     public Map<String, String> install(String service, String version) {
-        String basePath = Constants.getRootPath();
-        String archivesPath = basePath + File.separator + Constants.ARCHIVES;
+        String archivesPath = Constants.getRootPath() + File.separator + Constants.ARCHIVES;
         return this.binariesStore.prepare(archivesPath, service, version, true);
     }
 }

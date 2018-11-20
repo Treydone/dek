@@ -68,6 +68,7 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
     public static final String HDP_300 = "3.0.0";
     public static final String HDP_281 = "2.8.1";
     public static final String HDP_271 = "2.7.1";
+    public static final String SHA_256 = "SHA256 = ";
 
     private final RestTemplate restTemplate;
 
@@ -225,16 +226,40 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
                 if (line == null) {
                     break;
                 }
+                // Case for /build/source/target/artifacts/hadoop-2.8.5.tar.gz:\nSHA256 =...
                 if (("/build/source/target/artifacts/" + archive + ":").equals(line.trim())) {
                     line = reader.readLine();
                     if (line == null) {
                         break;
                     }
                     line = line.trim();
-                    if (line.startsWith("SHA256 = ")) {
-                        remoteSha256 = line.replace("SHA256 = ", "").replace(" ", "");
+                    int i = line.indexOf(SHA_256);
+                    if (i > -1) {
+                        remoteSha256 = line.substring(i + SHA_256.length()).replace(" ", "");
                         break;
                     }
+                }
+                // Case for "hadoop-2.7.7.tar.gz: SHA256 =....."
+                else if (line.trim().startsWith(archive)) {
+                    int i = line.indexOf(SHA_256);
+                    if (i > -1) {
+                        remoteSha256 = line.substring(i + SHA_256.length()).replace(" ", "");
+                        boolean loop = true;
+                        while (loop) {
+                            line = reader.readLine();
+                            if (line == null) {
+                                break;
+                            }
+                            line = line.trim();
+                            if (!line.trim().startsWith(archive)) {
+                                remoteSha256 += line.replace(" ", "");
+                            } else {
+                                loop = false;
+                            }
+                        }
+                        break;
+                    }
+
                 }
             }
         } catch (IOException e) {

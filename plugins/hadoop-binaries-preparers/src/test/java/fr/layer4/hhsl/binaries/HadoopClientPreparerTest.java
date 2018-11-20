@@ -64,7 +64,25 @@ public class HadoopClientPreparerTest {
                                             "         4773734B 08C9EE5A A1A24548 3A02F53A\n" +
                                             "/build/source/target/artifacts/hadoop-2.8.5.tar.gz: \n" +
                                             "SHA512 = 4174E7A6 7B614B7D 5E47A1A2 420CBE9A 57978908 F8AD0405 F1D17730 6FB36ED8\n" +
-                                            "         7C895810 F70E3C6A 6CBADC76 AFB9303F 1C49CBCA 67237E18 C799D30F 87AFA57C")),
+                                            "         7C895810 F70E3C6A 6CBADC76 AFB9303F 1C49CBCA 67237E18 C799D30F 87AFA57C"))
+
+                    .get("/repos/dist/release/hadoop/common/hadoop-2.7.7/hadoop-2.7.7.tar.gz.mds")
+                    .willReturn(success()
+                            .body(
+                                    "hadoop-2.7.7.tar.gz:    MD5 = CC 2F 01 9F 2A 41 45 8D  F8 43 0C 44 8B B9 F7 60\n" +
+                                            "hadoop-2.7.7.tar.gz:   SHA1 = DA60 1BF9 79CB 63DB 78EC  F85A 617B 4FF4 B265 5D23\n" +
+                                            "hadoop-2.7.7.tar.gz: RMD160 = 0C91 94F1 C22A DB54 0B23  4841 4B80 2074 D4AF 56A2\n" +
+                                            "hadoop-2.7.7.tar.gz: SHA224 = 83D70DC7 D579DDB4 3B3BA00D BA1A9695 2D73A0A4\n" +
+                                            "                              9286F404 219186AB\n" +
+                                            "hadoop-2.7.7.tar.gz: SHA256 = D129D08A 2C9DAFEC 32855A37 6CBD2AB9 0C6A4279\n" +
+                                            "                              0898CABB AC6BE4D2 9F9C2026\n" +
+                                            "hadoop-2.7.7.tar.gz: SHA384 = 7FD6F49A F16D4324 988B41B6 46C690B6 AFBABB24\n" +
+                                            "                              BA18C123 571AE4E2 277495EA 31335245 BF767707\n" +
+                                            "                              ED44BBAF 9A978F3F\n" +
+                                            "hadoop-2.7.7.tar.gz: SHA512 = 17C89172 11DD4C25 F78BF601 30A390F9 E273B014\n" +
+                                            "                              9737094E 45F4AE5C 917B1174 B97EB908 18C5DF06\n" +
+                                            "                              8E607835 12012628 1BCC0751 4F38BD7F D3CB8E9D\n" +
+                                            "                              3DB1BDDE")),
 
             service("api.github.com")
                     .get("/repos/steveloughran/winutils/contents/hadoop-2.8.1/bin")
@@ -104,7 +122,7 @@ public class HadoopClientPreparerTest {
     }
 
     @Test
-    public void getRemoteSha256() {
+    public void getRemoteSha256_simpleOneLine() {
 
         // Given
 
@@ -113,6 +131,19 @@ public class HadoopClientPreparerTest {
 
         // Then
         assertThat(sha256).isEqualTo("F9C726DF693CE2DAA4107886F603270D66E7257F77A92C9886502D6CD4A884A4");
+
+    }
+
+    @Test
+    public void getRemoteSha256_multiLine() {
+
+        // Given
+
+        // When
+        String sha256 = this.hadoopClientPreparer.getRemoteSha256("hadoop-2.7.7.tar.gz", "2.7.7");
+
+        // Then
+        assertThat(sha256).isEqualTo("D129D08A2C9DAFEC32855A376CBD2AB90C6A42790898CABBAC6BE4D29F9C2026");
 
     }
 

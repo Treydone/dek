@@ -47,7 +47,7 @@ public abstract class AbstractApacheClientPreparer extends AbstractClientPrepare
         try {
             return download(basePath, uri);
         } catch (IOException e) {
-            throw new RuntimeException("Can not download the client");
+            throw new RuntimeException("Can not download the client", e);
         }
     }
 

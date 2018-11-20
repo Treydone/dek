@@ -43,6 +43,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,6 +83,13 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 
         if (!this.store.isReady()) {
             throw new RuntimeException("Store not ready, please run 'hhsl init' before");
+        }
+
+        Path archives = Paths.get(Constants.getRootPath(), Constants.ARCHIVES);
+        if (!Files.exists(archives)) {
+            Files.createDirectory(archives);
+        } else if (Files.isRegularFile(archives)) {
+            throw new RuntimeException("Invalid path " + archives);
         }
 
         int i = commandsToRun.indexOf("--unlock");
