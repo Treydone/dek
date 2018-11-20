@@ -32,6 +32,7 @@ import org.jline.reader.impl.SimpleMaskingCallback;
 import org.springframework.boot.Banner;
 import org.springframework.boot.ExitCodeExceptionMapper;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -46,7 +47,7 @@ public class Main {
     public static void main(String... args) {
         SpringApplication app = new SpringApplication(Main.class);
         app.setBannerMode(Banner.Mode.OFF);
-        app.setWebEnvironment(false);
+        app.setWebApplicationType(WebApplicationType.NONE);
         app.run(args);
     }
 
