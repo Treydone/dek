@@ -45,6 +45,7 @@ public class Main {
     public static void main(String... args) {
         SpringApplication app = new SpringApplication(Main.class);
         app.setBannerMode(Banner.Mode.OFF);
+        app.setWebEnvironment(false);
         app.run(args);
     }
 
