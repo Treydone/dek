@@ -33,6 +33,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -60,6 +61,9 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
         String destFileName = FilenameUtils.getName(uri.getPath());
         HttpGet request = new HttpGet(uri);
         try (CloseableHttpResponse response = this.client.execute(request)) {
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new HttpResponseException(response.getStatusLine().getStatusCode(), response.getStatusLine().getReasonPhrase());
+            }
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 Files.copy(entity.getContent(), path.resolve(destFileName), StandardCopyOption.REPLACE_EXISTING);
