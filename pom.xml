@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fr.layer4.hhsl</groupId>
@@ -21,7 +22,7 @@
         <connection>scm:git:git@github.com:Treydone/hhsl.git</connection>
         <developerConnection>scm:git:git@github.com:Treydone/hhsl.git</developerConnection>
         <url>http://github.com/Treydone/hhsl</url>
-        <tag>v0.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
@@ -53,6 +54,33 @@
         </repository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>http://repo.spring.io/libs-snapshot-local</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>http://repo.spring.io/libs-milestone-local</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-releases</id>
+            <name>Spring Releases</name>
+            <url>http://repo.spring.io/release</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <modules>
         <module>core</module>
         <module>plugins</module>
@@ -75,16 +103,16 @@
         <hoverfly.version>0.8.1</hoverfly.version>
         <httpcomponents.version>4.5.3</httpcomponents.version>
         <java.version>1.8</java.version>
-        <jackson.version>2.9.0</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
         <jline.version>3.8.2</jline.version>
         <junit.version>4.11</junit.version>
         <logback.version>1.2.3</logback.version>
         <lombok.version>1.18.2</lombok.version>
         <mockito.version>2.9.0</mockito.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <spring-boot.version>1.5.17.RELEASE</spring-boot.version>
-        <spring-shell.version>2.0.1.RELEASE</spring-shell.version>
-        <spring.version>4.3.18.RELEASE</spring.version>
+        <spring-boot.version>2.0.6.RELEASE</spring-boot.version>
+        <spring-shell.version>3.0.0.BUILD-SNAPSHOT</spring-shell.version>
+        <spring.version>5.0.10.RELEASE</spring.version>
 
     </properties>
 

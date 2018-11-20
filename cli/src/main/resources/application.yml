@@ -19,6 +19,10 @@ spring:
   profiles:
     active: debug
 
+  shell:
+    script:
+      enabled: false
+
 git:
   version: "@project.version@"
   tags: "@git.tags@"
