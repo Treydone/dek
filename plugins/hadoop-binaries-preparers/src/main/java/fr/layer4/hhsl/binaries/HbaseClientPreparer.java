@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,6 +26,7 @@
 package fr.layer4.hhsl.binaries;
 
 import fr.layer4.hhsl.DefaultServices;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,11 @@ import org.springframework.web.client.RestTemplate;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class HbaseClientPreparer extends AbstractApacheClientPreparer {
 
@@ -56,23 +58,28 @@ public class HbaseClientPreparer extends AbstractApacheClientPreparer {
     }
 
     @Override
-    public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
+    public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
 
         String archive = "hbase-" + version + "-bin.tar.gz";
+        File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
+        log.debug("Preparing {} to {}", archive, dest);
 
-        if (force || !Files.exists(Paths.get(basePath, archive))) {
+        // Check if archive if already present
+        if (force || !Files.exists(basePath.resolve(archive))) {
             download(basePath, version, archive);
         }
 
         // Unpack
-        File dest = new File(basePath, FilenameUtils.getBaseName(archive));
+        File source = basePath.resolve(archive).toFile();
+        log.debug("Uncompress {} to {]", source, dest);
         if (force || !dest.exists()) {
             try {
-                uncompress(new File(basePath, archive), dest);
+                uncompress(source, dest);
             } catch (IOException e) {
                 throw new RuntimeException("Can not extract client", e);
             }
         }
+
 
         // Update environment variables
         Map<String, String> envVars = new HashMap<>();

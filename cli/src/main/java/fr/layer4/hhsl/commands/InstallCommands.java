@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 
 @Slf4j
@@ -46,7 +46,7 @@ public class InstallCommands {
 
     @ShellMethod(key = "install", value = "Install a client binaries", group = "Others")
     public Map<String, String> install(String service, String version) {
-        String archivesPath = Constants.getRootPath() + File.separator + Constants.ARCHIVES;
-        return this.binariesStore.prepare(archivesPath, service, version, true);
+        Path archivesPath = Constants.getRootPath().resolve(Constants.ARCHIVES);
+        return this.binariesStore.prepare(archivesPath, service, version, false);
     }
 }

@@ -25,7 +25,8 @@
  */
 package fr.layer4.hhsl;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @SuppressWarnings("squid:S2068")
 public interface Constants {
@@ -37,7 +38,7 @@ public interface Constants {
     String ENV_SH = "env.sh";
     String ENV_BAT = "env.bat";
 
-    static String getRootPath() {
-        return HOME + File.separator + FOLDER;
+    static Path getRootPath() {
+        return Paths.get(HOME, FOLDER);
     }
 }

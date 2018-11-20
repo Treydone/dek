@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 @Component
@@ -50,7 +51,7 @@ public class HiveClientPreparer extends AbstractApacheClientPreparer {
     }
 
     @Override
-    public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
+    public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
 
         String archive = "apache-hive-" + version + "-bin.tar.gz";
 

@@ -12,10 +12,10 @@ package fr.layer4.hhsl.binaries;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,6 +34,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.junit.Assert.fail;
@@ -69,12 +70,12 @@ public class LocalBinariesStoreTest {
         Mockito.when(this.zookeeperClientPreparer.isCompatible(Mockito.eq("zookeeper"), Mockito.anyString())).thenReturn(true);
 
         // When
-        this.localBinariesStore.prepare("", "zookeeper", "3.4.3", false);
+        this.localBinariesStore.prepare(Paths.get(""), "zookeeper", "3.4.3", false);
 
         // Then
         Mockito.verify(this.zookeeperClientPreparer).isCompatible("zookeeper", "3.4.3");
         Mockito.verify(this.hbaseClientPreparer).isCompatible("zookeeper", "3.4.3");
-        Mockito.verify(this.zookeeperClientPreparer).prepare("", "zookeeper", "3.4.3", false);
+        Mockito.verify(this.zookeeperClientPreparer).prepare(Paths.get(""), "zookeeper", "3.4.3", false);
     }
 
     @Test
@@ -86,7 +87,7 @@ public class LocalBinariesStoreTest {
 
         // When
         try {
-            this.localBinariesStore.prepare("", "unknown", "3.4.3", false);
+            this.localBinariesStore.prepare(Paths.get(""), "unknown", "3.4.3", false);
             fail();
         } catch (RuntimeException e) {
             // Don't care

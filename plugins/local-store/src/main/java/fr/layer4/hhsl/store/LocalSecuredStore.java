@@ -82,7 +82,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
             this.dataSource.dispose();
         }
         log.debug("Clean local file");
-        DeleteDbFiles.execute(fr.layer4.hhsl.Constants.getRootPath(), DB, true);
+        DeleteDbFiles.execute(fr.layer4.hhsl.Constants.getRootPath().toAbsolutePath().toString(), DB, true);
         this.isReady = false;
     }
 
@@ -167,7 +167,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
 
         // Change encryption password
         try {
-            ChangeFileEncryption.execute(fr.layer4.hhsl.Constants.getRootPath(), DB, CIPHER_EXTENSION + CIPHER, actualPassword.toCharArray(), newPassword.toCharArray(), true);
+            ChangeFileEncryption.execute(fr.layer4.hhsl.Constants.getRootPath().toAbsolutePath().toString(), DB, CIPHER_EXTENSION + CIPHER, actualPassword.toCharArray(), newPassword.toCharArray(), true);
         } catch (SQLException e) {
             throw new RuntimeException("Can not change password", e);
         }
@@ -184,13 +184,13 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
     }
 
     protected List<String> getDatabaseFiles() {
-        List<String> files = FileLister.getDatabaseFiles(fr.layer4.hhsl.Constants.getRootPath(), DB, true);
+        List<String> files = FileLister.getDatabaseFiles(fr.layer4.hhsl.Constants.getRootPath().toAbsolutePath().toString(), DB, true);
         try {
             FileLister.tryUnlockDatabase(files, "encryption");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        files = FileLister.getDatabaseFiles(fr.layer4.hhsl.Constants.getRootPath(), DB, false);
+        files = FileLister.getDatabaseFiles(fr.layer4.hhsl.Constants.getRootPath().toAbsolutePath().toString(), DB, false);
         return files;
     }
 

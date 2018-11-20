@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,16 +25,18 @@
  */
 package fr.layer4.hhsl.binaries;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 public interface BinariesStore {
 
     /**
      * Download and unpack the binaries for a client.
+     *
      * @param basePath
      * @param client
      * @param version
      * @param force
      */
-    Map<String, String> prepare(String basePath, String client, String version, boolean force);
+    Map<String, String> prepare(Path basePath, String client, String version, boolean force);
 }

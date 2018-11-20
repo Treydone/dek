@@ -28,6 +28,7 @@ package fr.layer4.hhsl.info;
 import fr.layer4.hhsl.Cluster;
 import fr.layer4.hhsl.ServiceClientAndVersion;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
@@ -57,7 +58,7 @@ public interface ClusterInfoResolver {
      * @param cluster
      * @return
      */
-    Map<String, String> resolveEnvironmentVariables(String archivesPath, String clusterGeneratedPath, Cluster cluster);
+    Map<String, String> resolveEnvironmentVariables(Path archivesPath, Path clusterGeneratedPath, Cluster cluster);
 
     /**
      * Render the configuration files to use the cluster.

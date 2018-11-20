@@ -47,7 +47,6 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import org.springframework.shell.table.Table;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -133,22 +132,22 @@ public class ClusterCommands {
     }
 
     protected void use(RegistryConnection underlyingConnection, Cluster cluster) {
-        String basePath = Constants.getRootPath();
-        String clusterGeneratedPath = basePath + File.separator + underlyingConnection.getId().toString() + File.separator + cluster.getId().toString();
+        Path basePath = Constants.getRootPath();
+        Path clusterGeneratedPath = basePath.resolve(Paths.get(underlyingConnection.getId().toString(), cluster.getId().toString()));
 
         try {
-            FileUtils.copyFile(new File(clusterGeneratedPath, Constants.ENV_SH), new File(basePath, Constants.ENV_SH));
-            FileUtils.copyFile(new File(clusterGeneratedPath, Constants.ENV_BAT), new File(basePath, Constants.ENV_BAT));
+            FileUtils.copyFile(clusterGeneratedPath.resolve(Constants.ENV_SH).toFile(), basePath.resolve(Constants.ENV_SH).toFile());
+            FileUtils.copyFile(clusterGeneratedPath.resolve(Constants.ENV_BAT).toFile(), basePath.resolve(Constants.ENV_BAT).toFile());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     protected void prepare(RegistryConnection underlyingConnection, Cluster cluster, boolean force) {
-        String basePath = Constants.getRootPath();
+        Path basePath = Constants.getRootPath();
 
-        String clusterGeneratedPath = basePath + File.separator + underlyingConnection.getId().toString() + File.separator + cluster.getId().toString();
-        String archivesPath = basePath + File.separator + Constants.ARCHIVES;
+        Path clusterGeneratedPath = basePath.resolve(Paths.get(underlyingConnection.getId().toString(), cluster.getId().toString()));
+        Path archivesPath = basePath.resolve(Constants.ARCHIVES);
 
         // List available services
         ClusterInfoResolver clusterInfoResolver = this.clusterInfoManager.fromType(cluster.getType());
@@ -163,7 +162,7 @@ public class ClusterCommands {
         Map<String, Map<String, byte[]>> confs = clusterInfoResolver.renderConfigurationFiles(cluster);
         confs.forEach((service, files) -> files.forEach((filename, content) -> {
             try {
-                Path serviceHome = Paths.get(clusterGeneratedPath, service);
+                Path serviceHome = clusterGeneratedPath.resolve(service);
                 // Create directory for the service
                 Files.createDirectory(serviceHome);
                 Files.write(serviceHome.resolve(filename), content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
@@ -175,8 +174,8 @@ public class ClusterCommands {
         // Print env variables in env.bat/env.sh
         env.putAll(clusterInfoResolver.resolveEnvironmentVariables(archivesPath, clusterGeneratedPath, cluster));
 
-        try (FileWriter unixFileWriter = new FileWriter(new File(clusterGeneratedPath, Constants.ENV_SH));
-             FileWriter windowsFileWriter = new FileWriter(new File(clusterGeneratedPath, Constants.ENV_BAT))) {
+        try (FileWriter unixFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_SH).toFile());
+             FileWriter windowsFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_BAT).toFile())) {
             env.entrySet().forEach(i -> {
                 try {
                     unixFileWriter.append("export " + i.getKey() + "=" + i.getValue() + ";\n");

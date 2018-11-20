@@ -56,8 +56,12 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -101,12 +105,12 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
     }
 
     @Override
-    public Map<String, String> resolveEnvironmentVariables(String archivesPath, String clusterGeneratedPath, Cluster cluster) {
+    public Map<String, String> resolveEnvironmentVariables(Path archivesPath, Path clusterGeneratedPath, Cluster cluster) {
         Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
         return resolveEnvironmentVariablesFromServices(clusterGeneratedPath, serviceClientAndVersions);
     }
 
-    protected Map<String, String> resolveEnvironmentVariablesFromServices(String clusterGeneratedPath, Collection<ServiceClientAndVersion> serviceClientAndVersions) {
+    protected Map<String, String> resolveEnvironmentVariablesFromServices(Path clusterGeneratedPath, Collection<ServiceClientAndVersion> serviceClientAndVersions) {
         Map<String, String> envVars = new HashMap<>();
 
         // Get services and components
@@ -114,20 +118,20 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
         serviceClientAndVersions.forEach(e -> {
             switch (e.getService().toLowerCase()) {
                 case DefaultServices.HDFS:
-                    envVars.put("HADOOP_CONF_DIR", clusterGeneratedPath + File.separator + e.getService());
+                    envVars.put("HADOOP_CONF_DIR", clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString());
                     envVars.put("HADOOP_CLIENT_OPTS", "-Xmx1g");
                     envVars.put("MAPRED_DISTCP_OPTS", "-Xmx2g");
                     envVars.put("HADOOP_DISTCP_OPTS", "-Xmx2g");
                     break;
                 case DefaultServices.HBASE:
 //                    envVars.put("HBASE_CLASSPATH", "");
-                    envVars.put("HBASE_CONF_DIR", clusterGeneratedPath + File.separator + e.getService());
+                    envVars.put("HBASE_CONF_DIR", clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString());
                     break;
                 case DefaultServices.YARN:
-                    envVars.put("YARN_CONF_DIR", clusterGeneratedPath + File.separator + e.getService());
+                    envVars.put("YARN_CONF_DIR", clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString());
                     break;
                 case DefaultServices.ZOOKEEPER:
-                    envVars.put("ZOOKEEPER_CONF_DIR", clusterGeneratedPath + File.separator + e.getService());
+                    envVars.put("ZOOKEEPER_CONF_DIR", clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString());
                     break;
                 case DefaultServices.PIG:
                     break;

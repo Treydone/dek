@@ -50,7 +50,7 @@ public class LocalSecuredStoreTest {
 
     @Before
     public void beforeEachTest() {
-        DeleteDbFiles.execute(Constants.getRootPath(), LocalSecuredStore.DB, true);
+        DeleteDbFiles.execute(Constants.getRootPath().toAbsolutePath().toString(), LocalSecuredStore.DB, true);
         this.localSecuredStore = new LocalSecuredStore(applicationEventPublisher);
     }
 

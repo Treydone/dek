@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,7 +40,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 @RequiredArgsConstructor
@@ -56,13 +56,13 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
      * @return
      * @throws IOException
      */
-    protected String download(String path, URI uri) throws IOException {
+    protected String download(Path path, URI uri) throws IOException {
         String destFileName = FilenameUtils.getName(uri.getPath());
         HttpGet request = new HttpGet(uri);
         try (CloseableHttpResponse response = this.client.execute(request)) {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
-                Files.copy(entity.getContent(), Paths.get(path, destFileName), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(entity.getContent(), path.resolve(destFileName), StandardCopyOption.REPLACE_EXISTING);
             }
         }
         return destFileName;
@@ -76,14 +76,14 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
      * @throws IOException
      */
     protected void uncompress(File source, File dest) throws IOException {
-        try (InputStream fi = new FileInputStream(source);
-             InputStream bi = new BufferedInputStream(fi);
-             InputStream gzi = new GzipCompressorInputStream(bi);
-             ArchiveInputStream i = new TarArchiveInputStream(gzi)
+        try (InputStream input = new FileInputStream(source);
+             InputStream buffered = new BufferedInputStream(input);
+             InputStream gzip = new GzipCompressorInputStream(buffered);
+             ArchiveInputStream tar = new TarArchiveInputStream(gzip)
         ) {
             ArchiveEntry entry;
-            while ((entry = i.getNextEntry()) != null) {
-                if (!i.canReadEntryData(entry)) {
+            while ((entry = tar.getNextEntry()) != null) {
+                if (!tar.canReadEntryData(entry)) {
                     // TODO log something?
                     continue;
                 }
@@ -99,7 +99,7 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
                         throw new IOException("failed to create directory " + parent);
                     }
                     try (OutputStream o = Files.newOutputStream(f.toPath())) {
-                        IOUtils.copy(i, o);
+                        IOUtils.copy(tar, o);
                     }
                 }
             }

@@ -9,6 +9,8 @@ import org.springframework.core.io.ByteArrayResource;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -39,7 +41,7 @@ public class HadoopUnitClusterInfoResolverTest {
         cluster.setUri(HadoopUnitClusterInfoResolver.class.getClassLoader().getResource("hadoop-unit").toURI());
 
         // When
-        Map<String, String> envVars = resolver.resolveEnvironmentVariables("/archives/path", "/cluster/conf/path", cluster);
+        Map<String, String> envVars = resolver.resolveEnvironmentVariables(Paths.get("/archives/path"), Paths.get("/cluster/conf/path"), cluster);
 
         // Then
         assertEquals(3, envVars.size());
@@ -93,7 +95,7 @@ public class HadoopUnitClusterInfoResolverTest {
         List<ServiceClientAndVersion> services = Arrays.asList(hive, hdfs, hbase, yarn, zookeeper);
 
 
-        String clusterGeneratedPath = "/base/conf_for_cluster/";
+        Path clusterGeneratedPath = Paths.get("/base/conf_for_cluster/");
 
         // When
         Map<String, String> envVars = resolver.resolveEnvironmentVariablesFromServices(clusterGeneratedPath, services);

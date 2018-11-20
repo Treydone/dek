@@ -48,7 +48,6 @@ import java.io.StringReader;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -90,13 +89,13 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
     }
 
     @Override
-    public Map<String, String> prepare(String basePath, String service, String version, boolean force) {
+    public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
         String archive = "hadoop-" + version + ".tar.gz";
-        File dest = new File(basePath, FilenameUtils.getBaseName(archive));
+        File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
         log.debug("Preparing {} to {}", archive, dest);
 
         // Check if archive if already present
-        if (force || !Files.exists(Paths.get(basePath, archive))) {
+        if (force || !Files.exists(basePath.resolve(archive))) {
             download(basePath, version, archive);
         }
 
@@ -112,7 +111,7 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
         }
 
         // Unpack
-        File source = new File(basePath, archive);
+        File source = basePath.resolve(archive).toFile();
         log.debug("Uncompress {} to {]", source, dest);
         if (force || !dest.exists()) {
             try {
@@ -189,7 +188,7 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
         return winutilsHadoopVersion;
     }
 
-    protected boolean compareLocalAndRemoteSignature(String basePath, String archive, String version) {
+    protected boolean compareLocalAndRemoteSignature(Path basePath, String archive, String version) {
 
         // Get local SHA-256
         String localSha256 = getLocalSha256(basePath, archive);
@@ -200,8 +199,8 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
         return remoteSha256.equalsIgnoreCase(localSha256);
     }
 
-    protected String getLocalSha256(String basePath, String archive) {
-        Path path = Paths.get(basePath, archive);
+    protected String getLocalSha256(Path basePath, String archive) {
+        Path path = basePath.resolve(archive);
         MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-256");

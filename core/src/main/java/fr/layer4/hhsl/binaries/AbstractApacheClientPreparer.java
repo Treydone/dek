@@ -29,6 +29,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
 
 public abstract class AbstractApacheClientPreparer extends AbstractClientPreparer {
 
@@ -41,7 +42,7 @@ public abstract class AbstractApacheClientPreparer extends AbstractClientPrepare
 
     protected abstract String getApachePart(String archive, String version);
 
-    protected String download(String basePath, String version, String archive) {
+    protected String download(Path basePath, String version, String archive) {
         // Download
         URI uri = apacheMirrorFinder.resolve(getApachePart(archive, version));
         try {
