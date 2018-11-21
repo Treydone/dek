@@ -3,7 +3,7 @@ hdp:
     hdfs: 2.7.3
     yarn: 2.7.3
     zookeeper: 3.4.6
-    hbase: 1.1.2
+    hbase: 1.1.0
     hive: 2.1.0
     oozie: 4.2.0
     pig: 0.16.0
@@ -13,7 +13,7 @@ hdp:
     hdfs: 2.7.3
     yarn: 2.7.3
     zookeeper: 3.4.6
-    hbase: 1.1.2
+    hbase: 1.1.0
     hive: 2.1.0
     oozie: 4.2.0
     pig: 0.16.0
@@ -23,7 +23,7 @@ hdp:
     hdfs: 2.7.3
     yarn: 2.7.3
     zookeeper: 3.4.6
-    hbase: 1.1.2
+    hbase: 1.1.0
     hive: 2.1.0
     oozie: 4.2.0
     pig: 0.16.0
@@ -33,7 +33,7 @@ hdp:
     hdfs: 2.7.3
     yarn: 2.7.3
     zookeeper: 3.4.6
-    hbase: 1.1.2
+    hbase: 1.1.0
     hive: 2.1.0
     oozie: 4.2.0
     pig: 0.16.0
@@ -43,7 +43,7 @@ hdp:
     hdfs: 2.7.3
     yarn: 2.7.3
     zookeeper: 3.4.6
-    hbase: 1.1.2
+    hbase: 1.1.0
     hive: 1.2.1
     oozie: 4.2.0
     pig: 0.16.0
@@ -53,7 +53,7 @@ hdp:
     hdfs: 2.7.3
     yarn: 2.7.3
     zookeeper: 3.4.6
-    hbase: 1.1.2
+    hbase: 1.1.0
     hive: 1.2.1
     oozie: 4.2.0
     pig: 0.16.0
@@ -63,7 +63,7 @@ hdp:
     hdfs: 2.7.1
     yarn: 2.7.1
     zookeeper: 3.4.6
-    hbase: 1.1.2
+    hbase: 1.1.0
     hive: 1.2.1
     oozie: 4.2.0
     pig: 0.16.0
@@ -73,7 +73,7 @@ hdp:
     hdfs: 2.7.1
     yarn: 2.7.1
     zookeeper: 3.4.6
-    hbase: 1.1.2
+    hbase: 1.1.0
     hive: 1.2.1
     oozie: 4.2.0
     pig: 0.16.0

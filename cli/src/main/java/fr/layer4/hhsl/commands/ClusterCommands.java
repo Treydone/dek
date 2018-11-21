@@ -152,6 +152,7 @@ public class ClusterCommands {
         // List available services
         ClusterInfoResolver clusterInfoResolver = this.clusterInfoManager.fromType(cluster.getType());
         Collection<ServiceClientAndVersion> availableServices = clusterInfoResolver.resolveAvailableServiceClients(cluster);
+        log.info("Found available services: {}", availableServices);
 
         // Download missing clients in archives and prepare some env
         Map<String, String> env = availableServices.stream()
@@ -160,6 +161,7 @@ public class ClusterCommands {
 
         // Render and write configuration files
         Map<String, Map<String, byte[]>> confs = clusterInfoResolver.renderConfigurationFiles(cluster);
+        log.info("Rendered files {}", confs.entrySet().stream().map(e -> Pair.of(e.getKey(), e.getValue().keySet())).collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
         confs.forEach((service, files) -> files.forEach((filename, content) -> {
             try {
                 Path serviceHome = clusterGeneratedPath.resolve(service);

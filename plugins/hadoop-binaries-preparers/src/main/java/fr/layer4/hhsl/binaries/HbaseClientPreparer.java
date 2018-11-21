@@ -71,7 +71,7 @@ public class HbaseClientPreparer extends AbstractApacheClientPreparer {
 
         // Unpack
         File source = basePath.resolve(archive).toFile();
-        log.debug("Uncompress {} to {]", source, dest);
+        log.debug("Uncompress {} to {}", source, dest);
         if (force || !dest.exists()) {
             try {
                 uncompress(source, dest);
@@ -88,6 +88,6 @@ public class HbaseClientPreparer extends AbstractApacheClientPreparer {
     }
 
     protected String getApachePart(String archive, String version) {
-        return "hbase/common/hbase-" + version + "/" + archive;
+        return "hbase/hbase-" + version + "/" + archive;
     }
 }

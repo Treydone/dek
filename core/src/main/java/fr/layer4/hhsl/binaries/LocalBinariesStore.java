@@ -44,10 +44,11 @@ public class LocalBinariesStore implements BinariesStore {
 
     @Override
     public Map<String, String> prepare(Path basePath, String client, String version, boolean force) {
-        ClientPreparer clientPreparer = clientPreparers.stream()
+        ClientPreparer clientPreparer = this.clientPreparers.stream()
                 .filter(c -> c.isCompatible(client, version))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Unmanaged client " + client + " for version " + version));
+        log.debug("Preparing binaries for {}@{}", client, version);
         return clientPreparer.prepare(basePath, client, version, force);
     }
 }

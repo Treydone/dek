@@ -26,14 +26,21 @@
 package fr.layer4.hhsl.binaries;
 
 import fr.layer4.hhsl.DefaultServices;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class OozieClientPreparer extends AbstractApacheClientPreparer {
 
@@ -54,9 +61,30 @@ public class OozieClientPreparer extends AbstractApacheClientPreparer {
     public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
 
         String archive = "oozie-" + version + ".tar.gz";
+        File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
+        log.debug("Preparing {} to {}", archive, dest);
 
-        //TODO
-        return null;
+        // Check if archive if already present
+        if (force || !Files.exists(basePath.resolve(archive))) {
+            download(basePath, version, archive);
+        }
+
+        // Unpack
+        File source = basePath.resolve(archive).toFile();
+        log.debug("Uncompress {} to {}", source, dest);
+        if (force || !dest.exists()) {
+            try {
+                uncompress(source, dest);
+            } catch (IOException e) {
+                throw new RuntimeException("Can not extract client", e);
+            }
+        }
+
+
+        // Update environment variables
+        Map<String, String> envVars = new HashMap<>();
+        envVars.put("OOZIE_HOME", dest.getAbsolutePath());
+        return envVars;
     }
 
     @Override

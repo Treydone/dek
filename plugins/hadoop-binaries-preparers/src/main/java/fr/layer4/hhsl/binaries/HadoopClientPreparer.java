@@ -39,6 +39,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
@@ -81,10 +82,10 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
     public boolean isCompatible(String service, String version) {
         return DefaultServices.HDFS.equalsIgnoreCase(service)
                 || DefaultServices.YARN.equalsIgnoreCase(service)
-                || DefaultServices.HBASE.equalsIgnoreCase(service)
-                || DefaultServices.HIVE.equalsIgnoreCase(service)
-                || DefaultServices.SQOOP.equalsIgnoreCase(service)
-                || DefaultServices.SPARK.equalsIgnoreCase(service)
+//                || DefaultServices.HBASE.equalsIgnoreCase(service)
+//                || DefaultServices.HIVE.equalsIgnoreCase(service)
+//                || DefaultServices.SQOOP.equalsIgnoreCase(service)
+//                || DefaultServices.SPARK.equalsIgnoreCase(service)
                 ; // Don't care about the versions
     }
 
@@ -100,19 +101,23 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
         }
 
         // Check signature
-        boolean isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
-        if (!isSameSignature) {
-            // Signature is different, try to redownload the archive
-            download(basePath, version, archive);
-            isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
+        try {
+            boolean isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
             if (!isSameSignature) {
-                throw new RuntimeException("Incorrect signature after redownload");
+                // Signature is different, try to redownload the archive
+                download(basePath, version, archive);
+                isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
+                if (!isSameSignature) {
+                    throw new RuntimeException("Incorrect signature after redownload");
+                }
             }
+        } catch (HttpClientErrorException e) {
+            log.warn("Can not get the remote signature", e);
         }
 
         // Unpack
         File source = basePath.resolve(archive).toFile();
-        log.debug("Uncompress {} to {]", source, dest);
+        log.debug("Uncompress {} to {}", source, dest);
         if (force || !dest.exists()) {
             try {
                 uncompress(source, dest);
