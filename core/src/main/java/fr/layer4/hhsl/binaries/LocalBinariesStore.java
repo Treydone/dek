@@ -43,7 +43,7 @@ public class LocalBinariesStore implements BinariesStore {
     private List<ClientPreparer> clientPreparers;
 
     @Override
-    public Map<String, String> prepare(Path basePath, String client, String version, boolean force) {
+    public Map<String, List<String>> prepare(Path basePath, String client, String version, boolean force) {
         ClientPreparer clientPreparer = this.clientPreparers.stream()
                 .filter(c -> c.isCompatible(client, version))
                 .findFirst()

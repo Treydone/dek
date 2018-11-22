@@ -162,9 +162,14 @@ public class ClusterCommands {
         log.info("Found available services: {}", availableServices);
 
         // Download missing clients in archives and prepare some env
-        Map<String, String> env = availableServices.stream()
+        Map<String, List<String>> env = availableServices.stream()
                 .flatMap(s -> this.binariesStore.prepare(archivesPath, s.getService(), s.getVersion(), force).entrySet().stream())
-                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (a, b) -> a)); // TODO No the best way to do it...
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (a, b) -> {
+                    List<String> merge = new ArrayList<>();
+                    merge.addAll(a);
+                    merge.addAll(b);
+                    return merge;
+                })); // TODO No the best way to do it...
 
         // Render and write configuration files
         Map<String, Map<String, byte[]>> confs = clusterInfoResolver.renderConfigurationFiles(cluster);
@@ -187,10 +192,14 @@ public class ClusterCommands {
 
         try (FileWriter unixFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_SH).toFile(), false);
              FileWriter windowsFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_BAT).toFile(), false)) {
+
+            unixFileWriter.append("export OLD_PATH =" + System.getenv("PATH") + ";\n");
+            windowsFileWriter.append("set OLD_PATH =" + System.getenv("PATH") + "\r\n");
+
             env.entrySet().forEach(i -> {
                 try {
-                    unixFileWriter.append("export " + i.getKey() + "=" + i.getValue() + ";\n");
-                    windowsFileWriter.append("set " + i.getKey() + "=" + i.getValue() + "\r\n");
+                    unixFileWriter.append("export " + i.getKey() + "=" + i.getValue().stream().collect(Collectors.joining(":")) + ";\n");
+                    windowsFileWriter.append("set " + i.getKey() + "=" + i.getValue().stream().collect(Collectors.joining(";")) + "\r\n");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

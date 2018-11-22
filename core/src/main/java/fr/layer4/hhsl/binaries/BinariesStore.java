@@ -26,6 +26,7 @@
 package fr.layer4.hhsl.binaries;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 public interface BinariesStore {
@@ -38,5 +39,5 @@ public interface BinariesStore {
      * @param version
      * @param force
      */
-    Map<String, String> prepare(Path basePath, String client, String version, boolean force);
+    Map<String, List<String>> prepare(Path basePath, String client, String version, boolean force);
 }

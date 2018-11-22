@@ -27,17 +27,16 @@ package fr.layer4.hhsl.binaries;
 
 import fr.layer4.hhsl.DefaultServices;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -58,15 +57,16 @@ public class HiveClientPreparer extends AbstractApacheHadoopClientPreparer {
     }
 
     @Override
-    public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
+    public Map<String, List<String>> prepare(Path basePath, String service, String version, boolean force) {
 
         String nameAndVersion = "apache-hive-" + version + "-bin";
         String archive = nameAndVersion + ".tar.gz";
         File dest = downloadClient(basePath, version, force, nameAndVersion, archive);
 
         // Update environment variables
-        Map<String, String> envVars = new HashMap<>();
-        envVars.put("HIVE_HOME", dest.getAbsolutePath());
+        Map<String, List<String>> envVars = new HashMap<>();
+        envVars.put("HIVE_HOME", Collections.singletonList(dest.getAbsolutePath()));
+        envVars.put("PATH", Collections.singletonList(new File(dest, "bin").getAbsolutePath()));
         return envVars;
     }
 

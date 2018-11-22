@@ -37,7 +37,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -58,15 +60,16 @@ public class HbaseClientPreparer extends AbstractApacheHadoopClientPreparer {
     }
 
     @Override
-    public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
+    public Map<String, List<String>> prepare(Path basePath, String service, String version, boolean force) {
 
         String nameAndVersion = "hbase-" + version;
         String archive = nameAndVersion + "-bin.tar.gz";
         File dest = downloadClient(basePath, version, force, nameAndVersion, archive);
 
         // Update environment variables
-        Map<String, String> envVars = new HashMap<>();
-        envVars.put("HBASE_HOME", dest.getAbsolutePath());
+        Map<String, List<String>> envVars = new HashMap<>();
+        envVars.put("HBASE_HOME", Collections.singletonList(dest.getAbsolutePath()));
+        envVars.put("PATH", Collections.singletonList(new File(dest, "bin").getAbsolutePath()));
         return envVars;
     }
 

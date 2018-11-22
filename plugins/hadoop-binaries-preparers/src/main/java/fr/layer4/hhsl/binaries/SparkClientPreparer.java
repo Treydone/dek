@@ -34,7 +34,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -55,15 +57,16 @@ public class SparkClientPreparer extends AbstractApacheHadoopClientPreparer {
     }
 
     @Override
-    public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
+    public Map<String, List<String>> prepare(Path basePath, String service, String version, boolean force) {
 
         String nameAndVersion = "spark-" + version + "-bin-hadoop2.7";
         String archive = nameAndVersion + ".tgz";
         File dest = downloadClient(basePath, version, force, nameAndVersion, archive);
 
         // Update environment variables
-        Map<String, String> envVars = new HashMap<>();
-        envVars.put("SPARK_HOME", dest.getAbsolutePath());
+        Map<String, List<String>> envVars = new HashMap<>();
+        envVars.put("SPARK_HOME", Collections.singletonList(dest.getAbsolutePath()));
+        envVars.put("PATH", Collections.singletonList(new File(dest, "bin").getAbsolutePath()));
         return envVars;
     }
 

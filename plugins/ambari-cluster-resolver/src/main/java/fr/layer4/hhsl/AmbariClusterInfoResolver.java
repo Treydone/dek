@@ -105,33 +105,33 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
     }
 
     @Override
-    public Map<String, String> resolveEnvironmentVariables(Path archivesPath, Path clusterGeneratedPath, Cluster cluster) {
+    public Map<String, List<String>> resolveEnvironmentVariables(Path archivesPath, Path clusterGeneratedPath, Cluster cluster) {
         Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
         return resolveEnvironmentVariablesFromServices(clusterGeneratedPath, serviceClientAndVersions);
     }
 
-    protected Map<String, String> resolveEnvironmentVariablesFromServices(Path clusterGeneratedPath, Collection<ServiceClientAndVersion> serviceClientAndVersions) {
-        Map<String, String> envVars = new HashMap<>();
+    protected Map<String, List<String>> resolveEnvironmentVariablesFromServices(Path clusterGeneratedPath, Collection<ServiceClientAndVersion> serviceClientAndVersions) {
+        Map<String, List<String>> envVars = new HashMap<>();
 
         // Get services and components
         // For each components, add custom entries in envVars
         serviceClientAndVersions.forEach(e -> {
             switch (e.getService().toLowerCase()) {
                 case DefaultServices.HDFS:
-                    envVars.put("HADOOP_CONF_DIR", clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString());
-                    envVars.put("HADOOP_CLIENT_OPTS", "-Xmx1g");
-                    envVars.put("MAPRED_DISTCP_OPTS", "-Xmx2g");
-                    envVars.put("HADOOP_DISTCP_OPTS", "-Xmx2g");
+                    envVars.put("HADOOP_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString()));
+                    envVars.put("HADOOP_CLIENT_OPTS", Collections.singletonList("-Xmx1g"));
+                    envVars.put("MAPRED_DISTCP_OPTS", Collections.singletonList("-Xmx2g"));
+                    envVars.put("HADOOP_DISTCP_OPTS", Collections.singletonList("-Xmx2g"));
                     break;
                 case DefaultServices.HBASE:
 //                    envVars.put("HBASE_CLASSPATH", "");
-                    envVars.put("HBASE_CONF_DIR", clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString());
+                    envVars.put("HBASE_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString()));
                     break;
                 case DefaultServices.YARN:
-                    envVars.put("YARN_CONF_DIR", clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString());
+                    envVars.put("YARN_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString()));
                     break;
                 case DefaultServices.ZOOKEEPER:
-                    envVars.put("ZOOKEEPER_CONF_DIR", clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString());
+                    envVars.put("ZOOKEEPER_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString()));
                     break;
                 case DefaultServices.PIG:
                     break;

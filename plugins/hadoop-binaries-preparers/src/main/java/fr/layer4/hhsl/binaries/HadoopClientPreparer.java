@@ -51,6 +51,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +91,7 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
     }
 
     @Override
-    public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
+    public Map<String, List<String>> prepare(Path basePath, String service, String version, boolean force) {
         String nameAndVersion = "hadoop-" + version;
         String archive = nameAndVersion + ".tar.gz";
         File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
@@ -137,8 +138,9 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
         }
 
         // Update environment variables
-        Map<String, String> envVars = new HashMap<>();
-        envVars.put("HADOOP_HOME", dest.getAbsolutePath());
+        Map<String, List<String>> envVars = new HashMap<>();
+        envVars.put("HADOOP_HOME", Collections.singletonList(dest.getAbsolutePath()));
+        envVars.put("PATH", Collections.singletonList(new File(dest, "bin").getAbsolutePath()));
         return envVars;
     }
 

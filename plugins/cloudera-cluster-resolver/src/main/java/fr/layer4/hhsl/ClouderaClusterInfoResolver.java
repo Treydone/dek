@@ -12,10 +12,10 @@ package fr.layer4.hhsl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,10 +33,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ClouderaClusterInfoResolver implements ClusterInfoResolver {
@@ -56,11 +53,11 @@ public class ClouderaClusterInfoResolver implements ClusterInfoResolver {
     }
 
     @Override
-    public Map<String, String> resolveEnvironmentVariables(Path archivesPath, Path clusterGeneratedPath, Cluster cluster) {
+    public Map<String, List<String>> resolveEnvironmentVariables(Path archivesPath, Path clusterGeneratedPath, Cluster cluster) {
 
         Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
 
-        Map<String, String> envVars = new HashMap<>();
+        Map<String, List<String>> envVars = new HashMap<>();
 
         return envVars;
     }
