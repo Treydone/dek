@@ -79,7 +79,7 @@ public class HadoopUnitClusterInfoResolverTest {
                 ServiceClientAndVersion.of("oozie", "4.2.0"),
                 ServiceClientAndVersion.of("kafka", "0.10.1.1"),
                 ServiceClientAndVersion.of("zookeeper", "3.4.6"),
-                ServiceClientAndVersion.of("hbase", "1.1.2")
+                ServiceClientAndVersion.of("hbase", "1.1.0")
         );
     }
 
