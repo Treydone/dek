@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,7 +42,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class HiveClientPreparer extends AbstractApacheClientPreparer {
+public class HiveClientPreparer extends AbstractApacheHadoopClientPreparer {
 
     private final RestTemplate restTemplate;
 
@@ -60,27 +60,9 @@ public class HiveClientPreparer extends AbstractApacheClientPreparer {
     @Override
     public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
 
-        String archive = "apache-hive-" + version + "-bin.tar.gz";
-
-        File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
-        log.debug("Preparing {} to {}", archive, dest);
-
-        // Check if archive if already present
-        if (force || !Files.exists(basePath.resolve(archive))) {
-            download(basePath, version, archive);
-        }
-
-        // Unpack
-        File source = basePath.resolve(archive).toFile();
-        log.debug("Uncompress {} to {}", source, dest);
-        if (force || !dest.exists()) {
-            try {
-                uncompress(source, dest);
-            } catch (IOException e) {
-                throw new RuntimeException("Can not extract client", e);
-            }
-        }
-
+        String nameAndVersion = "apache-hive-" + version + "-bin";
+        String archive = nameAndVersion + ".tar.gz";
+        File dest = downloadClient(basePath, version, force, nameAndVersion, archive);
 
         // Update environment variables
         Map<String, String> envVars = new HashMap<>();

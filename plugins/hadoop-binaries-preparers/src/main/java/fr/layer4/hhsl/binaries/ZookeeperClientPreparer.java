@@ -42,7 +42,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class ZookeeperClientPreparer extends AbstractApacheClientPreparer {
+public class ZookeeperClientPreparer extends AbstractApacheHadoopClientPreparer {
 
     private final RestTemplate restTemplate;
 
@@ -60,26 +60,9 @@ public class ZookeeperClientPreparer extends AbstractApacheClientPreparer {
     @Override
     public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
 
-        String archive = "zookeeper-" + version + ".tar.gz";
-        File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
-        log.debug("Preparing {} to {}", archive, dest);
-
-        // Check if archive if already present
-        if (force || !Files.exists(basePath.resolve(archive))) {
-            download(basePath, version, archive);
-        }
-
-        // Unpack
-        File source = basePath.resolve(archive).toFile();
-        log.debug("Uncompress {} to {}", source, dest);
-        if (force || !dest.exists()) {
-            try {
-                uncompress(source, dest);
-            } catch (IOException e) {
-                throw new RuntimeException("Can not extract client", e);
-            }
-        }
-
+        String nameAndVersion = "zookeeper-" + version;
+        String archive = nameAndVersion + ".tar.gz";
+        File dest = downloadClient(basePath, version, force, nameAndVersion, archive);
 
         // Update environment variables
         Map<String, String> envVars = new HashMap<>();

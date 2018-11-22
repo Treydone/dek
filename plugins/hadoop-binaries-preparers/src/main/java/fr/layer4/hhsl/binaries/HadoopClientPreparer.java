@@ -39,7 +39,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
@@ -57,7 +57,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class HadoopClientPreparer extends AbstractApacheClientPreparer {
+public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
 
     public static final String HDP_260 = "2.6.0";
     public static final String HDP_263 = "2.6.3";
@@ -91,7 +91,8 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
 
     @Override
     public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
-        String archive = "hadoop-" + version + ".tar.gz";
+        String nameAndVersion = "hadoop-" + version;
+        String archive = nameAndVersion + ".tar.gz";
         File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
         log.debug("Preparing {} to {}", archive, dest);
 
@@ -111,7 +112,7 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
                     throw new RuntimeException("Incorrect signature after redownload");
                 }
             }
-        } catch (HttpClientErrorException e) {
+        } catch (RestClientException e) {
             log.warn("Can not get the remote signature", e);
         }
 
@@ -126,12 +127,12 @@ public class HadoopClientPreparer extends AbstractApacheClientPreparer {
             }
         }
 
+        dest = new File(dest, nameAndVersion);
+
         // Add winutils if Windows
         if (OSUtils.IS_WINDOWS) {
             log.info("Download winutils...");
-
             String winutilsHadoopVersion = findWinUtilsMatchingVersion(version);
-
             downloadWinUtilsBinaries(this.restTemplate, force, dest, winutilsHadoopVersion);
         }
 
