@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -41,7 +38,7 @@ public class HadoopUnitClusterInfoResolverTest {
         cluster.setUri(HadoopUnitClusterInfoResolver.class.getClassLoader().getResource("hadoop-unit").toURI());
 
         // When
-        Map<String, String> envVars = resolver.resolveEnvironmentVariables(Paths.get("/archives/path"), Paths.get("/cluster/conf/path"), cluster);
+        Map<String, List<String>> envVars = resolver.resolveEnvironmentVariables(Paths.get("/archives/path"), Paths.get("/cluster/conf/path"), cluster);
 
         // Then
         assertEquals(3, envVars.size());
@@ -98,17 +95,17 @@ public class HadoopUnitClusterInfoResolverTest {
         Path clusterGeneratedPath = Paths.get("/base/conf_for_cluster/");
 
         // When
-        Map<String, String> envVars = resolver.resolveEnvironmentVariablesFromServices(clusterGeneratedPath, services);
+        Map<String, List<String>> envVars = resolver.resolveEnvironmentVariablesFromServices(clusterGeneratedPath, services);
 
         // Then
         assertThat(envVars).hasSize(7)
-                .containsEntry("HADOOP_CONF_DIR", clusterGeneratedPath + File.separator + "hdfs")
-                .containsEntry("HADOOP_CLIENT_OPTS", "-Xmx1g")
-                .containsEntry("MAPRED_DISTCP_OPTS", "-Xmx2g")
-                .containsEntry("HADOOP_DISTCP_OPTS", "-Xmx2g")
-                .containsEntry("HBASE_CONF_DIR", clusterGeneratedPath + File.separator + "hbase")
-                .containsEntry("YARN_CONF_DIR", clusterGeneratedPath + File.separator + "yarn")
-                .containsEntry("ZOOKEEPER_CONF_DIR", clusterGeneratedPath + File.separator + "zookeeper");
+                .containsEntry("HADOOP_CONF_DIR", Collections.singletonList(clusterGeneratedPath + File.separator + "hdfs"))
+                .containsEntry("HADOOP_CLIENT_OPTS", Collections.singletonList("-Xmx1g"))
+                .containsEntry("MAPRED_DISTCP_OPTS", Collections.singletonList("-Xmx2g"))
+                .containsEntry("HADOOP_DISTCP_OPTS", Collections.singletonList("-Xmx2g"))
+                .containsEntry("HBASE_CONF_DIR", Collections.singletonList(clusterGeneratedPath + File.separator + "hbase"))
+                .containsEntry("YARN_CONF_DIR", Collections.singletonList(clusterGeneratedPath + File.separator + "yarn"))
+                .containsEntry("ZOOKEEPER_CONF_DIR", Collections.singletonList(clusterGeneratedPath + File.separator + "zookeeper"));
     }
 
     @Test

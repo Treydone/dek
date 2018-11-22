@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
@@ -70,7 +71,7 @@ public class AbstractApacheClientPreparerTest {
             }
 
             @Override
-            public Map<String, String> prepare(Path basePath, String service, String version, boolean force) {
+            public Map<String, List<String>> prepare(Path basePath, String service, String version, boolean force) {
                 return null;
             }
         };
