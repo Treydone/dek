@@ -98,7 +98,7 @@ public class ClusterCommands {
             String type,
             String name,
             String uri,
-            @ShellOption(defaultValue = "") String banner) {
+            @ShellOption(defaultValue = "") String banner) throws IOException {
 
         // Check banner
         banner = this.bannerManager.checkAndLoadTemplate(banner);
@@ -112,7 +112,7 @@ public class ClusterCommands {
     @ShellMethod(key = "update cluster", value = "Update cluster configuration", group = "Cluster")
     public void updateCluster(
             @ShellOption(defaultValue = Constants.LOCAL_REGISTRY_NAME) String registryName,
-            String name) {
+            String name) throws IOException {
         Registry registry = this.registryManager.getFromName(registryName);
         RegistryConnection underlyingConnection = registry.getUnderlyingConnection();
         Cluster cluster = registry.getClusterService().getCluster(name).orElseThrow(() -> new RuntimeException("Can not find cluster"));
@@ -143,10 +143,17 @@ public class ClusterCommands {
         }
     }
 
-    protected void prepare(RegistryConnection underlyingConnection, Cluster cluster, boolean force) {
+    protected void prepare(RegistryConnection underlyingConnection, Cluster cluster, boolean force) throws IOException {
         Path basePath = Constants.getRootPath();
 
-        Path clusterGeneratedPath = basePath.resolve(Paths.get(underlyingConnection.getId().toString(), cluster.getId().toString()));
+        Path registryPath = basePath.resolve(underlyingConnection.getId().toString());
+        if (!Files.exists(registryPath)) {
+            Files.createDirectory(registryPath);
+        }
+        Path clusterGeneratedPath = registryPath.resolve(cluster.getId().toString());
+        if (!Files.exists(clusterGeneratedPath)) {
+            Files.createDirectory(clusterGeneratedPath);
+        }
         Path archivesPath = basePath.resolve(Constants.ARCHIVES);
 
         // List available services
@@ -164,10 +171,12 @@ public class ClusterCommands {
         log.info("Rendered files {}", confs.entrySet().stream().map(e -> Pair.of(e.getKey(), e.getValue().keySet())).collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
         confs.forEach((service, files) -> files.forEach((filename, content) -> {
             try {
-                Path serviceHome = clusterGeneratedPath.resolve(service);
+                Path serviceHomePath = clusterGeneratedPath.resolve(service);
                 // Create directory for the service
-                Files.createDirectory(serviceHome);
-                Files.write(serviceHome.resolve(filename), content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+                if (!Files.exists(serviceHomePath)) {
+                    Files.createDirectory(serviceHomePath);
+                }
+                Files.write(serviceHomePath.resolve(filename), content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -181,7 +190,7 @@ public class ClusterCommands {
             env.entrySet().forEach(i -> {
                 try {
                     unixFileWriter.append("export " + i.getKey() + "=" + i.getValue() + ";\n");
-                    windowsFileWriter.append("set " + i.getKey() + "=" + i.getValue() + "\n");
+                    windowsFileWriter.append("set " + i.getKey() + "=" + i.getValue() + "\r\n");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
