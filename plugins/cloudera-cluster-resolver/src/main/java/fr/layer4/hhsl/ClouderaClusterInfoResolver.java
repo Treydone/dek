@@ -26,21 +26,32 @@ package fr.layer4.hhsl;
  * #L%
  */
 
+import com.cloudera.api.swagger.ClustersResourceApi;
+import com.cloudera.api.swagger.ParcelResourceApi;
+import com.cloudera.api.swagger.ServicesResourceApi;
+import com.cloudera.api.swagger.client.ApiClient;
+import com.cloudera.api.swagger.client.Configuration;
+import com.cloudera.api.swagger.model.ApiCluster;
+import com.cloudera.api.swagger.model.ApiClusterList;
+import com.cloudera.api.swagger.model.ApiService;
+import com.squareup.okhttp.*;
+import fr.layer4.hhsl.http.HttpProperties;
 import fr.layer4.hhsl.info.ClusterInfoResolver;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.nio.file.Path;
 import java.util.*;
 
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ClouderaClusterInfoResolver implements ClusterInfoResolver {
 
-    @Autowired
-    @Setter
-    private RestTemplate restTemplate;
+    private final PropertyManager propertyManager;
 
     @Override
     public String getType() {
@@ -48,8 +59,70 @@ public class ClouderaClusterInfoResolver implements ClusterInfoResolver {
     }
 
     @Override
+    @SneakyThrows
     public Collection<ServiceClientAndVersion> resolveAvailableServiceClients(Cluster cluster) {
+
+        ApiClient cmClient = Configuration.getDefaultApiClient();
+        cmClient.setBasePath(cluster.getUri().toString());
+        cmClient.setUsername(cluster.getUser());
+        cmClient.setPassword(cluster.getPassword());
+        cmClient.setHttpClient(getOkHttpClient());
+
+        ClustersResourceApi clustersResourceApi = new ClustersResourceApi(cmClient);
+        ParcelResourceApi parcelResourceApi = new ParcelResourceApi(cmClient);
+
+        ApiClusterList clusters = clustersResourceApi.readClusters(null);
+        ApiCluster apiCluster = clusters.getItems().get(0);
+        List<ApiService> services = apiCluster.getServices();
+        String value = apiCluster.getVersion().getValue();
+
+//        parcelResourceApi.readParcel(apiCluster.getName())
+//        services.get(0).getConfig().get
+
         return Arrays.asList();
+    }
+
+    protected OkHttpClient getOkHttpClient() {
+        OkHttpClient httpClient = new OkHttpClient();
+        if (Boolean.valueOf(this.propertyManager.getProperty(HttpProperties.PROXY_ENABLED).orElse(HttpProperties.PROXY_ENABLED_DEFAULT))) {
+
+            // TODO check no host proxy
+
+            // Check host and port are present
+            String host = this.propertyManager.getProperty(HttpProperties.PROXY_HOST).orElseThrow(() -> new RuntimeException("Proxy is enabled but host is missing"));
+            Integer port = Integer.valueOf(this.propertyManager.getProperty(HttpProperties.PROXY_PORT).orElseThrow(() -> new RuntimeException("Proxy is enabled but port is missing")));
+            httpClient.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port)));
+
+            // Check auth
+            String proxyAuth = this.propertyManager.getProperty(HttpProperties.PROXY_AUTH_TYPE).orElse(HttpProperties.PROXY_AUTH_NONE);
+
+            switch (proxyAuth.toLowerCase()) {
+                case HttpProperties.PROXY_AUTH_NONE:
+                    break;
+                case HttpProperties.PROXY_AUTH_BASIC:
+                    String user = this.propertyManager.getProperty(HttpProperties.PROXY_AUTH_BASIC_USER).orElseThrow(() -> new RuntimeException("Basic proxy authentication is enabled but user is missing"));
+                    String password = this.propertyManager.getProperty(HttpProperties.PROXY_AUTH_BASIC_PASSWORD).orElseThrow(() -> new RuntimeException("Basic proxy authentication is enabled but password is missing"));
+                    httpClient.setAuthenticator(new Authenticator() {
+                        @Override
+                        public Request authenticate(Proxy proxy, Response response) {
+                            String credentials = Credentials.basic(user, password);
+                            if (credentials.equals(response.request().header("Authorization"))) {
+                                return null; // If we already failed with these credentials, don't retry.
+                            }
+                            return response.request().newBuilder().header("Authorization", credentials).build();
+                        }
+
+                        @Override
+                        public Request authenticateProxy(Proxy proxy, Response response) {
+                            return authenticate(proxy, response);
+                        }
+                    });
+                    break;
+                default:
+                    throw new RuntimeException("Unknown proxy auth " + proxyAuth);
+            }
+        }
+        return httpClient;
     }
 
     @Override
