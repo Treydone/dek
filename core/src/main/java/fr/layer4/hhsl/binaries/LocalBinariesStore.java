@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,11 +45,11 @@ public class LocalBinariesStore implements BinariesStore {
 
     @Override
     public Map<String, List<String>> prepare(Path basePath, String client, String version, boolean force) {
-        ClientPreparer clientPreparer = this.clientPreparers.stream()
+        log.debug("Preparing binaries for {}@{}", client, version);
+        return this.clientPreparers.stream()
                 .filter(c -> c.isCompatible(client, version))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Unmanaged client " + client + " for version " + version));
-        log.debug("Preparing binaries for {}@{}", client, version);
-        return clientPreparer.prepare(basePath, client, version, force);
+                .map(c -> c.prepare(basePath, client, version, force))
+                .orElse(new HashMap<>());
     }
 }

@@ -37,8 +37,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-import static org.junit.Assert.fail;
-
 @RunWith(MockitoJUnitRunner.class)
 public class LocalBinariesStoreTest {
 
@@ -86,12 +84,7 @@ public class LocalBinariesStoreTest {
         Mockito.when(this.zookeeperClientPreparer.isCompatible(Mockito.eq("unknown"), Mockito.eq("3.4.3"))).thenReturn(false);
 
         // When
-        try {
-            this.localBinariesStore.prepare(Paths.get(""), "unknown", "3.4.3", false);
-            fail();
-        } catch (RuntimeException e) {
-            // Don't care
-        }
+        this.localBinariesStore.prepare(Paths.get(""), "unknown", "3.4.3", false);
 
         // Then
         Mockito.verify(this.hbaseClientPreparer).isCompatible("unknown", "3.4.3");
