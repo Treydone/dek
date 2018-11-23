@@ -90,4 +90,8 @@ if "%FORCE_EXIT_ON_ERROR%" == "on" (
 exit /B %ERROR_CODE%
 
 # Set env
-if exist env.bat call env.bat
+if "%OLD_PATH%"=="" set OLD_PATH=%PATH%
+if exist %BASEDIR%\env.bat call (
+    %BASEDIR%\env.bat
+    del %BASEDIR%\env.bat
+)

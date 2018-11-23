@@ -193,13 +193,12 @@ public class ClusterCommands {
         try (FileWriter unixFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_SH).toFile(), false);
              FileWriter windowsFileWriter = new FileWriter(clusterGeneratedPath.resolve(Constants.ENV_BAT).toFile(), false)) {
 
-            unixFileWriter.append("export OLD_PATH =" + System.getenv("PATH") + ";\n");
-            windowsFileWriter.append("set OLD_PATH =" + System.getenv("PATH") + "\r\n");
+            String currentPathEnvVar = System.getenv("PATH");
 
             env.entrySet().forEach(i -> {
                 try {
-                    unixFileWriter.append("export " + i.getKey() + "=" + i.getValue().stream().collect(Collectors.joining(":")) + ";\n");
-                    windowsFileWriter.append("set " + i.getKey() + "=" + i.getValue().stream().collect(Collectors.joining(";")) + "\r\n");
+                    unixFileWriter.append("export " + i.getKey() + "=\"" + (i.getKey().equalsIgnoreCase("PATH") ? currentPathEnvVar + ":" : "") + i.getValue().stream().collect(Collectors.joining(":")) + "\";\n");
+                    windowsFileWriter.append("set " + i.getKey() + "=" + (i.getKey().equalsIgnoreCase("PATH") ? currentPathEnvVar + ";" : "") + i.getValue().stream().collect(Collectors.joining(";")) + "\r\n");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
