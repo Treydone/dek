@@ -169,7 +169,7 @@ public class ClusterCommands {
                     merge.addAll(a);
                     merge.addAll(b);
                     return merge;
-                })); // TODO No the best way to do it...
+                }));
 
         // Render and write configuration files
         Map<String, Map<String, byte[]>> confs = clusterInfoResolver.renderConfigurationFiles(cluster);
