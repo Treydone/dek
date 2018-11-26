@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -205,13 +204,13 @@ public class AmbariClusterInfoResolverTest {
 
         // Then
         assertThat(envVars).hasSize(7)
-                .containsEntry("HADOOP_CONF_DIR", Collections.singletonList(clusterGeneratedPath + File.separator + "hdfs"))
+                .containsEntry("HADOOP_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve("hdfs").toAbsolutePath().toString()))
                 .containsEntry("HADOOP_CLIENT_OPTS", Collections.singletonList("-Xmx1g"))
                 .containsEntry("MAPRED_DISTCP_OPTS", Collections.singletonList("-Xmx2g"))
                 .containsEntry("HADOOP_DISTCP_OPTS", Collections.singletonList("-Xmx2g"))
-                .containsEntry("HBASE_CONF_DIR", Collections.singletonList(clusterGeneratedPath + File.separator + "hbase"))
-                .containsEntry("YARN_CONF_DIR", Collections.singletonList(clusterGeneratedPath + File.separator + "yarn"))
-                .containsEntry("ZOOKEEPER_CONF_DIR", Collections.singletonList(clusterGeneratedPath + File.separator + "zookeeper"));
+                .containsEntry("HBASE_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve("hbase").toAbsolutePath().toString()))
+                .containsEntry("YARN_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve("yarn").toAbsolutePath().toString()))
+                .containsEntry("ZOOKEEPER_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve("zookeeper").toAbsolutePath().toString()));
     }
 
     @Test

@@ -42,22 +42,22 @@ It  has been developed by Hadoop sysadmins and developers, dealing with multiple
 
 [frame=none,cols="10,90"]
 |===
-^.^|icon:check-circle[role="gray",size="3x"]
+^.^|icon:brain[role="gray",size="3x"]
 | *By Data Engineers, for Data Engineers*
 
 Making life easier. No more trawling download pages, extracting archives, messing with $HOME/$PATH/$HADOOP_HOME/... environment variables. DEK! allows you to easily connect to multiple Hadoop clusters by downloading the rights clients, settings all the environment variables and preparing the *-defaults.xml/*-site.xml files.
 
-^.^|icon:exclamation-triangle[role="gray",size="3x"]
+^.^|icon:plug[role="gray",size="3x"]
 | *Extensible*
 
 Install data clients such as HDFS, HBase, Spark, Zookeeper, Oozie, Sqoop, Hive and many others also supported.
 
-^.^|icon:times-circle[role="gray",size="3x"]
+^.^|icon:figther-jet[role="gray",size="3x"]
 | *Lightweight*
 
 Written in Java and only requires a JRE to be present on your system.
 
-^.^|icon:question[role="gray",size="3x"]
+^.^|icon:linux[role="gray",size="3x"]
 | *Multi-platform*
 
 Runs on Windows and any UNIX based platforms (Mac OSX, Linux, Cygwin, Solaris and FreeBSD)
