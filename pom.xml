@@ -105,6 +105,7 @@
         <jackson.version>2.9.7</jackson.version>
         <jline.version>3.9.0</jline.version>
         <junit.version>4.12</junit.version>
+        <kerby.version>1.1.1</kerby.version>
         <logback.version>1.2.3</logback.version>
         <lombok.version>1.18.4</lombok.version>
         <mockito.version>2.9.0</mockito.version>
@@ -185,6 +186,12 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${apache-commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.kerby</groupId>
+                <artifactId>client-tool</artifactId>
+                <version>${kerby.version}</version>
             </dependency>
 
             <dependency>
