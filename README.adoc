@@ -30,7 +30,9 @@ endif::[]
 
 image:https://travis-ci.org/Treydone/hhsl.svg?branch=master[link=https://travis-ci.org/Treydone/hhsl]
 image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.hhsl%3Ahhsl&metric=alert_status[link=https://sonarcloud.io/dashboard?id=fr.layer4.hhsl%3Ahhsl]
-image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.hhsl%3Ahhsl&metric=reliability_rating[link=https://sonarcloud.io/dashboard?id=fr.layer4.hhsl%3Ahhsl]
+image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.hhsl%3Ahhsl&metric=coverage[link=https://sonarcloud.io/dashboard?id=fr.layer4.hhsl%3Ahhsl]
+image:https://snyk.io/test/github/Treydone/hhsl/badge.svg?targetFile=core/pom.xml[link=https://app.snyk.io/org/treydone/projects?q=hhsl]
+image:https://api.dependabot.com/badges/status?host=github&repo=Treydone/hhsl[link=https://app.dependabot.com/accounts/Treydone/]
 
 HHSL allows you to easily connect to multiple Hadoop clusters by downloading the rights clients,
 settings all the environment variables and preparing the -defaults.xml/-site.xml files.
