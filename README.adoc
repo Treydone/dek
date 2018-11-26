@@ -28,9 +28,11 @@ endif::[]
 :uri-contribute: {uri-rel-file-base}CONTRIBUTING.adoc
 :uri-license: {uri-rel-file-base}LICENSE
 
-image:https://travis-ci.org/Treydone/dek.svg?branch=master[link=https://travis-ci.org/Treydone/dek]
-image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Adek&metric=alert_status[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Adek]
-image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Adek&metric=reliability_rating[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Adek]
+image:https://travis-ci.org/Treydone/hhsl.svg?branch=master[link=https://travis-ci.org/Treydone/hhsl]
+image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Ahhsl&metric=alert_status[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Ahhsl]
+image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Ahhsl&metric=coverage[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Ahhsl]
+image:https://snyk.io/test/github/Treydone/hhsl/badge.svg?targetFile=core/pom.xml[link=https://app.snyk.io/org/treydone/projects?q=hhsl]
+image:https://api.dependabot.com/badges/status?host=github&repo=Treydone/hhsl[link=https://app.dependabot.com/accounts/Treydone/]
 
 DEK! is a tool for managing versions and configurations of multiple clients  like HDFS, HBase, MongoDB... on Windows and most Unix based systems in order to easily connect to multiple clusters.
 It provides a convenient Command Line Interface (CLI) and API for installing, switching, removing and listing clusters and their associated clients.
@@ -40,17 +42,17 @@ It  has been developed by Hadoop sysadmins and developers, dealing with multiple
 
 [frame=none,cols="10,90"]
 |===
-^.^|icon:check-circle[role="green",size="3x"]
+^.^|icon:check-circle[role="gray",size="3x"]
 | *By Data Engineers, for Data Engineers*
 
 Making life easier. No more trawling download pages, extracting archives, messing with $HOME/$PATH/$HADOOP_HOME/... environment variables. DEK! allows you to easily connect to multiple Hadoop clusters by downloading the rights clients, settings all the environment variables and preparing the *-defaults.xml/*-site.xml files.
 
-^.^|icon:exclamation-triangle[role="yellow",size="3x"]
+^.^|icon:exclamation-triangle[role="gray",size="3x"]
 | *Extensible*
 
 Install data clients such as HDFS, HBase, Spark, Zookeeper, Oozie, Sqoop, Hive and many others also supported.
 
-^.^|icon:times-circle[role="red",size="3x"]
+^.^|icon:times-circle[role="gray",size="3x"]
 | *Lightweight*
 
 Written in Java and only requires a JRE to be present on your system.
