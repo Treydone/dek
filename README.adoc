@@ -28,11 +28,11 @@ endif::[]
 :uri-contribute: {uri-rel-file-base}CONTRIBUTING.adoc
 :uri-license: {uri-rel-file-base}LICENSE
 
-image:https://travis-ci.org/Treydone/hhsl.svg?branch=master[link=https://travis-ci.org/Treydone/hhsl]
-image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Ahhsl&metric=alert_status[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Ahhsl]
-image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Ahhsl&metric=coverage[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Ahhsl]
-image:https://snyk.io/test/github/Treydone/hhsl/badge.svg?targetFile=core/pom.xml[link=https://app.snyk.io/org/treydone/projects?q=hhsl]
-image:https://api.dependabot.com/badges/status?host=github&repo=Treydone/hhsl[link=https://app.dependabot.com/accounts/Treydone/]
+image:https://travis-ci.org/Treydone/dek.svg?branch=master[link=https://travis-ci.org/Treydone/dek]
+image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Adek&metric=alert_status[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Adek]
+image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Adek&metric=coverage[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Adek]
+image:https://snyk.io/test/github/Treydone/dek/badge.svg?targetFile=core/pom.xml[link=https://app.snyk.io/org/treydone/projects?q=dek]
+image:https://api.dependabot.com/badges/status?host=github&repo=Treydone/dek[link=https://app.dependabot.com/accounts/Treydone/]
 
 DEK! is a tool for managing versions and configurations of multiple clients  like HDFS, HBase, MongoDB... on Windows and most Unix based systems in order to easily connect to multiple clusters.
 It provides a convenient Command Line Interface (CLI) and API for installing, switching, removing and listing clusters and their associated clients.
