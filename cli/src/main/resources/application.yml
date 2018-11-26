@@ -4,7 +4,7 @@ spring:
 logging:
   level:
     root: WARN
-    fr.layer4.hhsl: DEBUG
+    fr.layer4.dek: DEBUG
     org.apache.http.wire: INFO
     org.apache.http: DEBUG
 
@@ -14,7 +14,7 @@ spring:
 logging:
   level:
     root: ERROR
-    fr.layer4.hhsl: WARN
+    fr.layer4.dek: WARN
     org.apache.http.wire: INFO
     org.apache.http: WARN
 

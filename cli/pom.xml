@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>fr.layer4.hhsl</groupId>
-        <artifactId>hhsl</artifactId>
+        <groupId>fr.layer4.dek</groupId>
+        <artifactId>dek</artifactId>
         <version>0.8-SNAPSHOT</version>
     </parent>
 
@@ -13,36 +13,36 @@
     <dependencies>
 
         <dependency>
-            <groupId>fr.layer4.hhsl</groupId>
+            <groupId>fr.layer4.dek</groupId>
             <artifactId>core</artifactId>
         </dependency>
         <dependency>
-            <groupId>fr.layer4.hhsl.plugins</groupId>
+            <groupId>fr.layer4.dek.plugins</groupId>
             <artifactId>ambari-cluster-resolver</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>fr.layer4.hhsl.plugins</groupId>
+            <groupId>fr.layer4.dek.plugins</groupId>
             <artifactId>cloudera-cluster-resolver</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>fr.layer4.hhsl.plugins</groupId>
+            <groupId>fr.layer4.dek.plugins</groupId>
             <artifactId>hadoop-unit-cluster-resolver</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>fr.layer4.hhsl.plugins</groupId>
+            <groupId>fr.layer4.dek.plugins</groupId>
             <artifactId>hadoop-binaries-preparers</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>fr.layer4.hhsl.plugins</groupId>
+            <groupId>fr.layer4.dek.plugins</groupId>
             <artifactId>local-store</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>fr.layer4.hhsl.plugins</groupId>
+            <groupId>fr.layer4.dek.plugins</groupId>
             <artifactId>local-registry</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -148,8 +148,8 @@
                             <encoding>UTF-8</encoding>
                             <programs>
                                 <program>
-                                    <id>hhsl</id>
-                                    <mainClass>fr.layer4.hhsl.Main</mainClass>
+                                    <id>dek</id>
+                                    <mainClass>fr.layer4.dek.Main</mainClass>
                                     <jvmSettings>
                                         <initialMemorySize>1024m</initialMemorySize>
                                         <maxMemorySize>1024m</maxMemorySize>
@@ -166,12 +166,12 @@
                                             <!--<extraArgument>-XX:+PrintGCDateStamps</extraArgument>-->
                                             <!--<extraArgument>-verbose:gc</extraArgument>-->
                                             <!--<extraArgument>-XX:+PrintGCDetails</extraArgument>-->
-                                            <!--<extraArgument>-Xloggc:%APP_BASE%/logs/hhsl.gc.%p.log</extraArgument>-->
+                                            <!--<extraArgument>-Xloggc:%APP_BASE%/logs/dek.gc.%p.log</extraArgument>-->
                                             <!--<extraArgument>-XX:+UseGCLogFileRotation</extraArgument>-->
                                             <!--<extraArgument>-XX:NumberOfGCLogFiles=10</extraArgument>-->
                                             <!--<extraArgument>-XX:GCLogFileSize=100M</extraArgument>-->
                                             <!--<extraArgument>-XX:+HeapDumpOnOutOfMemoryError</extraArgument>-->
-                                            <!--<extraArgument>-XX:HeapDumpPath=%APP_BASE%/logs/hhsl-heapdump`date`.hprof</extraArgument>-->
+                                            <!--<extraArgument>-XX:HeapDumpPath=%APP_BASE%/logs/dek-heapdump`date`.hprof</extraArgument>-->
                                             <extraArgument>-Djava.net.preferIPv4Stack=true</extraArgument>
                                         </extraArguments>
                                     </jvmSettings>
@@ -192,8 +192,8 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <fixcrlf file="${project.build.directory}/appassembler/bin/hhsl" eol="unix" />
-                                <fixcrlf file="${project.build.directory}/appassembler/bin/hhsl.bat" eol="dos" />
+                                <fixcrlf file="${project.build.directory}/appassembler/bin/dek" eol="unix" />
+                                <fixcrlf file="${project.build.directory}/appassembler/bin/dek.bat" eol="dos" />
                             </tasks>
                         </configuration>
                         <goals>
@@ -216,7 +216,7 @@
                         <phase>package</phase>
                         <configuration>
                             <appendAssemblyId>false</appendAssemblyId>
-                            <finalName>hhsl-${project.version}</finalName>
+                            <finalName>dek-${project.version}</finalName>
                             <attach>false</attach>
                             <descriptors>
                                 <descriptor>src/main/assembly/zip.xml</descriptor>

@@ -1,5 +1,5 @@
 = Changelog
-:uri-repo: https://github.com/treydone/hhsl
+:uri-repo: https://github.com/treydone/dek
 :icons: font
 :star: icon:star[role=red]
 ifndef::icons[]

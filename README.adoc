@@ -1,4 +1,4 @@
-= HHSL
+= DEK! (Data Engineering toolKit)
 Vincent Devillers <https://github.com/treydone[@treydone]>;
 // settings:
 :idprefix:
@@ -15,7 +15,7 @@ ifdef::env-github[]
 endif::[]
 // URIs:
 :uri-org: https://github.com/treydone
-:uri-repo: {uri-org}/hhsl
+:uri-repo: {uri-org}/dek
 :uri-issues: {uri-repo}/issues
 :uri-contributors: {uri-repo}/graphs/contributors
 :uri-rel-file-base: link:
@@ -28,21 +28,44 @@ endif::[]
 :uri-contribute: {uri-rel-file-base}CONTRIBUTING.adoc
 :uri-license: {uri-rel-file-base}LICENSE
 
-image:https://travis-ci.org/Treydone/hhsl.svg?branch=master[link=https://travis-ci.org/Treydone/hhsl]
-image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.hhsl%3Ahhsl&metric=alert_status[link=https://sonarcloud.io/dashboard?id=fr.layer4.hhsl%3Ahhsl]
-image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.hhsl%3Ahhsl&metric=reliability_rating[link=https://sonarcloud.io/dashboard?id=fr.layer4.hhsl%3Ahhsl]
+image:https://travis-ci.org/Treydone/dek.svg?branch=master[link=https://travis-ci.org/Treydone/dek]
+image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Adek&metric=alert_status[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Adek]
+image:https://sonarcloud.io/api/project_badges/measure?project=fr.layer4.dek%3Adek&metric=reliability_rating[link=https://sonarcloud.io/dashboard?id=fr.layer4.dek%3Adek]
 
-HHSL allows you to easily connect to multiple Hadoop clusters by downloading the rights clients,
-settings all the environment variables and preparing the -defaults.xml/-site.xml files.
+DEK! is a tool for managing versions and configurations of multiple clients  like HDFS, HBase, MongoDB... on Windows and most Unix based systems in order to easily connect to multiple clusters.
+It provides a convenient Command Line Interface (CLI) and API for installing, switching, removing and listing clusters and their associated clients.
 
-HHSL has been developed by Hadoop sysadmin and developers, dealing with multiple, or even one, clusters,
-who don't want to do the boring stuff of configuring all the clients like HDFS, HBase and others on every clusters.
-This tool aims to easily switch from one cluster to an other, and is a defacto adapted tool for team managing multiple clusters.
+Formerly known as HHSL, the Hadoop Hyper Shell, DEK! was inspired by the very useful RVM and rbenv tools, used at large by the Ruby community.
+It  has been developed by Hadoop sysadmins and developers, dealing with multiple, or even one, simple datasources or clusters, who don't want anymore to do the boring stuff of configuring all the clients for each environment.
+
+[frame=none,cols="10,90"]
+|===
+^.^|icon:check-circle[role="green",size="3x"]
+| *By Data Engineers, for Data Engineers*
+
+Making life easier. No more trawling download pages, extracting archives, messing with $HOME/$PATH/$HADOOP_HOME/... environment variables. DEK! allows you to easily connect to multiple Hadoop clusters by downloading the rights clients, settings all the environment variables and preparing the *-defaults.xml/*-site.xml files.
+
+^.^|icon:exclamation-triangle[role="yellow",size="3x"]
+| *Extensible*
+
+Install data clients such as HDFS, HBase, Spark, Zookeeper, Oozie, Sqoop, Hive and many others also supported.
+
+^.^|icon:times-circle[role="red",size="3x"]
+| *Lightweight*
+
+Written in Java and only requires a JRE to be present on your system.
+
+^.^|icon:question[role="gray",size="3x"]
+| *Multi-platform*
+
+Runs on Windows and any UNIX based platforms (Mac OSX, Linux, Cygwin, Solaris and FreeBSD)
+
+|===
 
 
 == Requirements
 
-HHSL works on Linux, macOS and Windows and requires:
+DEK works on Linux, macOS and Windows and requires:
 
 * Java (1.8+)
 
@@ -57,46 +80,46 @@ HHSL works on Linux, macOS and Windows and requires:
 
 // TODO provide default file containing the password
 
-HHSL uses a secure storage in order to manage secrets and credentials for registries and resolvers.
-Most HHSL resolvers require credentials to interact with a third-party service managing their configuration: Ambari for Hortonworks, Cloudera Manager for Cloudera...
-HHSL has a simple mechanism to protect secrets: it use by default an implementation of a secure storage based on a H2 encrypted database (see plugins/local-store).
-Therefor, if you want to use HHSL, you need to specify a key to unlock the store. The first you use HHSL, you will be prompted to enter the root password.
+DEK uses a secure storage in order to manage secrets and credentials for registries and resolvers.
+Most DEK resolvers require credentials to interact with a third-party service managing their configuration: Ambari for Hortonworks, Cloudera Manager for Cloudera...
+DEK has a simple mechanism to protect secrets: it use by default an implementation of a secure storage based on a H2 encrypted database (see plugins/local-store).
+Therefor, if you want to use DEK, you need to specify a key to unlock the store. The first you use DEK, you will be prompted to enter the root password.
 
-With HHSL, you can unlock the store in 4 ways with the ```--unlock``` options:
+With DEK, you can unlock the store in 4 ways with the ```--unlock``` options:
 - direct password
 - prompt, if you enter ```@prompt```
 - file, if you enter an option starting with "file://..."
-- default secret file, if a file named 'secret' exists in the root path of HHSL
+- default secret file, if a file named 'secret' exists in the root path of DEK
 
 The preferred way to unlock the secured store is @prompt, which asks the user to enter the root password:
 
- hhsl ... --unlock @prompt
+ dek ... --unlock @prompt
  Root password:>
 
 For background process or automatic filling of the root password, you can use the file (or default secret file) or direct password options:
 
- hhsl ... --unlock <some password>
- hhsl ... --unlock file:///...
+ dek ... --unlock <some password>
+ dek ... --unlock file:///...
 
 Be aware that your commands will be store in the history of your shell if you use direct password...
 The file option and default secret file option allow you to use a file containing the root password. Ensure to protect this file with some restrictions (chown+chmod 700)
 
 == How to
 
- > hhsl init
+ > dek init
  password: ****
  retype password: ****
- Do you want to store the password in ~/.hhsl/secret?[Y/n]
+ Do you want to store the password in ~/.dek/secret?[Y/n]
 
 By initiating the database, a local registry is defined. A registry holds the references to clusters.
-HHSL can refer multiple registries. By default, a local registry is defined, and for each commands
+DEK can refer multiple registries. By default, a local registry is defined, and for each commands
 using a registry, that local registry is used.
 
 Display the info:
 
- > hhsl info
+ > dek info
  -----------------------------------------------------------------------------
-  HHSL
+  DEK
   Version: 0.3-SNAPSHOT
   Commit: 181c0a9e0415efe0fd01b3cc088f9e97ed78845a ()
   Build: 2018-11-15T07:29:44+0000
@@ -110,17 +133,17 @@ Display the info:
 You can then add a cluster. For instance, we add a cluster managed by Ambari, available at http://ambari:8080 and named PROD-HDP3.0:
 
 ```
-hhsl add cluster local ambari PROD-HDP3.0 http://ambari:8080
+dek add cluster local ambari PROD-HDP3.0 http://ambari:8080
 > user:
 > password:
 
 #or
 
-hhsl add cluster local hadoop-unit LOCAL-HU file:///home/devil/tools/hadoop-unit-standalone-2.9
+dek add cluster local hadoop-unit LOCAL-HU file:///home/devil/tools/hadoop-unit-standalone-2.9
 
 #or
 
-hhsl add cluster local cloudera PROD-CDH http://cloudera-manager:8080
+dek add cluster local cloudera PROD-CDH http://cloudera-manager:8080
 > user:
 > password:
 ```
@@ -128,7 +151,7 @@ hhsl add cluster local cloudera PROD-CDH http://cloudera-manager:8080
 Verify that the cluster has been added:
 
 ```
-hhsl list cluster
+dek list cluster
 
 ┌────────┬───────────┬──────┬──────────────────┐
 │Registry│Name       │Type  │URI               │
@@ -140,8 +163,8 @@ hhsl list cluster
 Now use it:
 
 ```
-hhsl use PROD-HDP3.0
-# or hhsl use cluster PROD-HDP3.0
+dek use PROD-HDP3.0
+# or dek use cluster PROD-HDP3.0
 ```
 
 The command 'use' download the missing clients, prepare the environment variables and
@@ -160,9 +183,9 @@ Also have a look on configuration files:
 cat
 ```
 
-HHSL can be used to just install binaries, ie without cluster configuration or environment management:
+DEK can be used to just install binaries, ie without cluster configuration or environment management:
 
- hhsl install hadoop 2.7.7
+ dek install hadoop 2.7.7
 
 
 
@@ -181,10 +204,10 @@ HHSL can be used to just install binaries, ie without cluster configuration or e
 
 == Architecture
 
-HHSL store all its data by default in ~/.hhsl (will be configurable in future releases, see Roadmap)
+DEK store all its data by default in ~/.dek (will be configurable in future releases, see Roadmap)
 
 ```
-~/.hhsl
+~/.dek
 
 
 ```
@@ -277,9 +300,9 @@ Not currently implemented
 
 === Proxy
 
-HHSL use external resources hosted on mirrors, like the Apache mirrors, and many others.
+DEK use external resources hosted on mirrors, like the Apache mirrors, and many others.
 You may need to use a proxy if your company or your private network settings requires some configuration.
-In HHSL, you can to change these properties:
+In DEK, you can to change these properties:
 
 .Available properties for proxy configuration
 [width="100%"]
@@ -368,40 +391,40 @@ See Proxy
 
 Example for proxies without authentication
 
- hhsl set env proxy.enabled true
- hhsl set env proxy.host leproxy.intern
- hhsl set env proxy.port 8888
+ dek set env proxy.enabled true
+ dek set env proxy.host leproxy.intern
+ dek set env proxy.port 8888
 
 Example for proxies requiring basic authentication
 
- hhsl set env proxy.enabled true
- hhsl set env proxy.host leproxy.intern
- hhsl set env proxy.port 8888
- hhsl set env proxy.auth.type basic
- hhsl set env proxy.auth.basic.user myuser
- hhsl set env proxy.auth.basic.password lepassword
+ dek set env proxy.enabled true
+ dek set env proxy.host leproxy.intern
+ dek set env proxy.port 8888
+ dek set env proxy.auth.type basic
+ dek set env proxy.auth.basic.user myuser
+ dek set env proxy.auth.basic.password lepassword
 
 Example for proxies requiring NTLM authentication
 
- hhsl set env proxy.enabled true
- hhsl set env proxy.host leproxy.intern
- hhsl set env proxy.port 8888
- hhsl set env proxy.auth.type ntlm
- hhsl set env proxy.auth.ntlm.user myuser
- hhsl set env proxy.auth.ntlm.password lepassword
- hhsl set env proxy.auth.ntlm.domain INTERN
+ dek set env proxy.enabled true
+ dek set env proxy.host leproxy.intern
+ dek set env proxy.port 8888
+ dek set env proxy.auth.type ntlm
+ dek set env proxy.auth.ntlm.user myuser
+ dek set env proxy.auth.ntlm.password lepassword
+ dek set env proxy.auth.ntlm.domain INTERN
 
-=== My service is not managed by HHSL
+=== My service is not managed by DEK
 
-HHSL manages some services (HDFS, HBASE and many others). If your service is not yet managed by HHSL, just create an implementation of fr.layer4.hhsl.binaries.ClientPreparer. See fr.layer4.hhsl.binaries.HdfsClientPreparer for an example.
+DEK manages some services (HDFS, HBASE and many others). If your service is not yet managed by DEK, just create an implementation of fr.layer4.dek.binaries.ClientPreparer. See fr.layer4.dek.binaries.HdfsClientPreparer for an example.
 
-=== How is security managed in HHSL?
+=== How is security managed in DEK?
 
-Kerberos authentication is not yet managed by HHSL. This feature will be added soon.
+Kerberos authentication is not yet managed by DEK. This feature will be added soon.
 
 == Roadmap
 
-* Allow to use a custom path for HHSL instead of the default ~/.hhsl via the configuration
+* Allow to use a custom path for DEK instead of the default ~/.dek via the configuration
 * Allow to use private binaries repositories instead of default Apache mirrors
 * Allow to skip integrity of files (specially in case of private repos)
 * Add option to skip winutils for Hadoop
@@ -417,7 +440,7 @@ Contributions are welcome! To submit a pull request you should fork the project 
 
 == License
 
-Copyright (C) 2012-2018 Vincent Devillers, and the individual contributors to HHSL.
+Copyright (C) 2012-2018 Vincent Devillers, and the individual contributors to DEK.
 Use of this software is granted under the terms of the MIT License.
 
 See the {uri-license}[LICENSE] for the full license text.

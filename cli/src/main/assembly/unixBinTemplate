@@ -98,7 +98,7 @@ exec "$JAVACMD" $JAVA_OPTS @EXTRA_JVM_ARGUMENTS@ \
 if [ ! -x "$OLD_PATH" ]; then
     export OLD_PATH=$PATH
 fi
-if [ -f ~/.hhsl/env.sh ]; then
+if [ -f ~/.dek/env.sh ]; then
     source env.sh
     rm env.sh
 fi

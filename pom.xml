@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.layer4.hhsl</groupId>
-    <artifactId>hhsl</artifactId>
+    <groupId>fr.layer4.dek</groupId>
+    <artifactId>dek</artifactId>
     <version>0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>An easy way to connect to multiple Hadoop clusters</description>
-    <url>http://github.com/Treydone/hhsl</url>
+    <url>http://github.com/Treydone/dek</url>
 
     <licenses>
         <license>
@@ -18,15 +18,15 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:Treydone/hhsl.git</connection>
-        <developerConnection>scm:git:git@github.com:Treydone/hhsl.git</developerConnection>
-        <url>http://github.com/Treydone/hhsl</url>
+        <connection>scm:git:git@github.com:Treydone/dek.git</connection>
+        <developerConnection>scm:git:git@github.com:Treydone/dek.git</developerConnection>
+        <url>http://github.com/Treydone/dek</url>
         <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
         <system>github</system>
-        <url>http://github.com/Treydone/hhsl/issues</url>
+        <url>http://github.com/Treydone/dek/issues</url>
     </issueManagement>
 
     <developers>
@@ -120,7 +120,7 @@
 
             <!-- Internal -->
             <dependency>
-                <groupId>fr.layer4.hhsl</groupId>
+                <groupId>fr.layer4.dek</groupId>
                 <artifactId>core</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -540,7 +540,7 @@
                             <licenseName>mit</licenseName>
                             <organizationName>Layer4</organizationName>
                             <inceptionYear>2018</inceptionYear>
-                            <projectName>HHSL</projectName>
+                            <projectName>DEK</projectName>
                             <addJavaLicenseAfterPackage>true</addJavaLicenseAfterPackage>
                             <canUpdateCopyright>true</canUpdateCopyright>
                             <canUpdateDescription>true</canUpdateDescription>
@@ -569,7 +569,7 @@
                             <licenseName>mit</licenseName>
                             <organizationName>Layer4</organizationName>
                             <inceptionYear>2018</inceptionYear>
-                            <projectName>HHSL</projectName>
+                            <projectName>DEK</projectName>
                             <addJavaLicenseAfterPackage>true</addJavaLicenseAfterPackage>
                             <canUpdateCopyright>true</canUpdateCopyright>
                             <canUpdateDescription>true</canUpdateDescription>

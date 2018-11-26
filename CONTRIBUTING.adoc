@@ -1,7 +1,7 @@
 = Contributing
 // settings:
 // URIs:
-:uri-repo: https://github.com/treydone/hhsl
+:uri-repo: https://github.com/treydone/dek
 :uri-help-base: https://help.github.com/articles
 :uri-issues: {uri-repo}/issues
 :uri-fork-help: {uri-help-base}/fork-a-repo

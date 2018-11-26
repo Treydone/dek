@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>fr.layer4.hhsl.plugins</groupId>
+        <groupId>fr.layer4.dek.plugins</groupId>
         <artifactId>plugins</artifactId>
         <version>0.8-SNAPSHOT</version>
     </parent>
@@ -14,7 +14,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>fr.layer4.hhsl</groupId>
+            <groupId>fr.layer4.dek</groupId>
             <artifactId>core</artifactId>
         </dependency>
 

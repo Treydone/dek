@@ -2,7 +2,7 @@ package io.specto.hoverfly.junit.dsl;
 
 /*-
  * #%L
- * HHSL
+ * DEK
  * %%
  * Copyright (C) 2018 Layer4
  * %%
