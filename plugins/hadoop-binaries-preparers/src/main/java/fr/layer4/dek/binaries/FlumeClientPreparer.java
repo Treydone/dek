@@ -44,26 +44,26 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class SqoopClientPreparer extends AbstractApacheHadoopClientPreparer {
+public class FlumeClientPreparer extends AbstractApacheHadoopClientPreparer {
 
     private final RestTemplate restTemplate;
 
     @Autowired
-    public SqoopClientPreparer(CloseableHttpClient client, RestTemplate restTemplate, ApacheMirrorFinder apacheMirrorFinder) {
+    public FlumeClientPreparer(CloseableHttpClient client, RestTemplate restTemplate, ApacheMirrorFinder apacheMirrorFinder) {
         super(client, apacheMirrorFinder);
         this.restTemplate = restTemplate;
     }
 
     @Override
     public boolean isCompatible(String service, String version) {
-        return DefaultServices.SQOOP.equalsIgnoreCase(service); // Don't care about the versions
+        return DefaultServices.FLUME.equalsIgnoreCase(service); // Don't care about the versions
     }
 
     @Override
     public Map<String, List<String>> prepare(Path basePath, String service, String version, boolean force) {
 
-        String nameAndVersion = "sqoop-" + version + ".bin__hadoop-2.6.0";
-        String archive = nameAndVersion + ".tar.gz";
+        String nameAndVersion = "apache-storm-" + version + "-bin";
+        String archive = nameAndVersion + ".tar.gz  ";
         File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
         log.debug("Preparing {} to {}", archive, dest);
 
@@ -87,13 +87,13 @@ public class SqoopClientPreparer extends AbstractApacheHadoopClientPreparer {
 
         // Update environment variables
         Map<String, List<String>> envVars = new HashMap<>();
-        envVars.put("SQOOP_HOME", Collections.singletonList(dest.getAbsolutePath()));
+        envVars.put("FLUME_HOME", Collections.singletonList(dest.getAbsolutePath()));
         envVars.put("PATH", Collections.singletonList(new File(dest, "bin").getAbsolutePath()));
         return envVars;
     }
 
     @Override
     protected String getApachePart(String archive, String version) {
-        return "sqoop/" + version + "/" + archive;
+        return "flume/" + version + "/" + archive;
     }
 }

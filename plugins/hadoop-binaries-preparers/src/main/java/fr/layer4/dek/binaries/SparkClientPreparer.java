@@ -27,12 +27,15 @@ package fr.layer4.dek.binaries;
 
 import fr.layer4.dek.DefaultServices;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,7 +64,26 @@ public class SparkClientPreparer extends AbstractApacheHadoopClientPreparer {
 
         String nameAndVersion = "spark-" + version + "-bin-hadoop2.7";
         String archive = nameAndVersion + ".tgz";
-        File dest = downloadClient(basePath, version, force, nameAndVersion, archive);
+        File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
+        log.debug("Preparing {} to {}", archive, dest);
+
+        // Check if archive if already present
+        if (force || !Files.exists(basePath.resolve(archive))) {
+            download(basePath, version, archive);
+        }
+
+        // Unpack
+        File source = basePath.resolve(archive).toFile();
+        log.debug("Uncompress {} to {}", source, dest);
+        if (force || !dest.exists()) {
+            try {
+                uncompress(source, dest);
+            } catch (IOException e) {
+                throw new RuntimeException("Can not extract client", e);
+            }
+        }
+
+        dest = new File(dest, nameAndVersion);
 
         // Update environment variables
         Map<String, List<String>> envVars = new HashMap<>();

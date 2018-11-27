@@ -35,5 +35,9 @@ public interface DefaultServices {
     String SQOOP = "sqoop";
     String YARN = "yarn";
     String ZOOKEEPER = "zookeeper";
+    String KAFKA = "kafka";
+    String CASSANDRA = "cassandra";
+    String STORM = "storm";
+    String FLUME = "flume";
     String PIG = "pig";
 }
