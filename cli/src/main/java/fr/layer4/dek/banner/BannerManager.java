@@ -27,6 +27,7 @@ package fr.layer4.dek.banner;
  */
 
 import fr.layer4.dek.Cluster;
+import fr.layer4.dek.auth.Credentials;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -54,8 +55,7 @@ public class BannerManager {
                 cluster.setName("test");
                 cluster.setUri(URI.create("file:///test"));
                 cluster.setRegistry("local");
-                cluster.setUser("le_user");
-                cluster.setPassword("le_password");
+                cluster.setCredentials(Credentials.basic("le_user", "le_password"));
 
                 // Load template from file
                 String template;
