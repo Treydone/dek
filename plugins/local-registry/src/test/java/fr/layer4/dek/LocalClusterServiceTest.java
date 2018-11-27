@@ -28,6 +28,7 @@ package fr.layer4.dek;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.layer4.dek.auth.Credentials;
+import fr.layer4.dek.config.JacksonConfiguration;
 import fr.layer4.dek.store.LocalSecuredStore;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.After;
@@ -61,7 +62,9 @@ public class LocalClusterServiceTest {
         this.pool = JdbcConnectionPool.create("jdbc:h2:mem:db", "sa", "sa");
         JdbcTemplate jdbcTemplate = new JdbcTemplate(this.pool);
         Mockito.when(this.localSecuredStore.getJdbcTemplate()).thenReturn(jdbcTemplate);
-        this.localClusterService = new LocalClusterService(this.localSecuredStore, new ObjectMapper());
+        ObjectMapper objectMapper = new ObjectMapper();
+        JacksonConfiguration.configure(objectMapper);
+        this.localClusterService = new LocalClusterService(this.localSecuredStore, objectMapper);
         LocalClusterService.updateDdl(jdbcTemplate);
     }
 
