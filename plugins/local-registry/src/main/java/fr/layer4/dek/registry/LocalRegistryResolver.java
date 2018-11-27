@@ -26,9 +26,9 @@ package fr.layer4.dek.registry;
  * #L%
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.layer4.dek.LocalClusterService;
 import fr.layer4.dek.events.StoreReadyEvent;
-import fr.layer4.dek.prompt.Prompter;
 import fr.layer4.dek.store.LocalSecuredStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 public class LocalRegistryResolver implements RegistryResolver, ApplicationListener<StoreReadyEvent> {
 
     private final LocalSecuredStore localSecuredStore;
-    private final Prompter prompter;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onApplicationEvent(StoreReadyEvent storeReadyEvent) {
@@ -55,6 +55,6 @@ public class LocalRegistryResolver implements RegistryResolver, ApplicationListe
     @Override
     public Registry prepare(RegistryConnection registryConnection) {
         // Information about registry connection is not useful here
-        return new LocalRegistry(registryConnection, this.localSecuredStore, this.prompter);
+        return new LocalRegistry(registryConnection, this.localSecuredStore, this.objectMapper);
     }
 }
