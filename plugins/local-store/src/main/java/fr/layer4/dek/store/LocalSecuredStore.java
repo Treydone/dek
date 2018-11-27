@@ -26,6 +26,7 @@ package fr.layer4.dek.store;
  * #L%
  */
 
+import fr.layer4.dek.DekException;
 import fr.layer4.dek.events.StoreReadyEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

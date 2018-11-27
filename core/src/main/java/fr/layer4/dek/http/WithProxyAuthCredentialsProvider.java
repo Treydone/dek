@@ -1,5 +1,6 @@
 package fr.layer4.dek.http;
 
+import fr.layer4.dek.DekException;
 import fr.layer4.dek.PropertyManager;
 import fr.layer4.dek.events.StoreReadyEvent;
 import lombok.RequiredArgsConstructor;
