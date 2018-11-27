@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -128,7 +129,7 @@
                 <version>2.0.0</version>
                 <executions>
                     <execution>
-                        <id>binaries</id>
+                        <id>main</id>
                         <phase>package</phase>
                         <goals>
                             <goal>assemble</goal>
@@ -179,6 +180,42 @@
                             </programs>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>kerberos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                        <configuration>
+                            <repositoryLayout>flat</repositoryLayout>
+                            <repositoryName>lib</repositoryName>
+                            <configurationSourceDirectory>${project.build.directory}/conf</configurationSourceDirectory>
+                            <copyConfigurationDirectory>true</copyConfigurationDirectory>
+                            <configurationDirectory>conf</configurationDirectory>
+                            <logsDirectory>logs</logsDirectory>
+                            <licenseHeaderFile>${basedir}/src/main/assembly/license-header.txt</licenseHeaderFile>
+                            <useWildcardClassPath>true</useWildcardClassPath>
+                            <encoding>UTF-8</encoding>
+                            <programs>
+                                <program>
+                                    <id>klist</id>
+                                    <mainClass>org.apache.kerby.kerberos.tool.klist.KlistTool</mainClass>
+                                    <jvmSettings>
+                                        <initialMemorySize>128m</initialMemorySize>
+                                        <maxMemorySize>128m</maxMemorySize>
+                                    </jvmSettings>
+                                </program>
+                                <program>
+                                    <id>kinit</id>
+                                    <mainClass>org.apache.kerby.kerberos.tool.kinit.KinitTool</mainClass>
+                                    <jvmSettings>
+                                        <initialMemorySize>128m</initialMemorySize>
+                                        <maxMemorySize>128m</maxMemorySize>
+                                    </jvmSettings>
+                                </program>
+                            </programs>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -192,8 +229,8 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <fixcrlf file="${project.build.directory}/appassembler/bin/dek" eol="unix" />
-                                <fixcrlf file="${project.build.directory}/appassembler/bin/dek.bat" eol="dos" />
+                                <fixcrlf file="${project.build.directory}/appassembler/bin/dek" eol="unix"/>
+                                <fixcrlf file="${project.build.directory}/appassembler/bin/dek.bat" eol="dos"/>
                             </tasks>
                         </configuration>
                         <goals>
