@@ -40,7 +40,7 @@ public class HadoopUnitClusterInfoResolverTest {
         Map<String, List<String>> envVars = resolver.resolveEnvironmentVariables(Paths.get("/archives/path"), Paths.get("/cluster/conf/path"), cluster);
 
         // Then
-        assertEquals(4, envVars.size());
+        assertEquals(8, envVars.size());
         // TODO
 //        assertTrue(envVars.containsKey("HADOOP_HOME"));
 //        assertEquals("", envVars.get("HADOOP_HOME"));
@@ -69,9 +69,10 @@ public class HadoopUnitClusterInfoResolverTest {
         Collection<ServiceClientAndVersion> services = resolver.resolveAvailableServiceClients(cluster);
 
         // Then
-        assertThat(services).hasSize(6).containsExactlyInAnyOrder(
+        assertThat(services).hasSize(7).containsExactlyInAnyOrder(
                 ServiceClientAndVersion.of("hive", "2.1.0"),
                 ServiceClientAndVersion.of("yarn", "2.7.3"),
+                ServiceClientAndVersion.of("hdfs", "2.7.3"),
                 ServiceClientAndVersion.of("oozie", "4.2.0"),
                 ServiceClientAndVersion.of("kafka", "0.10.1.1"),
                 ServiceClientAndVersion.of("zookeeper", "3.4.6"),
@@ -122,11 +123,20 @@ public class HadoopUnitClusterInfoResolverTest {
         Map<String, Map<String, byte[]>> configurationFiles = resolver.renderConfigurationFiles(cluster);
 
         // Then
-        assertThat(configurationFiles).hasSize(6).containsOnlyKeys("kafka", "hive", "zookeeper", "yarn", "oozie", "hbase");
+        assertThat(configurationFiles).hasSize(7).containsOnlyKeys("hdfs", "kafka", "hive", "zookeeper", "yarn", "oozie", "hbase");
+
+        assertThat(configurationFiles.get("hdfs")).hasSize(2).containsOnlyKeys("core-site.xml", "hdfs-site.xml");
+        assertThat(new String(configurationFiles.get("hdfs").get("hdfs-site.xml")))
+                .isEqualTo(new String(IOUtils.toByteArray(HadoopUnitClusterInfoResolver.class.getClassLoader().getResourceAsStream("hdfs-site.xml"))));
+        assertThat(new String(configurationFiles.get("hdfs").get("core-site.xml")))
+                .isEqualTo(new String(IOUtils.toByteArray(HadoopUnitClusterInfoResolver.class.getClassLoader().getResourceAsStream("core-site.xml"))));
+
         assertThat(configurationFiles.get("hbase")).hasSize(1).containsOnlyKeys("hbase-site.xml");
         assertThat(new String(configurationFiles.get("hbase").get("hbase-site.xml")))
                 .isEqualTo(new String(IOUtils.toByteArray(HadoopUnitClusterInfoResolver.class.getClassLoader().getResourceAsStream("hbase-site.xml"))));
-//        assertThat(configurationFiles.get("hbase").get("hbase-site.xml"))
-//                .isEqualTo(IOUtils.toByteArray(HadoopUnitClusterInfoResolver.class.getClassLoader().getResourceAsStream("hbase-site.xml")));
+
+        assertThat(configurationFiles.get("hive")).hasSize(1).containsOnlyKeys("hive-site.xml");
+        assertThat(new String(configurationFiles.get("hive").get("hive-site.xml")))
+                .isEqualTo(new String(IOUtils.toByteArray(HadoopUnitClusterInfoResolver.class.getClassLoader().getResourceAsStream("hive-site.xml"))));
     }
 }

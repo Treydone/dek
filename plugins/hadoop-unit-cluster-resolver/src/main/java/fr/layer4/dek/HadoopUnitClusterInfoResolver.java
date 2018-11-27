@@ -170,8 +170,10 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
             Map<String, byte[]> files = new HashMap<>();
             switch (sv.getService()) {
                 case DefaultServices.HDFS:
+                    Map<String, String> coreSite = new TreeMap<>();
+                    coreSite.put("fs.defaultFS", "hdfs://" + config.getProperty("hdfs.namenode.host") + ":" + config.getProperty("hdfs.namenode.port"));
+                    files.put("core-site.xml", renderXmlConfiguration(coreSite));
                     Map<String, String> hdfsSite = new TreeMap<>();
-                    hdfsSite.put("fs.defaultFS", "hdfs://" + config.getProperty("hdfs.namenode.host") + ":" + config.getProperty("hdfs.namenode.port"));
                     files.put("hdfs-site.xml", renderXmlConfiguration(hdfsSite));
                     break;
                 case DefaultServices.HBASE:
