@@ -34,7 +34,9 @@ import fr.layer4.dek.ambari.api.model.ClusterResponse;
 import fr.layer4.dek.ambari.api.model.ClusterResponseWrapperContext;
 import fr.layer4.dek.ambari.api.model.ServiceResponseWrapperContext;
 import fr.layer4.dek.ambari.api.model.StackServiceResponseSwagger;
+import fr.layer4.dek.auth.Credentials;
 import fr.layer4.dek.info.ClusterInfoResolver;
+import fr.layer4.dek.prompt.Prompter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -70,8 +72,10 @@ import java.util.stream.Collectors;
 public class AmbariClusterInfoResolver implements ClusterInfoResolver {
 
     private final RestTemplate restTemplate;
+    private final Prompter prompter;
 
-    public AmbariClusterInfoResolver(RestTemplate restTemplate) {
+    public AmbariClusterInfoResolver(Prompter prompter, RestTemplate restTemplate) {
+        this.prompter = prompter;
         this.restTemplate = new RestTemplate(restTemplate.getRequestFactory());
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         mappingJackson2HttpMessageConverter.setSupportedMediaTypes(Arrays.asList(new MediaType("text", "plain")));
@@ -206,10 +210,15 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
         return configurationFiles;
     }
 
+    @Override
+    public Credentials getCredentials() {
+        return Credentials.basic(this.prompter.prompt("user: "), this.prompter.doublePromptForPassword());
+    }
+
     protected ApiClient getApiClient(Cluster cluster) {
         URI uri = cluster.getUri();
-        String user = cluster.getUser();
-        String password = cluster.getPassword();
+        String user = cluster.getCredentials().getPrincipal();
+        String password = cluster.getCredentials().getPassword();
 
         ApiClient apiClient = new ApiClient(this.restTemplate);
         apiClient.setBasePath(uri.toString());

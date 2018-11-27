@@ -26,9 +26,11 @@ package fr.layer4.dek;
  * #L%
  */
 
-import fr.layer4.dek.prompt.Prompter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.layer4.dek.auth.Credentials;
 import fr.layer4.dek.store.LocalSecuredStore;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,34 +44,34 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LocalClusterService implements ClusterService {
 
-    public static final RowMapper<Cluster> CLUSTER_ROW_MAPPER = (r, i) -> {
-        Cluster cluster = new Cluster();
-        cluster.setId(r.getLong("id"));
-        cluster.setName(r.getString("name"));
-        cluster.setType(r.getString("type"));
-        cluster.setUser(r.getString("user"));
-        cluster.setPassword(r.getString("password"));
-        cluster.setRegistry(Constants.LOCAL_REGISTRY_NAME);
-        cluster.setUri(URI.create(r.getString("uri")));
-        cluster.setBanner(r.getString("banner").getBytes());
-        return cluster;
-    };
+    @SneakyThrows
+    public RowMapper<Cluster> getMapper() {
+        return (r, i) -> {
+            Cluster cluster = new Cluster();
+            cluster.setId(r.getLong("id"));
+            cluster.setName(r.getString("name"));
+            cluster.setType(r.getString("type"));
+            cluster.setCredentials(this.objectMapper.readValue(r.getString("credentials"), Credentials.class));
+            cluster.setRegistry(Constants.LOCAL_REGISTRY_NAME);
+            cluster.setUri(URI.create(r.getString("uri")));
+            cluster.setBanner(r.getString("banner").getBytes());
+            return cluster;
+        };
+    }
 
     public static void updateDdl(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
-                "CREATE TABLE IF NOT EXISTS local_cluster(id INT AUTO_INCREMENT PRIMARY KEY, type VARCHAR(255), name VARCHAR(255), uri VARCHAR(255), banner text, user VARCHAR(255), password VARCHAR(255))");
+                "CREATE TABLE IF NOT EXISTS local_cluster(id INT AUTO_INCREMENT PRIMARY KEY, type VARCHAR(255), name VARCHAR(255), uri VARCHAR(255), banner text, credentials TEXT)");
     }
 
     private final LocalSecuredStore localSecuredStore;
-    private final Prompter prompter;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public Cluster addOrUpdateCluster(String type, String name, String uri, String banner) {
-
-        String user = this.prompter.prompt("User:");
-        String password = this.prompter.promptForPassword("Password:");
-
-        this.localSecuredStore.getJdbcTemplate().update("MERGE INTO local_cluster KEY (`name`) VALUES (default, ?, ?, ?, ?, ?, ?);", type, name, uri, banner, user, password);
+    @SneakyThrows
+    public Cluster addOrUpdateCluster(String type, String name, String uri, String banner, Credentials credentials) {
+        String serializedCredentials = this.objectMapper.writeValueAsString(credentials);
+        this.localSecuredStore.getJdbcTemplate().update("MERGE INTO local_cluster KEY (`name`) VALUES (default, ?, ?, ?, ?, ?);", type, name, uri, banner, serializedCredentials);
 
         return getCluster(name).orElseThrow(() -> new RuntimeException("Can get cluster"));
     }
@@ -83,13 +85,13 @@ public class LocalClusterService implements ClusterService {
     public List<Cluster> listClusters() {
         String query = "SELECT * FROM local_cluster";
         Object[] objects = {};
-        return this.localSecuredStore.getJdbcTemplate().query(query, objects, CLUSTER_ROW_MAPPER);
+        return this.localSecuredStore.getJdbcTemplate().query(query, objects, getMapper());
     }
 
     @Override
     public Optional<Cluster> getCluster(String name) {
         try {
-            return Optional.of(this.localSecuredStore.getJdbcTemplate().queryForObject("SELECT * FROM local_cluster WHERE `name` = ?", CLUSTER_ROW_MAPPER, name));
+            return Optional.of(this.localSecuredStore.getJdbcTemplate().queryForObject("SELECT * FROM local_cluster WHERE `name` = ?", getMapper(), name));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }

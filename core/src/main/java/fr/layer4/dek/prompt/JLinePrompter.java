@@ -49,8 +49,8 @@ public class JLinePrompter implements Prompter {
     private MaskingCallback maskingCallback;
 
     public String doublePromptForPassword() {
-        String line1 = promptForPassword("password for root: ");
-        String line2 = promptForPassword("re-type password for root: ");
+        String line1 = promptForPassword("password: ");
+        String line2 = promptForPassword("re-type password: ");
 
         if (!line1.equals(line2)) {
             throw new RuntimeException("Password did not match");
@@ -58,8 +58,8 @@ public class JLinePrompter implements Prompter {
         return line1;
     }
 
-    public String promptForRootPassword() {
-        return promptForPassword("password for root: ");
+    public String promptForPassword() {
+        return promptForPassword("password: ");
     }
 
     public String promptForPassword(String message) {

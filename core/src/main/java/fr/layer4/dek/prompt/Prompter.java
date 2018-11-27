@@ -29,7 +29,7 @@ public interface Prompter {
 
     String doublePromptForPassword();
 
-    String promptForRootPassword();
+    String promptForPassword();
 
     String promptForPassword(String message);
 
