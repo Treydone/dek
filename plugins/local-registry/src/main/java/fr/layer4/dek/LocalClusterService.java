@@ -36,6 +36,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -44,14 +45,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LocalClusterService implements ClusterService {
 
-    @SneakyThrows
     public RowMapper<Cluster> getMapper() {
         return (r, i) -> {
             Cluster cluster = new Cluster();
             cluster.setId(r.getLong("id"));
             cluster.setName(r.getString("name"));
             cluster.setType(r.getString("type"));
-            cluster.setCredentials(this.objectMapper.readValue(r.getString("credentials"), Credentials.class));
+            try {
+                cluster.setCredentials(this.objectMapper.readValue(r.getString("credentials"), Credentials.class));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             cluster.setRegistry(Constants.LOCAL_REGISTRY_NAME);
             cluster.setUri(URI.create(r.getString("uri")));
             cluster.setBanner(r.getString("banner").getBytes());
