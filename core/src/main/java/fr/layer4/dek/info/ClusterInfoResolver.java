@@ -27,6 +27,7 @@ package fr.layer4.dek.info;
 
 import fr.layer4.dek.Cluster;
 import fr.layer4.dek.ServiceClientAndVersion;
+import fr.layer4.dek.auth.Credentials;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -68,4 +69,6 @@ public interface ClusterInfoResolver {
      * @return the binary content of the files, indexed by service and by filename
      */
     Map<String, Map<String, byte[]>> renderConfigurationFiles(Cluster cluster);
+
+    Credentials getCredentials();
 }

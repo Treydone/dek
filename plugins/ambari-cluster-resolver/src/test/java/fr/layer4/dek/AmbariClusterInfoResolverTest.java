@@ -25,6 +25,7 @@
  */
 package fr.layer4.dek;
 
+import fr.layer4.dek.auth.Credentials;
 import io.specto.hoverfly.junit.rule.HoverflyRule;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -147,7 +148,7 @@ public class AmbariClusterInfoResolverTest {
 
     @Before
     public void init() {
-        resolver = new AmbariClusterInfoResolver(new RestTemplate());
+        resolver = new AmbariClusterInfoResolver(null, new RestTemplate());
     }
 
     @Test
@@ -156,8 +157,7 @@ public class AmbariClusterInfoResolverTest {
         // Given
         Cluster cluster = new Cluster();
         cluster.setUri(URI.create("http://www.my-test.com/api/v1"));
-        cluster.setUser("le_user");
-        cluster.setPassword("le_password");
+        cluster.setCredentials(Credentials.basic("le_user", "le_password"));
 
         // When
         Map<String, List<String>> envVars = resolver.resolveEnvironmentVariables(Paths.get("/archives/path"), Paths.get("/cluster/conf/path"), cluster);
@@ -175,8 +175,7 @@ public class AmbariClusterInfoResolverTest {
         // Given
         Cluster cluster = new Cluster();
         cluster.setUri(URI.create("http://www.my-test.com/api/v1"));
-        cluster.setUser("le_user");
-        cluster.setPassword("le_password");
+        cluster.setCredentials(Credentials.basic("le_user", "le_password"));
 
         // When
         Collection<ServiceClientAndVersion> services = resolver.resolveAvailableServiceClients(cluster);
@@ -219,8 +218,7 @@ public class AmbariClusterInfoResolverTest {
         // Given
         Cluster cluster = new Cluster();
         cluster.setUri(URI.create("http://www.my-test.com/api/v1"));
-        cluster.setUser("le_user");
-        cluster.setPassword("le_password");
+        cluster.setCredentials(Credentials.basic("le_user", "le_password"));
 
         // When
         Map<String, Map<String, byte[]>> configurationFiles = resolver.renderConfigurationFiles(cluster);

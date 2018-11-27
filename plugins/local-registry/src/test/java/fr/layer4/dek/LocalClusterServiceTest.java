@@ -12,10 +12,10 @@ package fr.layer4.dek;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,7 +26,9 @@ package fr.layer4.dek;
  * #L%
  */
 
-import fr.layer4.dek.prompt.Prompter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.layer4.dek.auth.Credentials;
+import fr.layer4.dek.config.JacksonConfiguration;
 import fr.layer4.dek.store.LocalSecuredStore;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.After;
@@ -51,9 +53,6 @@ public class LocalClusterServiceTest {
     @Mock
     private LocalSecuredStore localSecuredStore;
 
-    @Mock
-    private Prompter prompter;
-
     private LocalClusterService localClusterService;
     private JdbcConnectionPool pool;
 
@@ -63,7 +62,9 @@ public class LocalClusterServiceTest {
         this.pool = JdbcConnectionPool.create("jdbc:h2:mem:db", "sa", "sa");
         JdbcTemplate jdbcTemplate = new JdbcTemplate(this.pool);
         Mockito.when(this.localSecuredStore.getJdbcTemplate()).thenReturn(jdbcTemplate);
-        this.localClusterService = new LocalClusterService(this.localSecuredStore, this.prompter);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JacksonConfiguration.configure(objectMapper);
+        this.localClusterService = new LocalClusterService(this.localSecuredStore, objectMapper);
         LocalClusterService.updateDdl(jdbcTemplate);
     }
 
@@ -71,34 +72,29 @@ public class LocalClusterServiceTest {
     public void afterEachTest() {
         this.pool.dispose();
         Mockito.verify(this.localSecuredStore, Mockito.atLeast(1)).getJdbcTemplate();
-        Mockito.verifyNoMoreInteractions(this.prompter, this.localSecuredStore);
-        Mockito.reset(this.prompter, this.localSecuredStore);
+        Mockito.verifyNoMoreInteractions(this.localSecuredStore);
+        Mockito.reset(this.localSecuredStore);
     }
 
     @Test
     public void getCluster_ok() {
 
         // Given
-        Mockito.when(this.prompter.prompt("User:")).thenReturn("le_user");
-        Mockito.when(this.prompter.promptForPassword("Password:")).thenReturn("le_password");
-        this.localClusterService.addOrUpdateCluster("type", "test", "file:///1", "banner");
-        this.localClusterService.addOrUpdateCluster("type", "name2", "file:///2", "banner");
+        this.localClusterService.addOrUpdateCluster("type", "test", "file:///1", "banner", Credentials.basic("le_user", "le_password"));
+        this.localClusterService.addOrUpdateCluster("type", "name2", "file:///2", "banner", Credentials.basic("le_user", "le_password"));
         Cluster expected = new Cluster();
         expected.setType("type");
         expected.setName("test");
         expected.setUri(URI.create("file:///1"));
         expected.setBanner("banner".getBytes());
         expected.setRegistry("local");
-        expected.setUser("le_user");
-        expected.setPassword("le_password");
+        expected.setCredentials(Credentials.basic("le_user", "le_password"));
 
         // When
         Optional<Cluster> cluster = this.localClusterService.getCluster("test");
 
         // Then
         assertThat(cluster).isPresent().get().isEqualToIgnoringGivenFields(expected, "id");
-        Mockito.verify(prompter, Mockito.times(2)).prompt("User:");
-        Mockito.verify(prompter, Mockito.times(2)).promptForPassword("Password:");
     }
 
     @Test
@@ -118,26 +114,20 @@ public class LocalClusterServiceTest {
     public void addOrUpdateCluster_ok() {
 
         // Given
-        Mockito.when(this.prompter.prompt("User:")).thenReturn("le_user");
-        Mockito.when(this.prompter.promptForPassword("Password:")).thenReturn("le_password");
 
         // When
-        Cluster cluster = this.localClusterService.addOrUpdateCluster("type", "name", "uri", "banner");
+        Cluster cluster = this.localClusterService.addOrUpdateCluster("type", "name", "uri", "banner", Credentials.basic("le_user", "le_password"));
 
         // Then
         assertThat(cluster.getId()).isNotNull().isGreaterThan(0L);
-        Mockito.verify(prompter, Mockito.times(1)).prompt("User:");
-        Mockito.verify(prompter, Mockito.times(1)).promptForPassword("Password:");
     }
 
     @Test
     public void deleteCluster_unknownCluster() {
 
         // Given
-        Mockito.when(this.prompter.prompt("User:")).thenReturn("le_user");
-        Mockito.when(this.prompter.promptForPassword("Password:")).thenReturn("le_password");
-        this.localClusterService.addOrUpdateCluster("type", "test", "file:///1", "banner");
-        this.localClusterService.addOrUpdateCluster("type", "test2", "file:///2", "banner");
+        this.localClusterService.addOrUpdateCluster("type", "test", "file:///1", "banner", Credentials.basic("le_user", "le_password"));
+        this.localClusterService.addOrUpdateCluster("type", "test2", "file:///2", "banner", Credentials.basic("le_user", "le_password"));
 
         // When
         this.localClusterService.deleteCluster("test3");
@@ -145,26 +135,21 @@ public class LocalClusterServiceTest {
         // Then
         List<Cluster> clusters = this.localClusterService.listClusters();
         assertThat(clusters).isNotEmpty().hasSize(2);
-        Mockito.verify(prompter, Mockito.times(2)).prompt("User:");
-        Mockito.verify(prompter, Mockito.times(2)).promptForPassword("Password:");
     }
 
     @Test
     public void deleteCluster_oneCluster() {
 
         // Given
-        Mockito.when(this.prompter.prompt("User:")).thenReturn("le_user");
-        Mockito.when(this.prompter.promptForPassword("Password:")).thenReturn("le_password");
-        this.localClusterService.addOrUpdateCluster("type", "test", "file:///1", "banner");
-        this.localClusterService.addOrUpdateCluster("type", "test2", "file:///2", "banner");
+        this.localClusterService.addOrUpdateCluster("type", "test", "file:///1", "banner", Credentials.basic("le_user", "le_password"));
+        this.localClusterService.addOrUpdateCluster("type", "test2", "file:///2", "banner", Credentials.basic("le_user", "le_password"));
         Cluster expected = new Cluster();
         expected.setType("type");
         expected.setName("test");
         expected.setUri(URI.create("file:///1"));
         expected.setBanner("banner".getBytes());
         expected.setRegistry("local");
-        expected.setUser("le_user");
-        expected.setPassword("le_password");
+        expected.setCredentials(Credentials.basic("le_user", "le_password"));
 
         // When
         this.localClusterService.deleteCluster("test2");
@@ -173,7 +158,5 @@ public class LocalClusterServiceTest {
         List<Cluster> clusters = this.localClusterService.listClusters();
         assertThat(clusters).isNotEmpty().hasSize(1);
         assertThat(clusters.get(0)).isEqualToIgnoringGivenFields(expected, "id");
-        Mockito.verify(prompter, Mockito.times(2)).prompt("User:");
-        Mockito.verify(prompter, Mockito.times(2)).promptForPassword("Password:");
     }
 }

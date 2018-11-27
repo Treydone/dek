@@ -63,8 +63,8 @@ public class ClouderaClusterInfoResolver implements ClusterInfoResolver {
 
         ApiClient cmClient = Configuration.getDefaultApiClient();
         cmClient.setBasePath(cluster.getUri().toString());
-        cmClient.setUsername(cluster.getUser());
-        cmClient.setPassword(cluster.getPassword());
+        cmClient.setUsername(cluster.getCredentials().getPrincipal());
+        cmClient.setPassword(cluster.getCredentials().getPassword());
         cmClient.setHttpClient(getOkHttpClient());
 
         ClustersResourceApi clustersResourceApi = new ClustersResourceApi(cmClient);
@@ -139,5 +139,10 @@ public class ClouderaClusterInfoResolver implements ClusterInfoResolver {
         Map<String, Map<String, byte[]>> configurationFiles = new HashMap<>();
 
         return configurationFiles;
+    }
+
+    @Override
+    public fr.layer4.dek.auth.Credentials getCredentials() {
+        return null;
     }
 }

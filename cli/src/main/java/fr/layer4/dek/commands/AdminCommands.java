@@ -69,7 +69,7 @@ public class AdminCommands {
 
     @ShellMethod(key = "password", value = "Change root password", group = "Configuration")
     public void change() {
-        String actualPassword = this.prompter.promptForRootPassword();
+        String actualPassword = this.prompter.promptForPassword();
         String newPassword = this.prompter.doublePromptForPassword();
         this.store.changePassword(actualPassword, newPassword);
     }

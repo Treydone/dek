@@ -26,6 +26,7 @@ package fr.layer4.dek;
  * #L%
  */
 
+import fr.layer4.dek.auth.Credentials;
 import fr.layer4.dek.info.ClusterInfoResolver;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -173,6 +174,11 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
             }
             return Pair.of(sv.getService(), files);
         }).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+    }
+
+    @Override
+    public Credentials getCredentials() {
+        return null;
     }
 
     protected byte[] renderXmlConfiguration(Map<String, String> config) {

@@ -27,8 +27,10 @@ package fr.layer4.dek.commands;
  */
 
 import fr.layer4.dek.Cluster;
+import fr.layer4.dek.ClusterService;
 import fr.layer4.dek.Constants;
 import fr.layer4.dek.ServiceClientAndVersion;
+import fr.layer4.dek.auth.Credentials;
 import fr.layer4.dek.banner.Banner;
 import fr.layer4.dek.banner.BannerManager;
 import fr.layer4.dek.binaries.BinariesStore;
@@ -105,7 +107,12 @@ public class ClusterCommands {
 
         Registry registry = this.registryManager.getFromName(registryName);
         RegistryConnection underlyingConnection = registry.getUnderlyingConnection();
-        Cluster cluster = registry.getClusterService().addOrUpdateCluster(type, name, uri, banner);
+        ClusterService clusterService = registry.getClusterService();
+
+        ClusterInfoResolver clusterInfoResolver = this.clusterInfoManager.fromType(type);
+        Credentials credentials = clusterInfoResolver.getCredentials();
+
+        Cluster cluster = clusterService.addOrUpdateCluster(type, name, uri, banner, credentials);
         prepare(underlyingConnection, cluster, false);
     }
 
