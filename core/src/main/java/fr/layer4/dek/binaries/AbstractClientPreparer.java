@@ -43,6 +43,10 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.HashSet;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public abstract class AbstractClientPreparer implements ClientPreparer {
@@ -70,6 +74,24 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
             }
         }
         return destFileName;
+    }
+
+    protected void chmodExecuteForEachFile(Path dir) throws IOException {
+        Set<PosixFilePermission> perms = new HashSet<>();
+        perms.add(PosixFilePermission.OWNER_EXECUTE);
+        perms.add(PosixFilePermission.OTHERS_EXECUTE);
+        perms.add(PosixFilePermission.GROUP_EXECUTE);
+
+        Files.list(dir).forEach(p -> {
+            PosixFileAttributeView view = Files.getFileAttributeView(p, PosixFileAttributeView.class);
+            if (view != null) {
+                try {
+                    view.setPermissions(perms);
+                } catch (IOException e) {
+                    throw new RuntimeException("Can not set execute attribute for file " + p.toAbsolutePath().toString(), e);
+                }
+            }
+        });
     }
 
     /**

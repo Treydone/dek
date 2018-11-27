@@ -85,6 +85,14 @@ public class StormClientPreparer extends AbstractApacheHadoopClientPreparer {
 
         dest = new File(dest, nameAndVersion);
 
+        // Chmod+x
+        Path bin = dest.toPath().resolve("bin");
+        try {
+            chmodExecuteForEachFile(bin);
+        } catch (IOException e) {
+            throw new RuntimeException("Can not chmod files in " + bin.toAbsolutePath().toString(), e);
+        }
+
         // Update environment variables
         Map<String, List<String>> envVars = new HashMap<>();
         envVars.put("STORM_HOME", Collections.singletonList(dest.getAbsolutePath()));

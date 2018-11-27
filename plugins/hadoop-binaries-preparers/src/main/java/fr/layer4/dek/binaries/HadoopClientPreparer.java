@@ -130,6 +130,14 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
 
         dest = new File(dest, nameAndVersion);
 
+        // Chmod+x
+        Path bin = dest.toPath().resolve("bin");
+        try {
+            chmodExecuteForEachFile(bin);
+        } catch (IOException e) {
+            throw new RuntimeException("Can not chmod files in " + bin.toAbsolutePath().toString(), e);
+        }
+
         // Add winutils if Windows
         if (OSUtils.IS_WINDOWS) {
             log.info("Download winutils...");
