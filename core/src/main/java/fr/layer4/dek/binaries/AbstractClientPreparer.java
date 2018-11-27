@@ -82,7 +82,7 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
         perms.add(PosixFilePermission.OTHERS_EXECUTE);
         perms.add(PosixFilePermission.GROUP_EXECUTE);
 
-        Files.list(dir).forEach(p -> {
+        Files.list(dir).filter(Files::isRegularFile).forEach(p -> {
             PosixFileAttributeView view = Files.getFileAttributeView(p, PosixFileAttributeView.class);
             if (view != null) {
                 try {
