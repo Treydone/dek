@@ -97,7 +97,7 @@
         <apache-commons-io.version>2.6</apache-commons-io.version>
         <apache-commons-lang3.version>3.1</apache-commons-lang3.version>
         <assertj.version>3.11.1</assertj.version>
-        <bouncycastle.version>1.55</bouncycastle.version>
+        <bouncycastle.version>1.60</bouncycastle.version>
         <freemarker.version>2.3.28</freemarker.version>
         <hoverfly.version>0.8.1</hoverfly.version>
         <httpcomponents.version>4.5.3</httpcomponents.version>
