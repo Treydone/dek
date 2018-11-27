@@ -54,7 +54,7 @@ public class LocalClusterService implements ClusterService {
             try {
                 cluster.setCredentials(this.objectMapper.readValue(r.getString("credentials"), Credentials.class));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new DekException(e);
             }
             cluster.setRegistry(Constants.LOCAL_REGISTRY_NAME);
             cluster.setUri(URI.create(r.getString("uri")));

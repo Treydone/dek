@@ -26,6 +26,7 @@ package fr.layer4.dek.banner;
  * #L%
  */
 
+import fr.layer4.dek.DekException;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.*;
 import lombok.Data;
@@ -66,14 +67,14 @@ public class Banner implements TerminalSizeAware {
         try {
             temp = new Template("name", new StringReader(this.template), configuration);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
 
         StringWriter out = new StringWriter();
         try {
             temp.process(model, out);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
 
         return out.toString();

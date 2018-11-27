@@ -76,15 +76,15 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
         }
 
         if (!this.store.isReady()) {
-            throw new RuntimeException("Store not ready, please run 'dek init' before");
+            throw new DekException("Store not ready, please run 'dek init' before");
         }
 
         // Ensure archives folder exists in root
         Path archives = Constants.getRootPath().resolve(Constants.ARCHIVES);
-        if (!Files.exists(archives)) {
+        if (!archives.toFile().exists()) {
             Files.createDirectory(archives);
         } else if (Files.isRegularFile(archives)) {
-            throw new RuntimeException("Invalid path " + archives);
+            throw new DekException("Invalid path " + archives);
         }
 
         // Unlock via option --unlock or via secret file
@@ -92,10 +92,10 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
         String password;
         if (i > -1) {
             password = unlockViaOption(commandsToRun, i);
-        } else if (Files.exists(Constants.getRootPath().resolve(Constants.SECRET))) {
+        } else if (Constants.getRootPath().resolve(Constants.SECRET).toFile().exists()) {
             password = unlockViaDefaultSecretFile();
         } else {
-            throw new RuntimeException("Missing unlock option and default secret file is missing");
+            throw new DekException("Missing unlock option and default secret file is missing");
         }
 
         this.store.unlock(password);
@@ -115,7 +115,7 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
     protected String unlockViaOption(List<String> commandsToRun, int i) throws IOException {
         String password;
         if (i + 1 > commandsToRun.size()) {
-            throw new RuntimeException("unlock argument without value @prompt|<password>|<file:///.....>");
+            throw new DekException("unlock argument without value @prompt|<password>|<file:///.....>");
         }
         commandsToRun.remove(i);
         String option = commandsToRun.remove(i);
@@ -127,7 +127,7 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
             if (file.exists()) {
                 password = FileUtils.readFileToString(file, StandardCharsets.UTF_8).replaceAll("(\\r|\\n)", "");
             } else {
-                throw new RuntimeException("File not found:" + option);
+                throw new DekException("File not found:" + option);
             }
         } else {
             password = option;
@@ -137,7 +137,7 @@ class NoInteractiveOnEmptyArgsCommandLineRunner implements CommandLineRunner {
 
     protected void init(List<String> commandsToRun) throws IOException {
         if (commandsToRun.size() > 1) {
-            throw new RuntimeException("'init' doesn't accept parameter");
+            throw new DekException("'init' doesn't accept parameter");
         } else {
             // Init the store, and purge before if necessary, then stop
             String password = this.prompter.doublePromptForPassword();

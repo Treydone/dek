@@ -25,6 +25,7 @@
  */
 package fr.layer4.dek.binaries;
 
+import fr.layer4.dek.DekException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -56,10 +57,10 @@ public abstract class AbstractApacheClientPreparer extends AbstractClientPrepare
             try {
                 return download(basePath, URI.create("https://archive.apache.org/dist/" + apachePart));
             } catch (IOException e1) {
-                throw new RuntimeException("Can not download the client even on archive", e1);
+                throw new DekException("Can not download the client even on archive", e1);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Can not download the client", e);
+            throw new DekException("Can not download the client", e);
         }
     }
 }

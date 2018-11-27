@@ -62,10 +62,10 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
 
         // Check hadoop.properties and hadoop-unit-default.properties
         if (!hadoopPropertiesPath.toFile().exists()) {
-            throw new RuntimeException("Can not find hadoop.properties at :" + hadoopPropertiesPath.toString());
+            throw new DekException("Can not find hadoop.properties at :" + hadoopPropertiesPath.toString());
         }
         if (!hadoopUnitDefaultPropertiesPath.toFile().exists()) {
-            throw new RuntimeException("Can not find hadoop-unit-default.properties at :" + hadoopUnitDefaultPropertiesPath.toString());
+            throw new DekException("Can not find hadoop-unit-default.properties at :" + hadoopUnitDefaultPropertiesPath.toString());
         }
 
         // Load hadoop.properties in order to find services
@@ -73,7 +73,7 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
         try {
             services.load(Files.newBufferedReader(hadoopPropertiesPath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
 
         // Load hadoop-unit-default.properties in order to match version
@@ -81,7 +81,7 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
         try {
             config.load(Files.newBufferedReader(hadoopUnitDefaultPropertiesPath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
 
         return services.entrySet().stream()
@@ -145,6 +145,8 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
                     break;
                 case DefaultServices.HIVE:
                     break;
+                default:
+                    break;
             }
         });
         return envVars;
@@ -155,7 +157,7 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
         try {
             config.load(Files.newBufferedReader(Paths.get(cluster.getUri()).resolve(Paths.get("conf", "hadoop-unit-default.properties"))));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
         return config;
     }
@@ -187,6 +189,8 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
                     Map<String, String> hiveSite = new TreeMap<>();
                     hiveSite.put("hive.metastore.uris", "thrift://" + config.getProperty("hive.metastore.hostname", "127.0.0.1") + ":" + config.getProperty("hive.metastore.port", "20102"));
                     files.put("hive-site.xml", renderXmlConfiguration(hiveSite));
+                    break;
+                default:
                     break;
             }
             return Pair.of(sv.getService(), files);

@@ -1,12 +1,12 @@
 package fr.layer4.dek.binaries;
 
+import fr.layer4.dek.DekException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Slf4j
@@ -21,7 +21,7 @@ public abstract class AbstractApacheHadoopClientPreparer extends AbstractApacheC
         log.debug("Preparing {} to {}", archive, dest);
 
         // Check if archive if already present
-        if (force || !Files.exists(basePath.resolve(archive))) {
+        if (force || !basePath.resolve(archive).toFile().exists()) {
             download(basePath, version, archive);
         }
 
@@ -32,7 +32,7 @@ public abstract class AbstractApacheHadoopClientPreparer extends AbstractApacheC
             try {
                 uncompress(source, dest);
             } catch (IOException e) {
-                throw new RuntimeException("Can not extract client", e);
+                throw new DekException("Can not extract client", e);
             }
         }
 

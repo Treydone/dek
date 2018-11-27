@@ -25,6 +25,7 @@
  */
 package fr.layer4.dek.prompt;
 
+import fr.layer4.dek.DekException;
 import org.jline.reader.LineReader;
 import org.jline.reader.MaskingCallback;
 import org.jline.terminal.Terminal;
@@ -53,7 +54,7 @@ public class JLinePrompter implements Prompter {
         String line2 = promptForPassword("re-type password: ");
 
         if (!line1.equals(line2)) {
-            throw new RuntimeException("Password did not match");
+            throw new DekException("Password did not match");
         }
         return line1;
     }

@@ -140,7 +140,7 @@ public class AmbariClusterInfoResolverTest {
                                     .status(HttpStatus.NOT_FOUND.value()))
             ));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
     }
 

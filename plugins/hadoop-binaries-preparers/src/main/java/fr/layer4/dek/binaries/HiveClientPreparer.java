@@ -26,6 +26,7 @@
 package fr.layer4.dek.binaries;
 
 import fr.layer4.dek.DefaultServices;
+import fr.layer4.dek.DekException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -35,7 +36,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,7 +68,7 @@ public class HiveClientPreparer extends AbstractApacheHadoopClientPreparer {
         log.debug("Preparing {} to {}", archive, dest);
 
         // Check if archive if already present
-        if (force || !Files.exists(basePath.resolve(archive))) {
+        if (force || !basePath.resolve(archive).toFile().exists()) {
             download(basePath, version, archive);
         }
 
@@ -79,7 +79,7 @@ public class HiveClientPreparer extends AbstractApacheHadoopClientPreparer {
             try {
                 uncompress(source, dest);
             } catch (IOException e) {
-                throw new RuntimeException("Can not extract client", e);
+                throw new DekException("Can not extract client", e);
             }
         }
 
@@ -90,7 +90,7 @@ public class HiveClientPreparer extends AbstractApacheHadoopClientPreparer {
         try {
             chmodExecuteForEachFile(bin);
         } catch (IOException e) {
-            throw new RuntimeException("Can not chmod files in " + bin.toAbsolutePath().toString(), e);
+            throw new DekException("Can not chmod files in " + bin.toAbsolutePath().toString(), e);
         }
 
         // Update environment variables

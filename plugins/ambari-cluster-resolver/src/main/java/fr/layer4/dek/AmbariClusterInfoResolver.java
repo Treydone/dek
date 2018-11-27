@@ -141,6 +141,8 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
                     break;
                 case DefaultServices.HIVE:
                     break;
+                default:
+                    break;
             }
         });
         return envVars;
@@ -198,7 +200,7 @@ public class AmbariClusterInfoResolver implements ClusterInfoResolver {
                                 }
                             }
                         } catch (IOException e) {
-                            throw new RuntimeException("Can not extract archive", e);
+                            throw new DekException("Can not extract archive", e);
                         }
                     } catch (RestClientException e) {
                         log.warn("Can not find client {} for service {}", clientName, serviceName);

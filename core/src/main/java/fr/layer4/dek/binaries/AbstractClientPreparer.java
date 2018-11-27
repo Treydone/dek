@@ -25,6 +25,7 @@
  */
 package fr.layer4.dek.binaries;
 
+import fr.layer4.dek.DekException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -47,6 +48,7 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public abstract class AbstractClientPreparer implements ClientPreparer {
@@ -82,16 +84,18 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
         perms.add(PosixFilePermission.OTHERS_EXECUTE);
         perms.add(PosixFilePermission.GROUP_EXECUTE);
 
-        Files.list(dir).filter(Files::isRegularFile).forEach(p -> {
-            PosixFileAttributeView view = Files.getFileAttributeView(p, PosixFileAttributeView.class);
-            if (view != null) {
-                try {
-                    view.setPermissions(perms);
-                } catch (IOException e) {
-                    throw new RuntimeException("Can not set execute attribute for file " + p.toAbsolutePath().toString(), e);
+        try (Stream<Path> list = Files.list(dir)) {
+            list.filter(Files::isRegularFile).forEach(p -> {
+                PosixFileAttributeView view = Files.getFileAttributeView(p, PosixFileAttributeView.class);
+                if (view != null) {
+                    try {
+                        view.setPermissions(perms);
+                    } catch (IOException e) {
+                        throw new DekException("Can not set execute attribute for file " + p.toAbsolutePath().toString(), e);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     /**

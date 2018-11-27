@@ -27,6 +27,7 @@ package fr.layer4.dek.binaries;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.layer4.dek.DefaultServices;
+import fr.layer4.dek.DekException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -47,7 +48,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -98,7 +98,7 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
         log.debug("Preparing {} to {}", archive, dest);
 
         // Check if archive if already present
-        if (force || !Files.exists(basePath.resolve(archive))) {
+        if (force || !basePath.resolve(archive).toFile().exists()) {
             download(basePath, version, archive);
         }
 
@@ -110,7 +110,7 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
                 download(basePath, version, archive);
                 isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
                 if (!isSameSignature) {
-                    throw new RuntimeException("Incorrect signature after redownload");
+                    throw new DekException("Incorrect signature after redownload");
                 }
             }
         } catch (RestClientException e) {
@@ -124,7 +124,7 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
             try {
                 uncompress(source, dest);
             } catch (IOException e) {
-                throw new RuntimeException("Can not extract client", e);
+                throw new DekException("Can not extract client", e);
             }
         }
 
@@ -135,7 +135,7 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
         try {
             chmodExecuteForEachFile(bin);
         } catch (IOException e) {
-            throw new RuntimeException("Can not chmod files in " + bin.toAbsolutePath().toString(), e);
+            throw new DekException("Can not chmod files in " + bin.toAbsolutePath().toString(), e);
         }
 
         // Add winutils if Windows
@@ -177,7 +177,7 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
                     FileUtils.copyInputStreamToFile(restTemplate.getRequestFactory().createRequest(URI.create(c.getDownloadUrl()), HttpMethod.GET).execute().getBody(), binFile);
                 }
             } catch (IOException e) {
-                throw new RuntimeException("Can not copy " + c.getPath() + " to " + dest.getAbsolutePath(), e);
+                throw new DekException("Can not copy " + c.getPath() + " to " + dest.getAbsolutePath(), e);
             }
         });
     }
@@ -199,7 +199,7 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
         } else if (version.compareTo(HDP_300) >= 0) {
             winutilsHadoopVersion = HDP_300;
         } else {
-            throw new RuntimeException("Can not find a compatible winutils version for Hadoop version " + version);
+            throw new DekException("Can not find a compatible winutils version for Hadoop version " + version);
         }
         return winutilsHadoopVersion;
     }
@@ -221,13 +221,13 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 not found...", e);
+            throw new DekException("SHA-256 not found...", e);
         }
         byte[] hash;
         try {
             hash = digest.digest(FileUtils.readFileToByteArray(path.toFile()));
         } catch (IOException e) {
-            throw new RuntimeException("Can not compute local SHA-256", e);
+            throw new DekException("Can not compute local SHA-256", e);
         }
         return new String(Hex.encode(hash));
     }
@@ -278,10 +278,10 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
         if (remoteSha256 == null) {
-            throw new RuntimeException("Can not retrieve remote SHA-256");
+            throw new DekException("Can not retrieve remote SHA-256");
         }
         return remoteSha256;
     }

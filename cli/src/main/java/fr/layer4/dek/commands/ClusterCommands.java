@@ -26,10 +26,7 @@ package fr.layer4.dek.commands;
  * #L%
  */
 
-import fr.layer4.dek.Cluster;
-import fr.layer4.dek.ClusterService;
-import fr.layer4.dek.Constants;
-import fr.layer4.dek.ServiceClientAndVersion;
+import fr.layer4.dek.*;
 import fr.layer4.dek.auth.Credentials;
 import fr.layer4.dek.banner.Banner;
 import fr.layer4.dek.banner.BannerManager;
@@ -146,7 +143,7 @@ public class ClusterCommands {
             FileUtils.copyFile(clusterGeneratedPath.resolve(Constants.ENV_SH).toFile(), basePath.resolve(Constants.ENV_SH).toFile());
             FileUtils.copyFile(clusterGeneratedPath.resolve(Constants.ENV_BAT).toFile(), basePath.resolve(Constants.ENV_BAT).toFile());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
     }
 
@@ -154,11 +151,11 @@ public class ClusterCommands {
         Path basePath = Constants.getRootPath();
 
         Path registryPath = basePath.resolve(underlyingConnection.getId().toString());
-        if (!Files.exists(registryPath)) {
+        if (!registryPath.toFile().exists()) {
             Files.createDirectory(registryPath);
         }
         Path clusterGeneratedPath = registryPath.resolve(cluster.getId().toString());
-        if (!Files.exists(clusterGeneratedPath)) {
+        if (!clusterGeneratedPath.toFile().exists()) {
             Files.createDirectory(clusterGeneratedPath);
         }
         Path archivesPath = basePath.resolve(Constants.ARCHIVES);
@@ -185,12 +182,12 @@ public class ClusterCommands {
             try {
                 Path serviceHomePath = clusterGeneratedPath.resolve(service);
                 // Create directory for the service
-                if (!Files.exists(serviceHomePath)) {
+                if (!serviceHomePath.toFile().exists()) {
                     Files.createDirectory(serviceHomePath);
                 }
                 Files.write(serviceHomePath.resolve(filename), content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new DekException(e);
             }
         }));
 
@@ -207,11 +204,11 @@ public class ClusterCommands {
                     unixFileWriter.append("export " + i.getKey() + "=\"" + (i.getKey().equalsIgnoreCase("PATH") ? currentPathEnvVar + ":" : "") + i.getValue().stream().collect(Collectors.joining(":")) + "\";\n");
                     windowsFileWriter.append("set " + i.getKey() + "=" + (i.getKey().equalsIgnoreCase("PATH") ? currentPathEnvVar + ";" : "") + i.getValue().stream().collect(Collectors.joining(";")) + "\r\n");
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new DekException(e);
                 }
             });
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
     }
 }

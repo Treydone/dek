@@ -118,7 +118,7 @@ public class ClouderaClusterInfoResolver implements ClusterInfoResolver {
                     });
                     break;
                 default:
-                    throw new RuntimeException("Unknown proxy auth " + proxyAuth);
+                    throw new DekException("Unknown proxy auth " + proxyAuth);
             }
         }
         return httpClient;

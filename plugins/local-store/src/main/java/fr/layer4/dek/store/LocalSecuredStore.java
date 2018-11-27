@@ -105,7 +105,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
         boolean encrypted = isEncrypted(files);
         if (!encrypted) {
             // Lock!
-            throw new RuntimeException("Local database doesn't seems to be encrypted");
+            throw new DekException("Local database doesn't seems to be encrypted");
         }
     }
 
@@ -125,7 +125,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
             if (e.getCause() instanceof JdbcSQLException) {
                 JdbcSQLException jdbcSQLException = (JdbcSQLException) e.getCause();
                 if (jdbcSQLException.getErrorCode() == 90049) {
-                    throw new RuntimeException("Wrong password: '" + password + "'");
+                    throw new DekException("Wrong password: '" + password + "'");
                 }
             }
             throw e;
@@ -170,7 +170,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
         try {
             ChangeFileEncryption.execute(fr.layer4.dek.Constants.getRootPath().toAbsolutePath().toString(), DB, CIPHER_EXTENSION + CIPHER, actualPassword.toCharArray(), newPassword.toCharArray(), true);
         } catch (SQLException e) {
-            throw new RuntimeException("Can not change password", e);
+            throw new DekException("Can not change password", e);
         }
 
         // Create new datasource and jdbctemplate
@@ -189,7 +189,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
         try {
             FileLister.tryUnlockDatabase(files, "encryption");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
         files = FileLister.getDatabaseFiles(fr.layer4.dek.Constants.getRootPath().toAbsolutePath().toString(), DB, false);
         return files;
@@ -218,7 +218,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
                 return false;
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new DekException(e);
         }
     }
 }

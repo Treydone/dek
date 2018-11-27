@@ -27,6 +27,7 @@ package fr.layer4.dek.banner;
  */
 
 import fr.layer4.dek.Cluster;
+import fr.layer4.dek.DekException;
 import fr.layer4.dek.auth.Credentials;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +48,7 @@ public class BannerManager {
         if (StringUtils.isNotBlank(path)) {
             File file = new File(path);
             if (!file.exists()) {
-                throw new RuntimeException("Banner does not exist");
+                throw new DekException("Banner does not exist");
             } else {
                 // Check template against fake data
                 Cluster cluster = new Cluster();
@@ -62,7 +63,7 @@ public class BannerManager {
                 try {
                     template = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
                 } catch (IOException e) {
-                    throw new RuntimeException("Can not read banner file", e);
+                    throw new DekException("Can not read banner file", e);
                 }
                 new Banner(template, Collections.singletonMap("cluster", cluster)).render(DEFAULT_TERMINAL_WIDTH);
 
