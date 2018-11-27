@@ -1,10 +1,14 @@
 <configuration>
     <property>
-        <name>hbase.zk</name>
-        <value>127.0.0.1:22010</value>
+        <name>hbase.zookeeper.client.port</name>
+        <value>22010</value>
     </property>
     <property>
-        <name>hbase.znode.parent</name>
+        <name>hbase.zookeeper.quorum</name>
+        <value>127.0.0.1</value>
+    </property>
+    <property>
+        <name>zookeeper.znode.parent</name>
         <value>/hbase-unsecure</value>
     </property>
 </configuration>

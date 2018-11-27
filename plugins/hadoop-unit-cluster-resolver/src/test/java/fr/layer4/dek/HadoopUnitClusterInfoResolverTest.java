@@ -40,7 +40,7 @@ public class HadoopUnitClusterInfoResolverTest {
         Map<String, List<String>> envVars = resolver.resolveEnvironmentVariables(Paths.get("/archives/path"), Paths.get("/cluster/conf/path"), cluster);
 
         // Then
-        assertEquals(3, envVars.size());
+        assertEquals(4, envVars.size());
         // TODO
 //        assertTrue(envVars.containsKey("HADOOP_HOME"));
 //        assertEquals("", envVars.get("HADOOP_HOME"));
@@ -80,7 +80,7 @@ public class HadoopUnitClusterInfoResolverTest {
     }
 
     @Test
-    public void resolveEnvironmentVariablesFromServices() {
+    public void resolveEnvironmentVariablesFromServices() throws URISyntaxException {
 
         // Given
         ServiceClientAndVersion hive = ServiceClientAndVersion.of(DefaultServices.HIVE, "1.2.1000");
@@ -88,23 +88,27 @@ public class HadoopUnitClusterInfoResolverTest {
         ServiceClientAndVersion hbase = ServiceClientAndVersion.of(DefaultServices.HBASE, "1.2.1000");
         ServiceClientAndVersion yarn = ServiceClientAndVersion.of(DefaultServices.YARN, "1.2.1000");
         ServiceClientAndVersion zookeeper = ServiceClientAndVersion.of(DefaultServices.ZOOKEEPER, "1.2.1000");
-        List<ServiceClientAndVersion> services = Arrays.asList(hive, hdfs, hbase, yarn, zookeeper);
+        ServiceClientAndVersion oozie = ServiceClientAndVersion.of(DefaultServices.OOZIE, "1.2.1000");
+        List<ServiceClientAndVersion> services = Arrays.asList(hive, hdfs, hbase, yarn, zookeeper, oozie);
 
-
+        Cluster cluster = new Cluster();
+        cluster.setUri(HadoopUnitClusterInfoResolver.class.getClassLoader().getResource("hadoop-unit").toURI());
         Path clusterGeneratedPath = Paths.get("/base/conf_for_cluster/");
 
         // When
-        Map<String, List<String>> envVars = resolver.resolveEnvironmentVariablesFromServices(clusterGeneratedPath, services);
+        Map<String, List<String>> envVars = resolver.resolveEnvironmentVariablesFromServices(clusterGeneratedPath, services, cluster);
 
         // Then
-        assertThat(envVars).hasSize(7)
+        assertThat(envVars).hasSize(8)
                 .containsEntry("HADOOP_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve("hdfs").toAbsolutePath().toString()))
                 .containsEntry("HADOOP_CLIENT_OPTS", Collections.singletonList("-Xmx1g"))
                 .containsEntry("MAPRED_DISTCP_OPTS", Collections.singletonList("-Xmx2g"))
                 .containsEntry("HADOOP_DISTCP_OPTS", Collections.singletonList("-Xmx2g"))
                 .containsEntry("HBASE_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve("hbase").toAbsolutePath().toString()))
                 .containsEntry("YARN_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve("yarn").toAbsolutePath().toString()))
-                .containsEntry("ZOOKEEPER_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve("zookeeper").toAbsolutePath().toString()));
+                .containsEntry("ZOOKEEPER_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve("zookeeper").toAbsolutePath().toString()))
+                .containsEntry("OOZIE_URL", Collections.singletonList("http://localhost:20113/oozie"))
+        ;
     }
 
     @Test

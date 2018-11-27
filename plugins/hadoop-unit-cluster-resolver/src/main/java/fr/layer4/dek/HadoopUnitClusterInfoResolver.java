@@ -111,11 +111,13 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
     @Override
     public Map<String, List<String>> resolveEnvironmentVariables(Path archivesPath, Path clusterGeneratedPath, Cluster cluster) {
         Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
-        return resolveEnvironmentVariablesFromServices(clusterGeneratedPath, serviceClientAndVersions);
+        return resolveEnvironmentVariablesFromServices(clusterGeneratedPath, serviceClientAndVersions, cluster);
     }
 
-    protected Map<String, List<String>> resolveEnvironmentVariablesFromServices(Path clusterGeneratedPath, Collection<ServiceClientAndVersion> serviceClientAndVersions) {
+    protected Map<String, List<String>> resolveEnvironmentVariablesFromServices(Path clusterGeneratedPath, Collection<ServiceClientAndVersion> serviceClientAndVersions, Cluster cluster) {
         Map<String, List<String>> envVars = new HashMap<>();
+
+        Properties config = loadConfig(cluster);
 
         // Get services and components
         // For each components, add custom entries in envVars
@@ -128,7 +130,6 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
                     envVars.put("HADOOP_DISTCP_OPTS", Collections.singletonList("-Xmx2g"));
                     break;
                 case DefaultServices.HBASE:
-//                    envVars.put("HBASE_CLASSPATH", "");
                     envVars.put("HBASE_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString()));
                     break;
                 case DefaultServices.YARN:
@@ -136,6 +137,9 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
                     break;
                 case DefaultServices.ZOOKEEPER:
                     envVars.put("ZOOKEEPER_CONF_DIR", Collections.singletonList(clusterGeneratedPath.resolve(e.getService()).toAbsolutePath().toString()));
+                    break;
+                case DefaultServices.OOZIE:
+                    envVars.put("OOZIE_URL", Collections.singletonList("http://" + config.getProperty("oozie.host") + ":" + config.getProperty("oozie.port") + "/oozie"));
                     break;
                 case DefaultServices.PIG:
                     break;
@@ -146,16 +150,21 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
         return envVars;
     }
 
-    @Override
-    public Map<String, Map<String, byte[]>> renderConfigurationFiles(Cluster cluster) {
-        Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
-
+    protected Properties loadConfig(Cluster cluster) {
         Properties config = new Properties();
         try {
             config.load(Files.newBufferedReader(Paths.get(cluster.getUri()).resolve(Paths.get("conf", "hadoop-unit-default.properties"))));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return config;
+    }
+
+    @Override
+    public Map<String, Map<String, byte[]>> renderConfigurationFiles(Cluster cluster) {
+        Collection<ServiceClientAndVersion> serviceClientAndVersions = resolveAvailableServiceClients(cluster);
+
+        Properties config = loadConfig(cluster);
 
         return serviceClientAndVersions.stream().map(sv -> {
             Map<String, byte[]> files = new HashMap<>();
@@ -167,9 +176,15 @@ public class HadoopUnitClusterInfoResolver implements ClusterInfoResolver {
                     break;
                 case DefaultServices.HBASE:
                     Map<String, String> hbaseSite = new TreeMap<>();
-                    hbaseSite.put("hbase.zk", config.getProperty("zookeeper.host") + ":" + config.getProperty("zookeeper.port"));
-                    hbaseSite.put("hbase.znode.parent", config.getProperty("hbase.znode.parent"));
+                    hbaseSite.put("hbase.zookeeper.quorum", config.getProperty("zookeeper.host", "127.0.0.1"));
+                    hbaseSite.put("hbase.zookeeper.client.port", config.getProperty("zookeeper.port", "22010"));
+                    hbaseSite.put("zookeeper.znode.parent", config.getProperty("hbase.znode.parent", "/hbase-unsecure"));
                     files.put("hbase-site.xml", renderXmlConfiguration(hbaseSite));
+                    break;
+                case DefaultServices.HIVE:
+                    Map<String, String> hiveSite = new TreeMap<>();
+                    hiveSite.put("hive.metastore.uris", "thrift://" + config.getProperty("hive.metastore.hostname", "127.0.0.1") + ":" + config.getProperty("hive.metastore.port", "20102"));
+                    files.put("hive-site.xml", renderXmlConfiguration(hiveSite));
                     break;
             }
             return Pair.of(sv.getService(), files);
