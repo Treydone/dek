@@ -99,7 +99,7 @@
         <assertj.version>3.11.1</assertj.version>
         <bouncycastle.version>1.60</bouncycastle.version>
         <freemarker.version>2.3.28</freemarker.version>
-        <hoverfly.version>0.8.1</hoverfly.version>
+        <hoverfly.version>0.11.1</hoverfly.version>
         <httpcomponents.version>4.5.3</httpcomponents.version>
         <java.version>1.8</java.version>
         <jackson.version>2.9.7</jackson.version>
