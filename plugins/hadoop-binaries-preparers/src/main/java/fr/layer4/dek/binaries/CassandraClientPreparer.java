@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,13 +26,18 @@
 package fr.layer4.dek.binaries;
 
 import fr.layer4.dek.DefaultServices;
+import fr.layer4.dek.DekException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,12 +80,35 @@ public class CassandraClientPreparer extends AbstractApacheHadoopClientPreparer 
     }
 
     @Override
-    protected boolean compareLocalAndRemoteSignature(Path basePath, String archive, String version) {
-        return true;
+    protected String getApachePart(String archive, String version) {
+        return "cassandra/" + version + "/" + archive;
     }
 
     @Override
-    protected String getApachePart(String archive, String version) {
-        return "cassandra/" + version + "/" + archive;
+    protected boolean compareLocalAndRemoteSignature(Path basePath, String archive, String version) {
+        String localSha1 = getLocalShaX(basePath, archive, "SHA-1");
+        String remoteSha1 = getRemoteSha1(archive, version);
+        return remoteSha1.equalsIgnoreCase(localSha1);
+    }
+
+    protected String getRemoteSha1(String archive, String version) {
+        ResponseEntity<String> rawResponse = restTemplate.getForEntity("https://dist.apache.org/repos/dist/release/" + getApachePart(archive, version) + ".sha1", String.class);
+        String remoteSha1 = null;
+        try (BufferedReader reader = new BufferedReader(new StringReader(rawResponse.getBody()))) {
+            for (; ; ) {
+                String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                remoteSha1 = line.trim();
+                break;
+            }
+        } catch (IOException e) {
+            throw new DekException(e);
+        }
+        if (remoteSha1 == null) {
+            throw new DekException("Can not retrieve remote SHA-1");
+        }
+        return remoteSha1;
     }
 }

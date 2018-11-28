@@ -26,13 +26,18 @@
 package fr.layer4.dek.binaries;
 
 import fr.layer4.dek.DefaultServices;
+import fr.layer4.dek.DekException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,12 +80,54 @@ public class StormClientPreparer extends AbstractApacheHadoopClientPreparer {
     }
 
     @Override
-    protected boolean compareLocalAndRemoteSignature(Path basePath, String archive, String version) {
-        return true;
+    protected String getApachePart(String archive, String version) {
+        return "storm/apache-storm-" + version + "/" + archive;
     }
 
     @Override
-    protected String getApachePart(String archive, String version) {
-        return "storm/apache-storm-" + version + "/" + archive;
+    protected boolean compareLocalAndRemoteSignature(Path basePath, String archive, String version) {
+        String localSha512 = getLocalShaX(basePath, archive, "SHA-512");
+        String remoteSha512 = getRemoteSha512(archive, version);
+        return remoteSha512.equalsIgnoreCase(localSha512);
+    }
+
+    protected String getRemoteSha512(String archive, String version) {
+        ResponseEntity<String> rawResponse = restTemplate.getForEntity("https://dist.apache.org/repos/dist/release/" + getApachePart(archive, version) + ".sha", String.class);
+        String remoteSha512 = null;
+        try (BufferedReader reader = new BufferedReader(new StringReader(rawResponse.getBody()))) {
+            for (; ; ) {
+                String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                String prefix = archive + ":";
+                if (line.trim().startsWith(prefix)) {
+                    int i = line.indexOf(prefix);
+                    if (i > -1) {
+                        remoteSha512 = line.substring(i + prefix.length()).replace(" ", "");
+                        boolean loop = true;
+                        while (loop) {
+                            line = reader.readLine();
+                            if (line == null) {
+                                break;
+                            }
+                            line = line.trim();
+                            if (!line.trim().startsWith(archive)) {
+                                remoteSha512 += line.replace(" ", "");
+                            } else {
+                                loop = false;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new DekException(e);
+        }
+        if (remoteSha512 == null) {
+            throw new DekException("Can not retrieve remote signature");
+        }
+        return remoteSha512;
     }
 }

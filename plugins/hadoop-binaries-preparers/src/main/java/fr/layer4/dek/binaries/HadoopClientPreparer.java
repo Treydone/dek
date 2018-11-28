@@ -226,7 +226,7 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
             throw new DekException(e);
         }
         if (remoteSha256 == null) {
-            throw new DekException("Can not retrieve remote SHA-256");
+            throw new DekException("Can not retrieve remote signature");
         }
         return remoteSha256;
     }

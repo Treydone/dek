@@ -84,7 +84,6 @@ public class HbaseClientPreparer extends AbstractApacheHadoopClientPreparer {
         return "hbase/hbase-" + version + "/" + archive;
     }
 
-
     @Override
     protected boolean compareLocalAndRemoteSignature(Path basePath, String archive, String version) {
         String localSha512 = getLocalShaX(basePath, archive, "SHA-512");
@@ -127,7 +126,7 @@ public class HbaseClientPreparer extends AbstractApacheHadoopClientPreparer {
             throw new DekException(e);
         }
         if (remoteSha512 == null) {
-            throw new DekException("Can not retrieve remote SHA-256");
+            throw new DekException("Can not retrieve remote signature");
         }
         return remoteSha512;
     }
