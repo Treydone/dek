@@ -27,8 +27,6 @@ package fr.layer4.dek.registry;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.layer4.dek.ClusterService;
-import fr.layer4.dek.LocalClusterService;
 import fr.layer4.dek.store.LocalSecuredStore;
 import lombok.Data;
 

@@ -25,7 +25,7 @@
  */
 package fr.layer4.dek.config;
 
-import fr.layer4.dek.PropertyManager;
+import fr.layer4.dek.property.PropertyManager;
 import fr.layer4.dek.http.ConfigurableHostnameVerifier;
 import fr.layer4.dek.http.NonProxyRoutePlanner;
 import fr.layer4.dek.http.WithProxyAuthCredentialsProvider;

@@ -27,6 +27,7 @@ package fr.layer4.dek;
  */
 
 import fr.layer4.dek.auth.Credentials;
+import fr.layer4.dek.cluster.Cluster;
 import fr.layer4.dek.info.ClusterInfoResolver;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;

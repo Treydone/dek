@@ -27,7 +27,7 @@ package fr.layer4.dek.http;
  */
 
 
-import fr.layer4.dek.PropertyManager;
+import fr.layer4.dek.property.PropertyManager;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;

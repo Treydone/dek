@@ -27,7 +27,7 @@ package fr.layer4.dek.http;
  */
 
 
-import fr.layer4.dek.PropertyManager;
+import fr.layer4.dek.property.PropertyManager;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;

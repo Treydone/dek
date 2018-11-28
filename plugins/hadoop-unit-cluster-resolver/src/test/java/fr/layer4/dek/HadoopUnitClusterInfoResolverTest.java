@@ -27,6 +27,7 @@ package fr.layer4.dek;
  */
 
 
+import fr.layer4.dek.cluster.Cluster;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;

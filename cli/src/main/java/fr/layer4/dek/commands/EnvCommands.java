@@ -26,7 +26,7 @@ package fr.layer4.dek.commands;
  * #L%
  */
 
-import fr.layer4.dek.PropertyManager;
+import fr.layer4.dek.property.PropertyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

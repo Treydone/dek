@@ -26,7 +26,7 @@ package fr.layer4.dek.banner;
  * #L%
  */
 
-import fr.layer4.dek.Cluster;
+import fr.layer4.dek.cluster.Cluster;
 import fr.layer4.dek.DekException;
 import fr.layer4.dek.auth.Credentials;
 import org.apache.commons.io.FileUtils;

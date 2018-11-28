@@ -1,4 +1,4 @@
-package fr.layer4.dek;
+package fr.layer4.dek.registry;
 
 /*-
  * #%L
@@ -27,6 +27,9 @@ package fr.layer4.dek;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.layer4.dek.cluster.Cluster;
+import fr.layer4.dek.Constants;
+import fr.layer4.dek.DekException;
 import fr.layer4.dek.auth.Credentials;
 import fr.layer4.dek.store.LocalSecuredStore;
 import lombok.RequiredArgsConstructor;

@@ -26,7 +26,7 @@ package fr.layer4.dek.http;
  * #L%
  */
 
-import fr.layer4.dek.PropertyManager;
+import fr.layer4.dek.property.PropertyManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

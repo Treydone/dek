@@ -23,36 +23,50 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.dek;
+package fr.layer4.dek.registry;
 
-import java.util.Map;
+import fr.layer4.dek.cluster.Cluster;
+import fr.layer4.dek.auth.Credentials;
+
+import java.util.List;
 import java.util.Optional;
 
-public interface PropertyManager {
+public interface ClusterService {
 
     /**
+     * Add a cluster in the specified registry.
+     *
+     * @param type
+     * @param name
+     * @param uri
+     * @param banner
      * @return
      */
-    Map<String, String> getProperty();
+    Cluster addOrUpdateCluster(String type, String name, String uri, String banner, Credentials credentials);
 
     /**
-     * Return the value associated by the key in the configuration.
+     * Delete a cluster in the specified registry.
      *
-     * @param key
+     * @param name
      * @return
      */
-    Optional<String> getProperty(String key);
+    void deleteCluster(String name);
 
     /**
-     * @param key
-     * @param value
-     */
-    void setProperty(String key, String value);
-
-    /**
-     * Delete a key with its associated value.
+     * List all the clusters for a registry, or all cluster if not registry has been specified.
+     * <p>
+     * (nullable)
      *
-     * @param key
+     * @return
      */
-    void deleteProperty(String key);
+    List<Cluster> listClusters();
+
+    /**
+     * Retrieve cluster information.
+     *
+     * @param name
+     * @return
+     */
+    Optional<Cluster> getCluster(String name);
+
 }

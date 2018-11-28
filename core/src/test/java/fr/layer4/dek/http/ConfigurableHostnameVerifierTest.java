@@ -26,7 +26,7 @@ package fr.layer4.dek.http;
  * #L%
  */
 
-import fr.layer4.dek.PropertyManager;
+import fr.layer4.dek.property.PropertyManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

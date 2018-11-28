@@ -26,6 +26,7 @@
 package fr.layer4.dek;
 
 import fr.layer4.dek.auth.Credentials;
+import fr.layer4.dek.cluster.Cluster;
 import io.specto.hoverfly.junit.rule.HoverflyRule;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;

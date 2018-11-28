@@ -26,7 +26,7 @@ package fr.layer4.dek.banner;
  * #L%
  */
 
-import fr.layer4.dek.Cluster;
+import fr.layer4.dek.cluster.Cluster;
 import org.assertj.core.api.Assertions;
 import org.jline.terminal.TerminalBuilder;
 import org.junit.Test;

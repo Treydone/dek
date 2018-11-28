@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  * #L%
  */
-package fr.layer4.dek;
+package fr.layer4.dek.cluster;
 
 import fr.layer4.dek.auth.Credentials;
 import lombok.Data;

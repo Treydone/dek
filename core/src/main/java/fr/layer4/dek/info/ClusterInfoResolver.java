@@ -25,7 +25,7 @@
  */
 package fr.layer4.dek.info;
 
-import fr.layer4.dek.Cluster;
+import fr.layer4.dek.cluster.Cluster;
 import fr.layer4.dek.ServiceClientAndVersion;
 import fr.layer4.dek.auth.Credentials;
 

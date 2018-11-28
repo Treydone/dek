@@ -35,6 +35,7 @@ import fr.layer4.dek.ambari.api.model.ClusterResponseWrapperContext;
 import fr.layer4.dek.ambari.api.model.ServiceResponseWrapperContext;
 import fr.layer4.dek.ambari.api.model.StackServiceResponseSwagger;
 import fr.layer4.dek.auth.Credentials;
+import fr.layer4.dek.cluster.Cluster;
 import fr.layer4.dek.info.ClusterInfoResolver;
 import fr.layer4.dek.prompt.Prompter;
 import lombok.extern.slf4j.Slf4j;
