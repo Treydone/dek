@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,12 +32,14 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.*;
 import java.net.URI;
@@ -46,6 +48,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -76,6 +80,27 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
             }
         }
         return destFileName;
+    }
+
+    protected String getLocalShaX(Path basePath, String archive, String sha) {
+        Path path = basePath.resolve(archive);
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance(sha);
+        } catch (NoSuchAlgorithmException e) {
+            throw new DekException(sha + " not found...", e);
+        }
+        byte[] hash;
+        try {
+            hash = digest.digest(FileUtils.readFileToByteArray(path.toFile()));
+        } catch (IOException e) {
+            throw new DekException("Can not compute local " + sha, e);
+        }
+        return new String(Hex.encode(hash));
+    }
+
+    protected String getLocalSha256(Path basePath, String archive) {
+        return getLocalShaX(basePath, archive, "SHA-256");
     }
 
     protected void chmodExecuteForEachFile(Path dir) throws IOException {

@@ -172,31 +172,9 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
     }
 
     protected boolean compareLocalAndRemoteSignature(Path basePath, String archive, String version) {
-
-        // Get local SHA-256
         String localSha256 = getLocalSha256(basePath, archive);
-
-        // Get remote SHA-256
         String remoteSha256 = getRemoteSha256(archive, version);
-
         return remoteSha256.equalsIgnoreCase(localSha256);
-    }
-
-    protected String getLocalSha256(Path basePath, String archive) {
-        Path path = basePath.resolve(archive);
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new DekException("SHA-256 not found...", e);
-        }
-        byte[] hash;
-        try {
-            hash = digest.digest(FileUtils.readFileToByteArray(path.toFile()));
-        } catch (IOException e) {
-            throw new DekException("Can not compute local SHA-256", e);
-        }
-        return new String(Hex.encode(hash));
     }
 
     protected String getRemoteSha256(String archive, String version) {
@@ -252,5 +230,4 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
         }
         return remoteSha256;
     }
-
 }
