@@ -1,13 +1,43 @@
 package fr.layer4.dek.binaries;
 
+/*-
+ * #%L
+ * DEK
+ * %%
+ * Copyright (C) 2018 Layer4
+ * %%
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * #L%
+ */
+
+
 import fr.layer4.dek.DekException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.web.client.RestClientException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public abstract class AbstractApacheHadoopClientPreparer extends AbstractApacheClientPreparer {
@@ -16,13 +46,32 @@ public abstract class AbstractApacheHadoopClientPreparer extends AbstractApacheC
         super(client, apacheMirrorFinder);
     }
 
-    protected File downloadClient(Path basePath, String version, boolean force, String nameAndVersion, String archive) {
+    @Override
+    public Map<String, List<String>> prepare(Path basePath, String service, String version, boolean force) {
+        String archive = getArchive(version);
+        String nameAndVersion = getNameAndVersion(version);
+
         File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
         log.debug("Preparing {} to {}", archive, dest);
 
         // Check if archive if already present
         if (force || !basePath.resolve(archive).toFile().exists()) {
             download(basePath, version, archive);
+        }
+
+        // Check signature
+        try {
+            boolean isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
+            if (!isSameSignature) {
+                // Signature is different, try to redownload the archive
+                download(basePath, version, archive);
+                isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
+                if (!isSameSignature) {
+                    throw new DekException("Incorrect signature after redownload");
+                }
+            }
+        } catch (RestClientException e) {
+            log.warn("Can not get the remote signature", e);
         }
 
         // Unpack
@@ -37,6 +86,29 @@ public abstract class AbstractApacheHadoopClientPreparer extends AbstractApacheC
         }
 
         dest = new File(dest, nameAndVersion);
-        return dest;
+
+        extraSteps(dest, force, version);
+
+        // Chmod+x
+        Path bin = dest.toPath().resolve("bin");
+        try {
+            chmodExecuteForEachFile(bin);
+        } catch (IOException e) {
+            throw new DekException("Can not chmod files in " + bin.toAbsolutePath().toString(), e);
+        }
+
+        return getEnvVars(dest);
     }
+
+    protected abstract Map<String, List<String>> getEnvVars(File dest);
+
+    protected void extraSteps(File dest, boolean force, String version) {
+
+    }
+
+    protected abstract String getNameAndVersion(String version);
+
+    protected abstract boolean compareLocalAndRemoteSignature(Path basePath, String archive, String version);
+
+    protected abstract String getArchive(String version);
 }

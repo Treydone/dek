@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,7 +31,6 @@ import fr.layer4.dek.DekException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.bouncycastle.util.encoders.Hex;
 import org.jline.utils.OSUtils;
@@ -40,7 +39,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
@@ -91,67 +89,36 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
     }
 
     @Override
-    public Map<String, List<String>> prepare(Path basePath, String service, String version, boolean force) {
-        String nameAndVersion = "hadoop-" + version;
-        String archive = nameAndVersion + ".tar.gz";
-        File dest = basePath.resolve(FilenameUtils.getBaseName(archive)).toFile();
-        log.debug("Preparing {} to {}", archive, dest);
-
-        // Check if archive if already present
-        if (force || !basePath.resolve(archive).toFile().exists()) {
-            download(basePath, version, archive);
-        }
-
-        // Check signature
-        try {
-            boolean isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
-            if (!isSameSignature) {
-                // Signature is different, try to redownload the archive
-                download(basePath, version, archive);
-                isSameSignature = compareLocalAndRemoteSignature(basePath, archive, version);
-                if (!isSameSignature) {
-                    throw new DekException("Incorrect signature after redownload");
-                }
-            }
-        } catch (RestClientException e) {
-            log.warn("Can not get the remote signature", e);
-        }
-
-        // Unpack
-        File source = basePath.resolve(archive).toFile();
-        log.debug("Uncompress {} to {}", source, dest);
-        if (force || !dest.exists()) {
-            try {
-                uncompress(source, dest);
-            } catch (IOException e) {
-                throw new DekException("Can not extract client", e);
-            }
-        }
-
-        dest = new File(dest, nameAndVersion);
-
-        // Chmod+x
-        Path bin = dest.toPath().resolve("bin");
-        try {
-            chmodExecuteForEachFile(bin);
-        } catch (IOException e) {
-            throw new DekException("Can not chmod files in " + bin.toAbsolutePath().toString(), e);
-        }
-
+    protected void extraSteps(File dest, boolean force, String version) {
         // Add winutils if Windows
         if (OSUtils.IS_WINDOWS) {
             log.info("Download winutils...");
             String winutilsHadoopVersion = findWinUtilsMatchingVersion(version);
             downloadWinUtilsBinaries(this.restTemplate, force, dest, winutilsHadoopVersion);
         }
+    }
 
-        // Update environment variables
+    @Override
+    protected Map<String, List<String>> getEnvVars(File dest) {
         Map<String, List<String>> envVars = new HashMap<>();
         envVars.put("HADOOP_HOME", Collections.singletonList(dest.getAbsolutePath()));
         envVars.put("PATH", Collections.singletonList(new File(dest, "bin").getAbsolutePath()));
         return envVars;
     }
 
+    @Override
+    protected String getArchive(String version) {
+        return getNameAndVersion(version) + ".tar.gz";
+    }
+
+    @Override
+    protected String getNameAndVersion(String version) {
+        return "hadoop-" + version;
+    }
+
+    protected String getApachePart(String archive, String version) {
+        return "hadoop/common/hadoop-" + version + "/" + archive;
+    }
 
     @Data
     public static class Content {
@@ -286,7 +253,4 @@ public class HadoopClientPreparer extends AbstractApacheHadoopClientPreparer {
         return remoteSha256;
     }
 
-    protected String getApachePart(String archive, String version) {
-        return "hadoop/common/hadoop-" + version + "/" + archive;
-    }
 }

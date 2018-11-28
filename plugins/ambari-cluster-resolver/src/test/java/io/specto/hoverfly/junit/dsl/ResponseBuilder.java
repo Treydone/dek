@@ -1,3 +1,4 @@
+
 package io.specto.hoverfly.junit.dsl;
 
 /*-
@@ -26,107 +27,82 @@ package io.specto.hoverfly.junit.dsl;
  * #L%
  */
 
+
 import io.specto.hoverfly.junit.core.model.Response;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.Collections.singletonList;
-
 public class ResponseBuilder {
-
-
-    private final Map<String, List<String>> headers = new HashMap<>();
+    private final Map<String, List<String>> headers = new HashMap();
     private String body = "";
     private int status = 200;
-    private boolean encoded = false;
     private boolean templated = true;
-
+    private final Map<String, String> transitionsState = new HashMap();
+    private final List<String> removesState = new ArrayList();
     private int delay;
     private TimeUnit delayTimeUnit;
+
+    // ---Custom
+    private boolean encoded;
+
+    public ResponseBuilder encoded(final boolean encoded) {
+        this.encoded = encoded;
+        return this;
+    }
+    // ---Custom
 
     ResponseBuilder() {
     }
 
     /**
-     * Instantiates a new instance
-     *
-     * @return the builder
+     * @deprecated
      */
     @Deprecated
     public static ResponseBuilder response() {
         return new ResponseBuilder();
     }
 
-    /**
-     * Sets the body
-     *
-     * @param body body of the response
-     * @return the {@link ResponseBuilder for further customizations}
-     */
-    public ResponseBuilder body(final String body) {
+    public ResponseBuilder body(String body) {
         this.body = body;
         return this;
     }
 
-    /**
-     * Sets the status
-     *
-     * @param status status of the response
-     * @return the {@link ResponseBuilder for further customizations}
-     */
-    public ResponseBuilder status(final int status) {
+    public ResponseBuilder status(int status) {
         this.status = status;
         return this;
     }
 
-    public ResponseBuilder encoded(final boolean encoded) {
-        this.encoded = encoded;
+    public ResponseBuilder header(String key, String value) {
+        this.headers.put(key, Collections.singletonList(value));
         return this;
     }
 
-    /**
-     * Sets a header
-     *
-     * @param key   header name
-     * @param value header value
-     * @return the {@link ResponseBuilder for further customizations}
-     */
-    public ResponseBuilder header(final String key, final String value) {
-        this.headers.put(key, singletonList(value));
+    public ResponseBuilder andSetState(String key, String value) {
+        this.transitionsState.put(key, value);
         return this;
     }
 
-    /**
-     * Builds a {@link Response}
-     *
-     * @return the response
-     */
+    public ResponseBuilder andRemoveState(String stateToRemove) {
+        this.removesState.add(stateToRemove);
+        return this;
+    }
+
     Response build() {
-        return new Response(status, body, encoded, templated, headers);
+        return new Response(this.status, this.body, encoded, this.templated, this.headers, this.transitionsState, this.removesState);
     }
 
-    public ResponseBuilder body(final HttpBodyConverter httpBodyConverter) {
+    public ResponseBuilder body(HttpBodyConverter httpBodyConverter) {
         this.body = httpBodyConverter.body();
         this.header("Content-Type", httpBodyConverter.contentType());
         return this;
     }
-
 
     public ResponseBuilder disableTemplating() {
         this.templated = false;
         return this;
     }
 
-    /**
-     * Sets delay paramters.
-     *
-     * @param delay         amount of delay
-     * @param delayTimeUnit time unit of delay (e.g. SECONDS)
-     * @return the {@link ResponseBuilder for further customizations}
-     */
     public ResponseBuilder withDelay(int delay, TimeUnit delayTimeUnit) {
         this.delay = delay;
         this.delayTimeUnit = delayTimeUnit;
@@ -134,7 +110,6 @@ public class ResponseBuilder {
     }
 
     ResponseDelaySettingsBuilder addDelay() {
-        return new ResponseDelaySettingsBuilder(delay, delayTimeUnit);
+        return new ResponseDelaySettingsBuilder(this.delay, this.delayTimeUnit);
     }
-
 }
