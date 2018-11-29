@@ -76,7 +76,7 @@ public class HiveClientPreparer extends AbstractApacheHadoopClientPreparer {
 
     @Override
     protected String getNameAndVersion(String version) {
-        return "hive-" + version + "-bin";
+        return "apache-hive-" + version + "-bin";
     }
 
     @Override
