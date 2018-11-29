@@ -27,6 +27,7 @@ package fr.layer4.dek.binaries;
 
 import fr.layer4.dek.DekException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -54,6 +55,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+@Slf4j
 @RequiredArgsConstructor
 public abstract class AbstractClientPreparer implements ClientPreparer {
 
@@ -104,17 +106,22 @@ public abstract class AbstractClientPreparer implements ClientPreparer {
     }
 
     protected void chmodExecuteForEachFile(Path dir) throws IOException {
-        Set<PosixFilePermission> perms = new HashSet<>();
-        perms.add(PosixFilePermission.OWNER_EXECUTE);
-        perms.add(PosixFilePermission.OTHERS_EXECUTE);
-        perms.add(PosixFilePermission.GROUP_EXECUTE);
+        Set<PosixFilePermission> execute = new HashSet<>();
+        execute.add(PosixFilePermission.OWNER_EXECUTE);
+        execute.add(PosixFilePermission.OTHERS_EXECUTE);
+        execute.add(PosixFilePermission.GROUP_EXECUTE);
 
         try (Stream<Path> list = Files.list(dir)) {
             list.filter(Files::isRegularFile).forEach(p -> {
+                log.info("chmox+x on {}", p.toAbsolutePath().toString());
                 PosixFileAttributeView view = Files.getFileAttributeView(p, PosixFileAttributeView.class);
                 if (view != null) {
                     try {
-                        view.setPermissions(perms);
+                        Set<PosixFilePermission> currentPermissions = Files.getPosixFilePermissions(p);
+                        Set<PosixFilePermission> perms = new HashSet<>();
+                        perms.addAll(currentPermissions);
+                        perms.addAll(execute);
+                        Files.setPosixFilePermissions(p, perms);
                     } catch (IOException e) {
                         throw new DekException("Can not set execute attribute for file " + p.toAbsolutePath().toString(), e);
                     }
