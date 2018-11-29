@@ -32,8 +32,6 @@ import fr.layer4.dek.banner.BannerManager;
 import fr.layer4.dek.cluster.Cluster;
 import fr.layer4.dek.cluster.ClusterManager;
 import fr.layer4.dek.registry.Registry;
-import fr.layer4.dek.registry.RegistryConnection;
-import fr.layer4.dek.registry.RegistryManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -61,13 +59,13 @@ public class ClusterCommands {
         List<Pair<Registry, Cluster>> clusters = this.clusterManager.getAllClusters(registryName);
 
         String[][] data = new String[clusters.size() + 1][];
-        data[0] = new String[]{"Registry", "Name", "Type", "URI"};
+        data[0] = new String[]{"#", "Registry", "Name", "Type", "URI"};
 
         int it = 1;
         Iterator<Pair<Registry, Cluster>> iterator = clusters.iterator();
         while (iterator.hasNext()) {
             Pair<Registry, Cluster> pair = iterator.next();
-            data[it] = new String[]{pair.getKey().getUnderlyingConnection().getName(), pair.getValue().getName(), pair.getValue().getType(), pair.getValue().getUri().toString()};
+            data[it] = new String[]{pair.getValue().getId().toString(), pair.getKey().getUnderlyingConnection().getName(), pair.getValue().getName(), pair.getValue().getType(), pair.getValue().getUri().toString()};
             it++;
         }
         return CommandUtils.getTable(data);
