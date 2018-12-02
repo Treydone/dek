@@ -117,6 +117,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
         this.dataSource = JdbcConnectionPool.create(JDBC_H2 + getDatabasePath() + CIPHER_EXTENSION + CIPHER, USER, password);
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
         checkUnlockWithPassword(password);
+        this.applicationEventPublisher.publishEvent(new StoreReadyEvent(this.jdbcTemplate));
     }
 
     protected void checkUnlockWithPassword(String password) {
@@ -179,6 +180,7 @@ public class LocalSecuredStore implements SecuredStore, InitializingBean, Dispos
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
 
         this.isReady = true;
+        this.applicationEventPublisher.publishEvent(new StoreReadyEvent(this.jdbcTemplate));
     }
 
     public static String getDatabasePath() {

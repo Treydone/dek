@@ -3,9 +3,9 @@ spring:
   profiles: debug
 logging:
   level:
-    root: WARN
+    root: INFO
     fr.layer4.dek: DEBUG
-    org.apache.http.wire: INFO
+    org.apache.http.wire: DEBUG
     org.apache.http: DEBUG
 
 ---
@@ -13,8 +13,8 @@ spring:
   profiles: runtime
 logging:
   level:
-    root: ERROR
-    fr.layer4.dek: WARN
+    root: WARN
+    fr.layer4.dek: INFO
     org.apache.http.wire: INFO
     org.apache.http: WARN
 

@@ -40,6 +40,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalSecuredStoreTest {
@@ -99,7 +100,6 @@ public class LocalSecuredStoreTest {
         this.localSecuredStore.afterPropertiesSet();
         this.localSecuredStore.init("le_password");
         this.localSecuredStore.destroy();
-        Mockito.verify(this.applicationEventPublisher).publishEvent(Mockito.any());
 
         // When
         this.localSecuredStore.afterPropertiesSet();
@@ -107,6 +107,7 @@ public class LocalSecuredStoreTest {
 
         // Then
         assertTrue(this.localSecuredStore.isReady());
+        Mockito.verify(this.applicationEventPublisher, times(2)).publishEvent(Mockito.any());
 
     }
 
@@ -135,7 +136,6 @@ public class LocalSecuredStoreTest {
         this.localSecuredStore.afterPropertiesSet();
         this.localSecuredStore.init("le_password");
         this.localSecuredStore.destroy();
-        Mockito.verify(this.applicationEventPublisher).publishEvent(Mockito.any());
 
         // When
         this.localSecuredStore.afterPropertiesSet();
@@ -147,5 +147,6 @@ public class LocalSecuredStoreTest {
         this.localSecuredStore.destroy();
         this.localSecuredStore.unlock("new_password");
         assertTrue(this.localSecuredStore.isReady());
+        Mockito.verify(this.applicationEventPublisher, times(4)).publishEvent(Mockito.any());
     }
 }

@@ -49,7 +49,7 @@ public abstract class AbstractApacheClientPreparer extends AbstractClientPrepare
     protected String download(Path basePath, String version, String archive) {
         // Download
         String apachePart = getApachePart(archive, version);
-        URI uri = apacheMirrorFinder.resolve(apachePart);
+        URI uri = this.apacheMirrorFinder.resolve(apachePart);
         try {
             return download(basePath, uri);
         } catch (HttpResponseException e) {

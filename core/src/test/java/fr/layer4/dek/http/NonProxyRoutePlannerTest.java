@@ -92,6 +92,41 @@ public class NonProxyRoutePlannerTest {
     }
 
     @Test
+    public void excludeHostWithOtherWithProxy() {
+
+        // Given
+        Mockito.when(this.propertyManager.getProperty(HttpProperties.PROXY_ENABLED)).thenReturn(Optional.of("true"));
+        Mockito.when(this.propertyManager.getProperty(HttpProperties.PROXY_NON_PROXY_HOSTS)).thenReturn(Optional.of("dek.fr|locahost"));
+        HttpHost target = new HttpHost("dek.fr");
+
+        // When
+        HttpHost proxy = this.nonProxyRoutePlanner.determineProxy(target, null, null);
+
+        // Then
+        assertThat(proxy).isNull();
+        Mockito.verify(this.propertyManager).getProperty(HttpProperties.PROXY_ENABLED);
+        Mockito.verify(this.propertyManager).getProperty(HttpProperties.PROXY_NON_PROXY_HOSTS);
+    }
+
+
+    @Test
+    public void excludeHostWithPatternWithProxy() {
+
+        // Given
+        Mockito.when(this.propertyManager.getProperty(HttpProperties.PROXY_ENABLED)).thenReturn(Optional.of("true"));
+        Mockito.when(this.propertyManager.getProperty(HttpProperties.PROXY_NON_PROXY_HOSTS)).thenReturn(Optional.of("*.dek.fr|pouet.fr"));
+        HttpHost target = new HttpHost("test.dek.fr");
+
+        // When
+        HttpHost proxy = this.nonProxyRoutePlanner.determineProxy(target, null, null);
+
+        // Then
+        assertThat(proxy).isNull();
+        Mockito.verify(this.propertyManager).getProperty(HttpProperties.PROXY_ENABLED);
+        Mockito.verify(this.propertyManager).getProperty(HttpProperties.PROXY_NON_PROXY_HOSTS);
+    }
+
+    @Test
     public void justProxy() {
 
         // Given

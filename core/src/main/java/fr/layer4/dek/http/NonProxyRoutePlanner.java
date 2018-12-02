@@ -12,10 +12,10 @@ package fr.layer4.dek.http;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,6 +28,7 @@ package fr.layer4.dek.http;
 
 
 import fr.layer4.dek.property.PropertyManager;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.conn.SchemePortResolver;
@@ -37,7 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
+@Slf4j
 @Component
 public class NonProxyRoutePlanner extends DefaultRoutePlanner {
 
@@ -54,15 +57,27 @@ public class NonProxyRoutePlanner extends DefaultRoutePlanner {
         if (Boolean.valueOf(propertyManager.getProperty(HttpProperties.PROXY_ENABLED).orElse(HttpProperties.PROXY_ENABLED_DEFAULT))) {
             String nonProxyHosts = propertyManager.getProperty(HttpProperties.PROXY_NON_PROXY_HOSTS).orElse(HttpProperties.PROXY_NON_PROXY_HOSTS_DEFAULT);
 
-            if (Arrays.stream(nonProxyHosts.split(",")).map(String::trim).noneMatch(ex -> target.getHostName().contains(ex))) {
+            // If one host match -> no proxy
+            if (Arrays.stream(
+                    nonProxyHosts.split("\\|"))
+                    .map(String::trim)
+                    .filter(ex -> Pattern.matches(toRegex(ex), target.getHostName()))
+                    .count() == 0) {
 
                 String host = propertyManager.getProperty(HttpProperties.PROXY_HOST).orElseThrow(() -> new RuntimeException("Proxy is enabled but host is missing"));
                 Integer port = Integer.valueOf(propertyManager.getProperty(HttpProperties.PROXY_PORT).orElseThrow(() -> new RuntimeException("Proxy is enabled but port is missing")));
 
-                return new HttpHost(host, port);
+                HttpHost proxy = new HttpHost(host, port);
+
+                log.info("Using proxy {} for target {}", proxy, target);
+                return proxy;
             }
         }
         return null;
+    }
+
+    private String toRegex(String ex) {
+        return ex.replace(".", "\\.").replace("*", ".*");
     }
 }
 

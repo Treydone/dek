@@ -31,6 +31,7 @@ import fr.layer4.dek.DekException;
 import fr.layer4.dek.property.PropertyManager;
 import fr.layer4.dek.events.StoreReadyEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -39,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WithProxyAuthCredentialsProvider extends BasicCredentialsProvider implements ApplicationListener<StoreReadyEvent> {
@@ -70,12 +72,14 @@ public class WithProxyAuthCredentialsProvider extends BasicCredentialsProvider i
                     String ntlmPassword = this.propertyManager.getProperty(HttpProperties.PROXY_AUTH_NTLM_PASSWORD).orElseThrow(() -> new RuntimeException("NTLM proxy authentication is enabled but password is missing"));
                     String domain = this.propertyManager.getProperty(HttpProperties.PROXY_AUTH_NTLM_DOMAIN).orElseThrow(() -> new RuntimeException("NTLM proxy authentication is enabled but domain is missing"));
                     NTCredentials ntCredentials = new NTCredentials(ntlmUser, ntlmPassword, null, domain);
+                    log.info("Set NT credentials {} for scope {}", ntCredentials, authscope);
                     super.setCredentials(authscope, ntCredentials);
                     break;
                 case HttpProperties.PROXY_AUTH_BASIC:
                     String user = this.propertyManager.getProperty(HttpProperties.PROXY_AUTH_BASIC_USER).orElseThrow(() -> new RuntimeException("Basic proxy authentication is enabled but user is missing"));
                     String password = this.propertyManager.getProperty(HttpProperties.PROXY_AUTH_BASIC_PASSWORD).orElseThrow(() -> new RuntimeException("Basic proxy authentication is enabled but password is missing"));
                     UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(user, password);
+                    log.info("Set basic credentials {} for scope {}", usernamePasswordCredentials, authscope);
                     super.setCredentials(authscope, usernamePasswordCredentials);
                     break;
                 default:
