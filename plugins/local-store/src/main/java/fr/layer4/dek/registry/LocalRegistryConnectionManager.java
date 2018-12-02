@@ -57,7 +57,7 @@ public class LocalRegistryConnectionManager implements RegistryConnectionManager
     }
 
     public static void updateData(JdbcTemplate jdbcTemplate, String databasePath) {
-        jdbcTemplate.update("INSERT INTO registry VALUES (default, 'local', concat('local://', ?))", databasePath);
+        jdbcTemplate.update("MERGE INTO registry KEY (`name`) VALUES (default, 'local', concat('local://', ?))", databasePath);
     }
 
     public static final RowMapper<RegistryConnection> REGISTRY_ROW_MAPPER = (r, i) -> {

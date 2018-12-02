@@ -56,7 +56,7 @@ public class LocalPropertyManager implements PropertyManager, ApplicationListene
 
     public static void updateData(JdbcTemplate jdbcTemplate) {
         jdbcTemplate.batchUpdate(
-                "INSERT INTO env VALUES "
+                "MERGE INTO env KEY (`key`) VALUES "
                         + "(default, 'http.socket.timeout', '30000'),"
                         + "(default, 'http.connect.timeout', '30000'),"
                         + "(default, 'proxy.enabled', 'false')"
