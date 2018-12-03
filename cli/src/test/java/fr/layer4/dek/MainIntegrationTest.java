@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 import static fr.layer4.dek.store.LocalSecuredStore.getDatabasePath;
@@ -46,7 +47,7 @@ public class MainIntegrationTest {
     public static final String PASSWORD = "le_password";
 
     @Test
-    public void info() {
+    public void info() throws URISyntaxException {
 
         init();
 
@@ -60,6 +61,9 @@ public class MainIntegrationTest {
         Main.main("set", "env", "test-key", "test-value2", "--unlock", PASSWORD);
         Main.main("get", "env", "test-key", "--unlock", PASSWORD);
         Main.main("list", "env", "--unlock", PASSWORD);
+
+        Main.main("add", "cluster", "local", "hadoop-unit", "LOCAL-HU", MainIntegrationTest.class.getClassLoader().getResource("hadoop-unit").toURI().toString(), "--unlock", PASSWORD);
+        Main.main("list", "cluster", "--unlock", PASSWORD);
 
     }
 
