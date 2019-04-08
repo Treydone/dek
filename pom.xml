@@ -103,7 +103,7 @@
         <httpcomponents.version>4.5.7</httpcomponents.version>
         <java.version>1.8</java.version>
         <jackson.version>2.9.8</jackson.version>
-        <jline.version>3.10.0</jline.version>
+        <jline.version>3.11.0</jline.version>
         <junit.version>4.12</junit.version>
         <kerby.version>2.0.0</kerby.version>
         <logback.version>1.2.3</logback.version>
