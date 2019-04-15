@@ -95,7 +95,7 @@
 
         <apache-commons-compress.version>1.18</apache-commons-compress.version>
         <apache-commons-io.version>2.6</apache-commons-io.version>
-        <apache-commons-lang3.version>3.8.1</apache-commons-lang3.version>
+        <apache-commons-lang3.version>3.9</apache-commons-lang3.version>
         <assertj.version>3.12.2</assertj.version>
         <bouncycastle.version>1.61</bouncycastle.version>
         <freemarker.version>2.3.28</freemarker.version>
