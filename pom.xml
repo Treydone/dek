@@ -93,7 +93,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quick>false</quick>
 
-        <apache-commons-compress.version>1.18</apache-commons-compress.version>
+        <apache-commons-compress.version>1.19</apache-commons-compress.version>
         <apache-commons-io.version>2.6</apache-commons-io.version>
         <apache-commons-lang3.version>3.8.1</apache-commons-lang3.version>
         <assertj.version>3.12.2</assertj.version>
