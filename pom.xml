@@ -93,7 +93,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quick>false</quick>
 
-        <apache-commons-compress.version>1.18</apache-commons-compress.version>
+        <apache-commons-compress.version>1.21</apache-commons-compress.version>
         <apache-commons-io.version>2.6</apache-commons-io.version>
         <apache-commons-lang3.version>3.8.1</apache-commons-lang3.version>
         <assertj.version>3.12.2</assertj.version>
@@ -105,7 +105,7 @@
         <jackson.version>2.9.8</jackson.version>
         <jline.version>3.10.0</jline.version>
         <junit.version>4.12</junit.version>
-        <kerby.version>2.0.0</kerby.version>
+        <kerby.version>2.0.1</kerby.version>
         <logback.version>1.2.3</logback.version>
         <lombok.version>1.18.6</lombok.version>
         <mockito.version>2.25.1</mockito.version>
